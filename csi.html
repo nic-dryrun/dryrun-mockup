@@ -112,6 +112,13 @@
     .ai-bar-trigger-right { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-muted); }
     .ai-bar-chevron { transition: transform 0.2s; }
     .ai-bar[open] .ai-bar-chevron { transform: rotate(180deg); }
+    .ai-bar-preview {
+      display: flex; gap: 8px; padding: 10px 18px;
+      border-top: 1px solid var(--border-light);
+    }
+    .ai-bar[open] .ai-bar-preview { display: none; }
+    .ai-bar-preview .ai-input { height: 36px; }
+    .ai-bar-preview .ai-send { width: 36px; height: 36px; flex-shrink: 0; }
     .ai-bar-body {
       display: none; padding: 16px 18px;
       border-top: 1px solid var(--border-light);
@@ -294,6 +301,12 @@
         <svg class="ai-bar-chevron" width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M12.78 6.22a.75.75 0 010 1.06l-4.25 4.25a.75.75 0 01-1.06 0L3.22 7.28a.75.75 0 011.06-1.06L8 9.94l3.72-3.72a.75.75 0 011.06 0z"/></svg>
       </span>
     </button>
+    <div class="ai-bar-preview" onclick="document.getElementById('aiBar').setAttribute('open','')">
+      <input type="text" class="ai-input" placeholder="Ask a question about your security data..." onfocus="document.getElementById('aiBar').setAttribute('open',''); setTimeout(()=>document.querySelector('.ai-bar-body .ai-input').focus(),50)">
+      <button class="ai-send">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="#fff"><path d="M.989 8.014L15.492 1.27a.5.5 0 01.657.657L9.406 16.43a.5.5 0 01-.917-.07l-2.32-5.57L.6 8.47a.5.5 0 01.389-.456z"/></svg>
+      </button>
+    </div>
     <div class="ai-bar-body">
       <div class="ai-message">Hello! I can help you explore your security data, investigate specific findings, or answer questions about your code and PRs.</div>
       <div class="ai-pills">
