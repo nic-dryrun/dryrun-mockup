@@ -1,0 +1,1507 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DryRun Security — GitHub Comment Workflow Redesign</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'JetBrains Mono', 'Consolas', monospace;
+      --bg: #f6f8fa;
+      --surface: #ffffff;
+      --text: #1f2328;
+      --text-muted: #656d76;
+      --text-faint: #8b949e;
+      --border: #d0d7de;
+      --border-light: #e8ecf0;
+      --accent: #1a1e3a;
+      --accent-light: #2d3260;
+      --green: #1a7f37;
+      --green-bg: #dafbe1;
+      --green-border: #aceebb;
+      --orange: #bf8700;
+      --orange-bg: #fff8c5;
+      --orange-border: #f5e0a0;
+      --red: #cf222e;
+      --red-bg: #ffebe9;
+      --purple: #8250df;
+      --blue: #0969da;
+      --section-gap: clamp(3rem, 6vw, 6rem);
+      --card-radius: 8px;
+    }
+
+    html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+    body {
+      font-family: var(--font-body);
+      font-size: 15px;
+      line-height: 1.6;
+      color: var(--text);
+      background: var(--bg);
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: var(--accent);
+      padding: 14px 24px;
+      display: flex; align-items: center; gap: 24px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+    }
+    nav .logo {
+      display: flex; align-items: center; gap: 10px;
+      color: #fff; font-weight: 700; font-size: 15px; text-decoration: none;
+      white-space: nowrap;
+    }
+    nav .logo svg { flex-shrink: 0; }
+    nav .nav-links {
+      display: flex; gap: 6px; flex-wrap: wrap;
+    }
+    nav .nav-links a {
+      color: rgba(255,255,255,0.75); text-decoration: none;
+      font-size: 13px; font-weight: 500; padding: 5px 10px;
+      border-radius: 6px; transition: all 0.15s;
+    }
+    nav .nav-links a:hover { color: #fff; background: rgba(255,255,255,0.1); }
+
+    /* ── LAYOUT ── */
+    .container { max-width: 960px; margin: 0 auto; padding: 0 20px; }
+    section { padding: var(--section-gap) 0; }
+
+    /* ── HERO ── */
+    .hero {
+      text-align: center;
+      padding: clamp(3rem, 8vw, 5rem) 0 clamp(2rem, 4vw, 3rem);
+    }
+    .hero h1 {
+      font-size: clamp(1.6rem, 3vw, 2.2rem);
+      font-weight: 700; line-height: 1.2;
+      color: var(--accent);
+    }
+    .hero p {
+      margin-top: 12px; color: var(--text-muted);
+      font-size: clamp(0.95rem, 1.5vw, 1.05rem);
+      max-width: 600px; margin-left: auto; margin-right: auto;
+    }
+    .badge {
+      display: inline-block; font-size: 11px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.06em;
+      padding: 4px 10px; border-radius: 20px;
+      margin-bottom: 12px;
+    }
+    .badge--proposal { background: #ddf4ff; color: #0969da; }
+
+    /* ── HEADINGS ── */
+    .section-label {
+      font-size: 11px; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.08em; color: var(--text-faint);
+      margin-bottom: 8px;
+    }
+    h2 {
+      font-size: clamp(1.3rem, 2.5vw, 1.7rem);
+      font-weight: 700; color: var(--text); line-height: 1.25;
+      margin-bottom: 10px;
+    }
+    h3 {
+      font-size: 1.05rem; font-weight: 600; color: var(--text);
+      margin-bottom: 8px;
+    }
+    .section-intro {
+      color: var(--text-muted); max-width: 640px;
+      margin-bottom: 28px; font-size: 0.95rem;
+    }
+
+    /* ── PROBLEM CARDS ── */
+    .problem-grid {
+      display: grid; grid-template-columns: repeat(2, 1fr);
+      gap: 16px; margin-top: 20px;
+    }
+    @media (max-width: 600px) {
+      .problem-grid { grid-template-columns: 1fr; }
+    }
+    .problem-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--card-radius); padding: 20px;
+      border-left: 3px solid var(--red);
+    }
+    .problem-card h4 {
+      font-size: 0.9rem; font-weight: 600; margin-bottom: 6px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .problem-card p { font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; }
+
+    /* ── SOLUTION CARDS ── */
+    .solution-card {
+      border-left: 3px solid var(--green);
+    }
+    .solution-card h4 { color: var(--green); }
+
+    /* ── FLOW DIAGRAM ── */
+    .flow-section { margin-top: 32px; }
+    .flow-steps {
+      display: flex; flex-direction: column; gap: 0;
+      position: relative; padding-left: 28px;
+    }
+    .flow-step {
+      position: relative; padding: 14px 0 14px 20px;
+      border-left: 2px solid var(--border);
+    }
+    .flow-step:last-child { border-left-color: transparent; }
+    .flow-step::before {
+      content: '';
+      position: absolute; left: -7px; top: 18px;
+      width: 12px; height: 12px; border-radius: 50%;
+      background: var(--accent); border: 2px solid var(--surface);
+      box-shadow: 0 0 0 2px var(--accent);
+    }
+    .flow-step.green::before { background: var(--green); box-shadow: 0 0 0 2px var(--green); }
+    .flow-step.orange::before { background: var(--orange); box-shadow: 0 0 0 2px var(--orange); }
+    .flow-step .step-title { font-weight: 600; font-size: 0.9rem; }
+    .flow-step .step-desc { font-size: 0.85rem; color: var(--text-muted); margin-top: 2px; }
+    .flow-branch {
+      margin-left: 18px; margin-top: 8px; padding: 10px 14px;
+      background: var(--bg); border-radius: 6px; font-size: 0.83rem;
+      border: 1px solid var(--border-light);
+    }
+    .flow-branch code {
+      font-family: var(--font-mono); font-size: 0.78rem;
+      background: rgba(175,184,193,0.2); padding: 1px 5px; border-radius: 4px;
+    }
+
+    /* ── GITHUB COMMENT MOCKUPS ── */
+    .mockup-wrapper {
+      margin-top: 28px; margin-bottom: 48px;
+    }
+    .mockup-label {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 12px; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.06em; padding: 5px 12px;
+      border-radius: 6px 6px 0 0; color: #fff;
+    }
+    .mockup-label--current { background: var(--red); }
+    .mockup-label--proposed { background: var(--green); }
+    .mockup-label--unchanged { background: var(--text-faint); }
+
+    .gh-comment {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 0 var(--card-radius) var(--card-radius) var(--card-radius);
+      overflow: hidden;
+    }
+
+    .gh-header {
+      display: flex; align-items: center; gap: 8px;
+      padding: 10px 16px;
+      background: #f6f8fa;
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+    }
+    .gh-avatar {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: var(--accent);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .gh-avatar svg { display: block; }
+    .gh-header strong { font-weight: 600; }
+    .gh-header .gh-badge {
+      font-size: 10px; font-weight: 500; padding: 1px 6px;
+      border: 1px solid var(--border); border-radius: 12px;
+      color: var(--text-muted);
+    }
+    .gh-header .gh-time { color: var(--text-faint); font-size: 12px; }
+
+    .gh-body { padding: 16px; }
+
+    /* DryRun Banner */
+    .dr-banner {
+      background: linear-gradient(135deg, #0d1030 0%, #1a1e3a 50%, #252a50 100%);
+      border-radius: 6px;
+      padding: 16px 20px;
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 16px;
+      position: relative;
+      overflow: hidden;
+    }
+    .dr-banner::before {
+      content: '';
+      position: absolute; inset: 0;
+      background-image: radial-gradient(circle at 30% 40%, rgba(100,120,255,0.12) 0%, transparent 50%),
+                        radial-gradient(circle at 70% 60%, rgba(140,100,255,0.08) 0%, transparent 40%);
+    }
+    .dr-banner-left {
+      display: flex; align-items: center; gap: 10px;
+      position: relative; z-index: 1;
+    }
+    .dr-banner-logo {
+      width: 32px; height: 32px;
+    }
+    .dr-banner-text {
+      color: #fff; font-weight: 700; font-size: 14px;
+      line-height: 1.2;
+    }
+    .dr-banner-text span { display: block; font-size: 11px; font-weight: 600; letter-spacing: 0.05em; }
+    .dr-banner-right {
+      color: rgba(255,255,255,0.85); font-size: 12px; font-weight: 500;
+      position: relative; z-index: 1;
+    }
+    .dr-dots {
+      position: absolute; inset: 0; z-index: 0; overflow: hidden;
+    }
+    .dr-dots span {
+      position: absolute; width: 6px; height: 6px; border-radius: 2px;
+      opacity: 0.25;
+    }
+
+    /* Summary text */
+    .gh-summary {
+      font-size: 13.5px; color: var(--text);
+      line-height: 1.6; margin-bottom: 16px;
+    }
+
+    /* Finding details */
+    .gh-finding {
+      margin-bottom: 12px;
+    }
+    .gh-finding-header {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 13px; font-weight: 600;
+      cursor: pointer; padding: 6px 0;
+    }
+    .gh-finding-header .severity {
+      width: 14px; height: 14px; border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .severity--high { background: #cf222e; }
+    .severity--medium { background: #bf8700; }
+    .severity--low { background: #0969da; }
+    .gh-finding-header code {
+      font-family: var(--font-mono); font-size: 11px;
+      background: rgba(175,184,193,0.2); padding: 1px 5px;
+      border-radius: 4px; font-weight: 400;
+    }
+    .gh-finding-header .finding-id {
+      color: var(--text-faint); font-weight: 400; font-size: 12px;
+    }
+
+    .gh-finding-body {
+      margin-left: 22px; padding: 12px 0;
+    }
+    .gh-finding-table {
+      width: 100%; border: 1px solid var(--border);
+      border-radius: 6px; overflow: hidden;
+      font-size: 13px; margin-bottom: 12px;
+    }
+    .gh-finding-table th {
+      background: #f6f8fa; text-align: left;
+      padding: 8px 12px; font-weight: 600;
+      border-bottom: 1px solid var(--border);
+      width: 120px; vertical-align: top;
+    }
+    .gh-finding-table td {
+      padding: 8px 12px; border-bottom: 1px solid var(--border);
+      line-height: 1.5;
+    }
+    .gh-finding-table tr:last-child th,
+    .gh-finding-table tr:last-child td { border-bottom: none; }
+
+    /* Code snippet */
+    .gh-code-block {
+      background: #f6f8fa; border: 1px solid var(--border);
+      border-radius: 6px; overflow: hidden; margin-bottom: 12px;
+      font-family: var(--font-mono); font-size: 12px;
+    }
+    .gh-code-header {
+      padding: 6px 12px; font-size: 11px;
+      border-bottom: 1px solid var(--border);
+    }
+    .gh-code-header a { color: var(--blue); text-decoration: none; }
+    .gh-code-header span { color: var(--text-muted); }
+    .gh-code-lines { padding: 0; }
+    .gh-code-line {
+      display: flex; padding: 0 12px;
+      line-height: 1.7;
+    }
+    .gh-code-line .line-num {
+      color: var(--text-faint); min-width: 36px;
+      text-align: right; padding-right: 12px;
+      user-select: none;
+    }
+    .gh-code-line .line-content { white-space: pre; overflow-x: auto; }
+    .kw { color: #cf222e; }
+    .fn { color: #8250df; }
+    .str { color: #0a3069; }
+    .cm { color: #6e7781; }
+
+    /* Feedback section */
+    .gh-feedback {
+      border-top: 1px solid var(--border-light);
+      margin-top: 16px; padding-top: 12px;
+    }
+    .gh-feedback summary {
+      font-size: 12px; color: var(--text-muted);
+      cursor: pointer; font-weight: 500;
+    }
+    .gh-feedback-body {
+      padding-top: 8px; font-size: 12px; color: var(--text-muted);
+      line-height: 1.7;
+    }
+    .gh-feedback-body code {
+      font-family: var(--font-mono); font-size: 11px;
+      background: rgba(175,184,193,0.2); padding: 1px 5px;
+      border-radius: 4px;
+    }
+
+    /* Dashboard link */
+    .gh-dashboard-link {
+      font-size: 12px; margin-top: 12px;
+    }
+    .gh-dashboard-link a { color: var(--blue); text-decoration: none; }
+
+    /* ── STATUS BADGES ── */
+    .status-badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: 11px; font-weight: 600; padding: 2px 8px;
+      border-radius: 12px; white-space: nowrap;
+    }
+    .status-badge--pass {
+      background: var(--green-bg); color: var(--green);
+      border: 1px solid var(--green-border);
+    }
+    .status-badge--resolved {
+      background: var(--green-bg); color: var(--green);
+      border: 1px solid var(--green-border);
+    }
+    .status-badge--fp {
+      background: #f6f8fa; color: var(--text-muted);
+      border: 1px solid var(--border);
+    }
+    .status-badge--nit {
+      background: #fff8c5; color: #7d6807;
+      border: 1px solid #f5e0a0;
+    }
+    .status-badge--active {
+      background: var(--red-bg); color: var(--red);
+      border: 1px solid #ffcecb;
+    }
+
+    /* ── CLEAN SCAN STATE ── */
+    .clean-scan-msg {
+      display: flex; align-items: center; gap: 10px;
+      padding: 14px 16px;
+      background: var(--green-bg);
+      border: 1px solid var(--green-border);
+      border-radius: 6px;
+      margin-bottom: 12px;
+    }
+    .clean-scan-msg svg { flex-shrink: 0; }
+    .clean-scan-msg .msg-text {
+      font-size: 13.5px; font-weight: 500; color: var(--green);
+    }
+    .clean-scan-msg .msg-sub {
+      font-size: 12px; color: #4d7c3f; font-weight: 400;
+    }
+
+    /* Resolved finding (dimmed) */
+    .finding-resolved {
+      opacity: 0.55;
+    }
+    .finding-resolved .gh-finding-header {
+      text-decoration: line-through;
+      text-decoration-color: var(--text-faint);
+    }
+    .finding-dismissed .gh-finding-header {
+      opacity: 0.6;
+    }
+
+    /* ── EMPTY STATE (current behavior) ── */
+    .empty-state {
+      text-align: center; padding: 48px 20px;
+      color: var(--text-faint);
+    }
+    .empty-state svg { margin: 0 auto 12px; opacity: 0.4; }
+    .empty-state p {
+      font-size: 13px; max-width: 340px; margin: 0 auto;
+    }
+    .empty-state .empty-title {
+      font-weight: 600; font-size: 14px; color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    /* ── SCENARIO TABS ── */
+    .scenario-section {
+      margin-bottom: 48px;
+    }
+    .scenario-header {
+      display: flex; align-items: baseline; gap: 12px;
+      margin-bottom: 6px;
+    }
+    .scenario-num {
+      font-size: 11px; font-weight: 700; color: var(--accent);
+      background: #e8ecf0; padding: 2px 8px; border-radius: 10px;
+      white-space: nowrap;
+    }
+    .scenario-desc {
+      font-size: 0.88rem; color: var(--text-muted);
+      margin-bottom: 20px; line-height: 1.5;
+    }
+    .mockup-pair {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
+    }
+    @media (max-width: 768px) {
+      .mockup-pair { grid-template-columns: 1fr; }
+    }
+    .mockup-col { min-width: 0; }
+
+    /* ── SEPARATOR ── */
+    .divider {
+      border: none; border-top: 1px solid var(--border-light);
+      margin: var(--section-gap) 0;
+    }
+
+    /* ── SUMMARY TABLE ── */
+    .summary-table {
+      width: 100%; border: 1px solid var(--border);
+      border-radius: var(--card-radius); overflow: hidden;
+      font-size: 13px; margin-top: 20px;
+    }
+    .summary-table th {
+      background: #f6f8fa; text-align: left;
+      padding: 10px 14px; font-weight: 600;
+      border-bottom: 1px solid var(--border);
+    }
+    .summary-table td {
+      padding: 10px 14px; border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+    .summary-table tr:last-child td { border-bottom: none; }
+    .summary-table .current-col { color: var(--red); }
+    .summary-table .proposed-col { color: var(--green); }
+
+    /* ── FOOTER ── */
+    footer {
+      text-align: center; padding: 32px 20px;
+      font-size: 12px; color: var(--text-faint);
+      border-top: 1px solid var(--border-light);
+    }
+
+    /* ── FEATURE FLAGS ── */
+    .flag-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--card-radius); padding: 0;
+      overflow: hidden; margin-bottom: 20px;
+    }
+    .flag-card-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 20px;
+      background: #f6f8fa; border-bottom: 1px solid var(--border-light);
+    }
+    .flag-card-header-left {
+      display: flex; align-items: center; gap: 12px;
+    }
+    .flag-name {
+      font-family: var(--font-mono); font-size: 13px; font-weight: 600;
+      color: var(--accent); background: rgba(27,31,36,0.06);
+      padding: 3px 8px; border-radius: 4px;
+    }
+    .flag-default {
+      font-size: 11px; font-weight: 600; padding: 2px 8px;
+      border-radius: 12px; white-space: nowrap;
+    }
+    .flag-default--on {
+      background: var(--green-bg); color: var(--green);
+      border: 1px solid var(--green-border);
+    }
+    .flag-default--off {
+      background: #f6f8fa; color: var(--text-muted);
+      border: 1px solid var(--border);
+    }
+    .flag-toggle {
+      width: 44px; height: 24px; border-radius: 12px;
+      background: var(--green); position: relative;
+      flex-shrink: 0; border: none; cursor: default;
+    }
+    .flag-toggle::after {
+      content: ''; position: absolute;
+      width: 18px; height: 18px; border-radius: 50%;
+      background: #fff; top: 3px; right: 3px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+    .flag-toggle--off {
+      background: var(--border);
+    }
+    .flag-toggle--off::after {
+      right: auto; left: 3px;
+    }
+    .flag-card-body {
+      padding: 16px 20px;
+    }
+    .flag-card-body p {
+      font-size: 0.88rem; color: var(--text-muted); line-height: 1.55;
+    }
+    .flag-card-body p + p { margin-top: 8px; }
+    .flag-behavior {
+      margin-top: 12px; display: grid;
+      grid-template-columns: 1fr 1fr; gap: 12px;
+    }
+    @media (max-width: 600px) {
+      .flag-behavior { grid-template-columns: 1fr; }
+    }
+    .flag-behavior-col {
+      padding: 12px 14px; border-radius: 6px;
+      font-size: 0.82rem; line-height: 1.5;
+    }
+    .flag-behavior-col h5 {
+      font-size: 0.75rem; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.06em; margin-bottom: 4px;
+    }
+    .flag-on {
+      background: var(--green-bg); border: 1px solid var(--green-border);
+    }
+    .flag-on h5 { color: var(--green); }
+    .flag-off {
+      background: #f6f8fa; border: 1px solid var(--border-light);
+    }
+    .flag-off h5 { color: var(--text-muted); }
+    .flag-location {
+      margin-top: 12px; font-size: 0.82rem;
+      color: var(--text-faint);
+      display: flex; align-items: center; gap: 6px;
+    }
+    .flag-location svg { flex-shrink: 0; }
+
+    /* configurable badge inline */
+    .configurable-badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: 10px; font-weight: 600;
+      color: var(--purple); background: #f5f0ff;
+      border: 1px solid #d8b9ff; border-radius: 10px;
+      padding: 1px 7px; margin-left: 6px;
+      vertical-align: middle; white-space: nowrap;
+    }
+    .configurable-badge svg { flex-shrink: 0; }
+
+    /* summary table flag column */
+    .flag-col {
+      font-family: var(--font-mono); font-size: 11px;
+      color: var(--purple);
+    }
+
+    /* ── FINDING HISTORY LOG ── */
+    .finding-history {
+      margin-top: 10px; padding: 8px 12px;
+      background: #f6f8fa; border-radius: 6px;
+      font-size: 12px; color: var(--text-muted);
+      border: 1px solid var(--border-light);
+    }
+    .finding-history-entry {
+      display: flex; align-items: center; gap: 6px;
+      padding: 3px 0;
+    }
+    .finding-history-entry svg { flex-shrink: 0; }
+
+    /* ── ALL CLEAR BOX ── */
+    .all-clear-box {
+      display: flex; align-items: center; gap: 10px;
+      padding: 14px 16px;
+      background: var(--green-bg);
+      border: 1px solid var(--green-border);
+      border-radius: 6px;
+      margin-bottom: 16px;
+    }
+    .all-clear-box svg { flex-shrink: 0; }
+    .all-clear-box .msg-text { font-size: 13.5px; font-weight: 500; color: var(--green); }
+    .all-clear-box .msg-sub { font-size: 12px; color: #4d7c3f; font-weight: 400; margin-top: 2px; }
+
+    /* Previously detected findings collapsible */
+    .prev-findings-toggle {
+      font-size: 12px; color: var(--text-muted); cursor: pointer;
+      margin-top: 8px; font-weight: 500;
+    }
+    .prev-findings-content {
+      margin-top: 8px;
+    }
+
+    /* ── ANNOTATION for context ── */
+    .annotation {
+      background: #ddf4ff; border: 1px solid #b6e3ff;
+      border-radius: 6px; padding: 10px 14px;
+      font-size: 12px; color: #0550ae;
+      margin-bottom: 16px;
+      display: flex; align-items: flex-start; gap: 8px;
+    }
+    .annotation svg { flex-shrink: 0; margin-top: 1px; }
+
+    /* Run info line */
+    .run-info {
+      font-size: 12px; color: var(--text-faint);
+      display: flex; align-items: center; gap: 6px;
+      margin-bottom: 14px;
+    }
+    .run-info svg { flex-shrink: 0; }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="logo">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+      <path d="M12 2L3 7v10l9 5 9-5V7l-9-5z" stroke="#fff" stroke-width="1.5" fill="none"/>
+      <path d="M12 8l-4 2.5v5L12 18l4-2.5v-5L12 8z" fill="rgba(255,255,255,0.3)" stroke="#fff" stroke-width="1"/>
+      <path d="M10 12.5l1.5 1.5 3-3" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    DRYRUN SECURITY
+  </a>
+  <div class="nav-links">
+    <a href="#problems">Current Behavior</a>
+    <a href="#proposed">Proposed Workflow</a>
+    <a href="#mockups">Mock-ups</a>
+    <a href="#summary">Summary</a>
+    <a href="#flags">Feature Flags</a>
+  </div>
+</nav>
+
+<div class="container">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="badge badge--proposal">Internal Proposal</div>
+    <h1>GitHub Comment Workflow Redesign</h1>
+    <p>Ensuring DryRun Security visibility in every PR — whether findings are detected, resolved, or dismissed.</p>
+  </section>
+
+  <!-- ─── PROBLEMS ─── -->
+  <section id="problems">
+    <div class="section-label">Current Behavior</div>
+    <h2>The Visibility Gap</h2>
+    <p class="section-intro">
+      Today, DryRun's GitHub comment is only visible when there are active, unresolved findings on a non-draft PR. In all other states — including draft PRs with findings — the comment either isn't posted or gets deleted, making it impossible to tell that DryRun scanned the PR at all.
+    </p>
+
+    <div class="problem-grid">
+      <div class="problem-card">
+        <h4>
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="#cf222e"><circle cx="8" cy="8" r="8"/><path d="M5.5 5.5l5 5M10.5 5.5l-5 5" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg>
+          No Findings = No Comment
+        </h4>
+        <p>When a PR scan produces zero findings, no comment is posted. From GitHub, there's no evidence DryRun ran.</p>
+      </div>
+      <div class="problem-card">
+        <h4>
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="#cf222e"><circle cx="8" cy="8" r="8"/><path d="M5.5 5.5l5 5M10.5 5.5l-5 5" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg>
+          Resolved = Comment Deleted
+        </h4>
+        <p>When a developer fixes the vulnerability and the next scan is clean, the comment is deleted. It looks like DryRun never ran.</p>
+      </div>
+      <div class="problem-card">
+        <h4>
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="#cf222e"><circle cx="8" cy="8" r="8"/><path d="M5.5 5.5l5 5M10.5 5.5l-5 5" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg>
+          Dismissed = Comment Deleted
+        </h4>
+        <p>When a developer marks the last finding as a false positive or nitpick, the finding is removed and the comment is deleted entirely.</p>
+      </div>
+      <div class="problem-card">
+        <h4>
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="#cf222e"><circle cx="8" cy="8" r="8"/><path d="M5.5 5.5l5 5M10.5 5.5l-5 5" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg>
+          Draft PR = No Comment
+        </h4>
+        <p>When a PR is in draft mode, DryRun scans it but does not post a comment — even when findings are detected. The developer gets no feedback until the PR is marked ready for review.</p>
+      </div>
+    </div>
+
+    <div style="margin-top: 28px;">
+      <h3>Why This Matters</h3>
+      <p class="section-intro" style="margin-bottom: 0;">
+        Security teams, engineering managers, and auditors need to see that every PR was scanned. Deleted comments leave no audit trail, make it harder to demonstrate coverage, and reduce the perceived value of DryRun in the developer workflow.
+      </p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ─── PROPOSED WORKFLOW ─── -->
+  <section id="proposed">
+    <div class="section-label">Proposed Workflow</div>
+    <h2>Always-Visible Comment Lifecycle</h2>
+    <p class="section-intro">
+      The core change: DryRun always posts or retains a comment on every scanned PR, regardless of whether findings exist. The comment is never deleted — it transitions between states.
+    </p>
+
+    <div class="flow-section">
+      <div class="flow-steps">
+
+        <div class="flow-step">
+          <div class="step-title">PR Commit Triggers Scan</div>
+          <div class="step-desc">DryRun scans the PR as usual on each new commit.</div>
+        </div>
+
+        <div class="flow-step green">
+          <div class="step-title">No Findings Detected <span class="configurable-badge"><svg width="10" height="10" viewBox="0 0 16 16" fill="#8250df"><path d="M8 0a8 8 0 100 16A8 8 0 008 0zm0 3a1 1 0 110 2 1 1 0 010-2zm2 9H6v-1h1V7H6V6h3v6h1v1z"/></svg>Configurable</span></div>
+          <div class="step-desc">Post a "clean scan" comment confirming DryRun analyzed the PR and found no vulnerabilities.</div>
+          <div class="flow-branch">
+            <strong>New:</strong> Comment is posted with a green status — <code>No security vulnerabilities detected</code><br>
+            <strong>Flag:</strong> <code>comment_on_clean_scan</code> — admin can disable to only post when findings exist.
+          </div>
+        </div>
+
+        <div class="flow-step orange">
+          <div class="step-title">Findings Detected</div>
+          <div class="step-desc">Post the comment with finding details, severity, code snippets, and feedback commands (same as today). On draft PRs, this is also configurable.</div>
+          <div class="flow-branch">
+            <strong>Flag:</strong> <code>comment_on_draft_pr</code> — admin can disable to suppress comments on draft PRs entirely. <span class="configurable-badge"><svg width="10" height="10" viewBox="0 0 16 16" fill="#8250df"><path d="M8 0a8 8 0 100 16A8 8 0 008 0zm0 3a1 1 0 110 2 1 1 0 010-2zm2 9H6v-1h1V7H6V6h3v6h1v1z"/></svg>Configurable</span>
+          </div>
+        </div>
+
+        <div class="flow-step green">
+          <div class="step-title">Developer Fixes Issue → Next Scan Clean</div>
+          <div class="step-desc">Update the comment to show all findings are resolved. Do not delete.</div>
+          <div class="flow-branch">
+            <strong>New:</strong> Comment transitions to "All Clear" state with collapsed history of what was found and fixed.
+          </div>
+        </div>
+
+        <div class="flow-step">
+          <div class="step-title">Developer Dismisses Finding (FP / Nit)</div>
+          <div class="step-desc">Update the comment to reflect the dismissal. Show a badge on the finding. Do not remove or delete.</div>
+          <div class="flow-branch">
+            <strong>New:</strong> Finding entry is visually dimmed with a <code>False Positive</code> or <code>Nitpick</code> badge. If it was the last active finding, the comment transitions to "All Clear."
+          </div>
+        </div>
+
+        <div class="flow-step green">
+          <div class="step-title">All Findings Addressed <span class="configurable-badge"><svg width="10" height="10" viewBox="0 0 16 16" fill="#8250df"><path d="M8 0a8 8 0 100 16A8 8 0 008 0zm0 3a1 1 0 110 2 1 1 0 010-2zm2 9H6v-1h1V7H6V6h3v6h1v1z"/></svg>Configurable</span></div>
+          <div class="step-desc">Whether fixed or dismissed, the comment persists in a resolved state showing what was found and how it was handled.</div>
+          <div class="flow-branch">
+            <strong>Flag:</strong> <code>delete_resolved_comment</code> — admin can enable to delete the comment once all findings are resolved/dismissed (restores current behavior).
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div style="margin-top: 32px;">
+      <div class="problem-grid">
+        <div class="problem-card solution-card">
+          <h4>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="#1a7f37"><circle cx="8" cy="8" r="8"/><path d="M5 8l2 2 4-4" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Continuous Visibility
+          </h4>
+          <p>Every PR shows DryRun ran, whether findings exist or not. Proves coverage to security teams and auditors.</p>
+        </div>
+        <div class="problem-card solution-card">
+          <h4>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="#1a7f37"><circle cx="8" cy="8" r="8"/><path d="M5 8l2 2 4-4" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Audit Trail
+          </h4>
+          <p>Resolved and dismissed findings remain visible in collapsed form, creating a clear record of what was found and how it was handled.</p>
+        </div>
+        <div class="problem-card solution-card">
+          <h4>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="#1a7f37"><circle cx="8" cy="8" r="8"/><path d="M5 8l2 2 4-4" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Developer Confidence
+          </h4>
+          <p>Developers can see their fix worked. The comment confirms the finding is resolved rather than silently vanishing.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ─── MOCKUPS ─── -->
+  <section id="mockups">
+    <div class="section-label">Mock-ups</div>
+    <h2>Comment States — Current vs. Proposed</h2>
+    <p class="section-intro">
+      Side-by-side comparison of how each scenario appears in GitHub under the current and proposed workflows.
+    </p>
+
+    <!-- SCENARIO 1: No Findings -->
+    <div class="scenario-section">
+      <div class="scenario-header">
+        <span class="scenario-num">Scenario 1</span>
+        <h3>PR Scanned — No Findings</h3>
+      </div>
+      <p class="scenario-desc">A developer opens a PR and pushes a commit. DryRun scans it and finds zero vulnerabilities.</p>
+
+      <div class="mockup-pair">
+        <!-- Current -->
+        <div class="mockup-col">
+          <div class="mockup-label mockup-label--current">Current Behavior</div>
+          <div class="gh-comment">
+            <div class="gh-body">
+              <div class="empty-state">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#8b949e" stroke-width="1.5">
+                  <circle cx="12" cy="12" r="10"/>
+                  <path d="M8 12h8M12 8v8" stroke-linecap="round"/>
+                </svg>
+                <p class="empty-title">No comment posted</p>
+                <p>DryRun found no vulnerabilities, so nothing appears on the PR. There is no indication DryRun scanned this PR.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Proposed -->
+        <div class="mockup-col">
+          <div class="mockup-label mockup-label--proposed">Proposed Behavior</div>
+          <div class="gh-comment">
+            <div class="gh-header">
+              <div class="gh-avatar">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 2L3 7v10l9 5 9-5V7l-9-5z" stroke="#fff" stroke-width="1.5"/></svg>
+              </div>
+              <strong>dryrunsecurity</strong>
+              <span class="gh-badge">bot</span>
+              <span class="gh-time">commented just now</span>
+            </div>
+            <div class="gh-body">
+              <div class="dr-banner">
+                <div class="dr-banner-left">
+                  <svg class="dr-banner-logo" width="32" height="32" viewBox="0 0 32 32" fill="none">
+                    <path d="M16 2L4 9v14l12 7 12-7V9L16 2z" stroke="#fff" stroke-width="1.2" fill="none"/>
+                    <path d="M16 10l-6 3.5v7L16 24l6-3.5v-7L16 10z" fill="rgba(255,255,255,0.2)" stroke="#fff" stroke-width="0.8"/>
+                    <path d="M13 16l2 2 4-4" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                  <div class="dr-banner-text">DRYRUN<span>SECURITY</span></div>
+                </div>
+                <div class="dr-banner-right">Contextual Security Analysis</div>
+              </div>
+
+              <div class="clean-scan-msg">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                  <circle cx="10" cy="10" r="9" fill="#1a7f37"/>
+                  <path d="M6.5 10l2.5 2.5 5-5" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <div>
+                  <div class="msg-text">No security vulnerabilities detected</div>
+                  <div class="msg-sub">All changes in this pull request have been analyzed.</div>
+                </div>
+              </div>
+
+              <div class="run-info">
+                <svg width="12" height="12" viewBox="0 0 16 16" fill="#8b949e"><path d="M8 0a8 8 0 100 16A8 8 0 008 0zm.5 4.5v4l-2.75 1.63-.75-1.3L7.5 7.5V4.5h1z"/></svg>
+                Scanned at Apr 8, 2026 1:04 PM CDT &middot; Commit <code style="font-family: var(--font-mono); font-size: 11px;">a3f82c1</code>
+              </div>
+
+              <div class="gh-dashboard-link">
+                All finding details can be found in the <a href="#">DryRun Security Dashboard</a>.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCENARIO 2: Active Findings -->
+    <div class="scenario-section">
+      <div class="scenario-header">
+        <span class="scenario-num">Scenario 2</span>
+        <h3>PR Scanned — Active Findings</h3>
+      </div>
+      <p class="scenario-desc">DryRun scans the PR and detects one or more vulnerabilities. This behavior is unchanged from today.</p>
+
+      <div class="mockup-wrapper">
+        <div class="mockup-label mockup-label--unchanged">Unchanged</div>
+        <div class="gh-comment">
+          <div class="gh-header">
+            <div class="gh-avatar">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 2L3 7v10l9 5 9-5V7l-9-5z" stroke="#fff" stroke-width="1.5"/></svg>
+            </div>
+            <strong>dryrunsecurity</strong>
+            <span class="gh-badge">bot</span>
+            <span class="gh-time">commented 2 days ago</span>
+          </div>
+          <div class="gh-body">
+            <div class="dr-banner">
+              <div class="dr-banner-left">
+                <svg class="dr-banner-logo" width="32" height="32" viewBox="0 0 32 32" fill="none">
+                  <path d="M16 2L4 9v14l12 7 12-7V9L16 2z" stroke="#fff" stroke-width="1.2" fill="none"/>
+                  <path d="M16 10l-6 3.5v7L16 24l6-3.5v-7L16 10z" fill="rgba(255,255,255,0.2)" stroke="#fff" stroke-width="0.8"/>
+                  <path d="M13 16l2 2 4-4" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <div class="dr-banner-text">DRYRUN<span>SECURITY</span></div>
+              </div>
+              <div class="dr-banner-right">Contextual Security Analysis</div>
+            </div>
+
+            <div class="gh-summary">
+              This pull request updates code where the DeleteDrift model method in <code style="font-family: var(--font-mono); font-size: 12px; background: rgba(175,184,193,0.2); padding: 1px 5px; border-radius: 4px;">pkg/models/drift.go</code> accepts an account UUID but does not use it to filter the database Update/Delete queries, risking cross-tenant data modification.
+            </div>
+
+            <div class="gh-finding">
+              <div class="gh-finding-header">
+                <span>▾</span>
+                <span class="severity severity--medium"></span>
+                Missing Tenant Isolation in Database Delete in <code>pkg/models/drift.go</code>
+                <span class="finding-id">(drs_b8948228)</span>
+              </div>
+              <div class="gh-finding-body">
+                <table class="gh-finding-table">
+                  <tr>
+                    <th>Vulnerability</th>
+                    <td>Missing Tenant Isolation in Database Delete</td>
+                  </tr>
+                  <tr>
+                    <th>Description</th>
+                    <td>The <code style="font-family: var(--font-mono); font-size: 12px;">DeleteDrift</code> method accepts an <code style="font-family: var(--font-mono); font-size: 12px;">account</code> UUID parameter but fails to use it in its database queries. Both the Update and Delete operations only filter by repoDrift ID, ignoring the account context.</td>
+                  </tr>
+                </table>
+                <div class="gh-code-block">
+                  <div class="gh-code-header">
+                    <a href="#">dryrun-api/pkg/models/drift.go</a>
+                    <span> &middot; Lines 224 to 227 in 0595c66</span>
+                  </div>
+                  <div class="gh-code-lines">
+                    <div class="gh-code-line"><span class="line-num">224</span><span class="line-content"><span class="kw">if</span> err := d.db.<span class="fn">WithContext</span>(ctx).<span class="fn">Model</span>(&amp;repoDrift{}).<span class="fn">Update</span>(<span class="str">"del...</span></span></div>
+                    <div class="gh-code-line"><span class="line-num">225</span><span class="line-content">    <span class="kw">return</span> err</span></div>
+                    <div class="gh-code-line"><span class="line-num">226</span><span class="line-content">}</span></div>
+                    <div class="gh-code-line"><span class="line-num">227</span><span class="line-content"><span class="kw">return</span> d.db.<span class="fn">WithContext</span>(ctx).<span class="fn">Delete</span>(&amp;repoDrift{}).<span class="fn">Error</span></span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="gh-feedback">
+              <details>
+                <summary>Comment to provide feedback on these findings.</summary>
+                <div class="gh-feedback-body">
+                  Report false positive: <code>@dryrunsecurity fp [FINDING ID] [FEEDBACK]</code><br>
+                  Report low-impact: <code>@dryrunsecurity nit [FINDING ID] [FEEDBACK]</code><br><br>
+                  Example: <code>@dryrunsecurity fp drs_90eda195 This code is not user-facing</code>
+                </div>
+              </details>
+            </div>
+
+            <div class="gh-dashboard-link">
+              All finding details can be found in the <a href="#">DryRun Security Dashboard</a>.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCENARIO 3: Findings Resolved -->
+    <div class="scenario-section">
+      <div class="scenario-header">
+        <span class="scenario-num">Scenario 3</span>
+        <h3>Developer Fixes Issue — Next Scan Clean</h3>
+      </div>
+      <p class="scenario-desc">The developer pushes a new commit that addresses the vulnerability. DryRun re-scans and finds no remaining issues.</p>
+
+      <div class="mockup-pair">
+        <!-- Current -->
+        <div class="mockup-col">
+          <div class="mockup-label mockup-label--current">Current Behavior</div>
+          <div class="gh-comment">
+            <div class="gh-body">
+              <div class="empty-state">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#8b949e" stroke-width="1.5">
+                  <path d="M19 7l-7 7-7-7"/>
+                  <rect x="3" y="3" width="18" height="18" rx="3"/>
+                  <line x1="5" y1="12" x2="19" y2="12"/>
+                </svg>
+                <p class="empty-title">Comment deleted</p>
+                <p>The finding was resolved, so DryRun deleted the entire comment. There is no record that a vulnerability was found and fixed.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Proposed -->
+        <div class="mockup-col">
+          <div class="mockup-label mockup-label--proposed">Proposed Behavior</div>
+          <div class="gh-comment">
+            <div class="gh-header">
+              <div class="gh-avatar">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 2L3 7v10l9 5 9-5V7l-9-5z" stroke="#fff" stroke-width="1.5"/></svg>
+              </div>
+              <strong>dryrunsecurity</strong>
+              <span class="gh-badge">bot</span>
+              <span class="gh-time">commented 2 days ago &middot; edited just now</span>
+            </div>
+            <div class="gh-body">
+              <div class="dr-banner">
+                <div class="dr-banner-left">
+                  <svg class="dr-banner-logo" width="32" height="32" viewBox="0 0 32 32" fill="none">
+                    <path d="M16 2L4 9v14l12 7 12-7V9L16 2z" stroke="#fff" stroke-width="1.2" fill="none"/>
+                    <path d="M16 10l-6 3.5v7L16 24l6-3.5v-7L16 10z" fill="rgba(255,255,255,0.2)" stroke="#fff" stroke-width="0.8"/>
+                    <path d="M13 16l2 2 4-4" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                  <div class="dr-banner-text">DRYRUN<span>SECURITY</span></div>
+                </div>
+                <div class="dr-banner-right">Contextual Security Analysis</div>
+              </div>
+
+              <div class="all-clear-box">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                  <circle cx="10" cy="10" r="9" fill="#1a7f37"/>
+                  <path d="M6.5 10l2.5 2.5 5-5" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <div>
+                  <div class="msg-text">All findings resolved</div>
+                  <div class="msg-sub">1 vulnerability was detected and has been fixed.</div>
+                </div>
+              </div>
+
+              <div class="run-info">
+                <svg width="12" height="12" viewBox="0 0 16 16" fill="#8b949e"><path d="M8 0a8 8 0 100 16A8 8 0 008 0zm.5 4.5v4l-2.75 1.63-.75-1.3L7.5 7.5V4.5h1z"/></svg>
+                Last scanned Apr 8, 2026 1:04 PM CDT &middot; Commit <code style="font-family: var(--font-mono); font-size: 11px;">e7b21d4</code>
+              </div>
+
+              <details class="prev-findings-toggle">
+                <summary>View previously detected findings (1 resolved)</summary>
+                <div class="prev-findings-content">
+                  <div class="gh-finding finding-resolved">
+                    <div class="gh-finding-header">
+                      <span>▸</span>
+                      <span class="severity severity--medium"></span>
+                      Missing Tenant Isolation in Database Delete
+                      <span class="status-badge status-badge--resolved">
+                        <svg width="10" height="10" viewBox="0 0 16 16" fill="#1a7f37"><path d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"/></svg>
+                        Resolved
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </details>
+
+              <div class="gh-dashboard-link" style="margin-top: 14px;">
+                All finding details can be found in the <a href="#">DryRun Security Dashboard</a>.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCENARIO 4: Finding Dismissed (FP / Nit) -->
+    <div class="scenario-section">
+      <div class="scenario-header">
+        <span class="scenario-num">Scenario 4</span>
+        <h3>Developer Marks Finding as False Positive or Nitpick</h3>
+      </div>
+      <p class="scenario-desc">The developer replies with <code style="font-family: var(--font-mono); font-size: 13px; background: rgba(175,184,193,0.2); padding: 1px 5px; border-radius: 4px;">@dryrunsecurity fp drs_b8948228 This code is not user-facing</code> to dismiss the finding.</p>
+
+      <div class="mockup-pair">
+        <!-- Current -->
+        <div class="mockup-col">
+          <div class="mockup-label mockup-label--current">Current Behavior</div>
+          <div class="gh-comment">
+            <div class="gh-body">
+              <div class="empty-state">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#8b949e" stroke-width="1.5">
+                  <path d="M19 7l-7 7-7-7"/>
+                  <rect x="3" y="3" width="18" height="18" rx="3"/>
+                  <line x1="5" y1="12" x2="19" y2="12"/>
+                </svg>
+                <p class="empty-title">Comment deleted</p>
+                <p>The finding was the only one, so DryRun removed the entry and deleted the comment entirely. No record remains.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Proposed -->
+        <div class="mockup-col">
+          <div class="mockup-label mockup-label--proposed">Proposed Behavior</div>
+          <div class="gh-comment">
+            <div class="gh-header">
+              <div class="gh-avatar">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 2L3 7v10l9 5 9-5V7l-9-5z" stroke="#fff" stroke-width="1.5"/></svg>
+              </div>
+              <strong>dryrunsecurity</strong>
+              <span class="gh-badge">bot</span>
+              <span class="gh-time">commented 2 days ago &middot; edited just now</span>
+            </div>
+            <div class="gh-body">
+              <div class="dr-banner">
+                <div class="dr-banner-left">
+                  <svg class="dr-banner-logo" width="32" height="32" viewBox="0 0 32 32" fill="none">
+                    <path d="M16 2L4 9v14l12 7 12-7V9L16 2z" stroke="#fff" stroke-width="1.2" fill="none"/>
+                    <path d="M16 10l-6 3.5v7L16 24l6-3.5v-7L16 10z" fill="rgba(255,255,255,0.2)" stroke="#fff" stroke-width="0.8"/>
+                    <path d="M13 16l2 2 4-4" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                  <div class="dr-banner-text">DRYRUN<span>SECURITY</span></div>
+                </div>
+                <div class="dr-banner-right">Contextual Security Analysis</div>
+              </div>
+
+              <div class="all-clear-box">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                  <circle cx="10" cy="10" r="9" fill="#1a7f37"/>
+                  <path d="M6.5 10l2.5 2.5 5-5" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <div>
+                  <div class="msg-text">All findings addressed</div>
+                  <div class="msg-sub">1 finding marked as false positive.</div>
+                </div>
+              </div>
+
+              <div class="run-info">
+                <svg width="12" height="12" viewBox="0 0 16 16" fill="#8b949e"><path d="M8 0a8 8 0 100 16A8 8 0 008 0zm.5 4.5v4l-2.75 1.63-.75-1.3L7.5 7.5V4.5h1z"/></svg>
+                Last scanned Apr 6, 2026 3:22 PM CDT &middot; Commit <code style="font-family: var(--font-mono); font-size: 11px;">0595c66</code>
+              </div>
+
+              <details class="prev-findings-toggle">
+                <summary>View dismissed findings (1 false positive)</summary>
+                <div class="prev-findings-content">
+                  <div class="gh-finding finding-dismissed">
+                    <div class="gh-finding-header">
+                      <span>▸</span>
+                      <span class="severity severity--medium" style="opacity: 0.4;"></span>
+                      Missing Tenant Isolation in Database Delete
+                      <span class="status-badge status-badge--fp">
+                        False Positive
+                      </span>
+                    </div>
+                    <div class="finding-history">
+                      <div class="finding-history-entry">
+                        <svg width="12" height="12" viewBox="0 0 16 16" fill="#656d76"><path d="M8 0a8 8 0 100 16A8 8 0 008 0zm3.28 5.78l-4 4a.75.75 0 01-1.06 0l-2-2a.75.75 0 011.06-1.06L6.75 8.19l3.47-3.47a.75.75 0 111.06 1.06z"/></svg>
+                        Dismissed by <strong>@developer</strong> — "This code is not user-facing"
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </details>
+
+              <div class="gh-dashboard-link" style="margin-top: 14px;">
+                All finding details can be found in the <a href="#">DryRun Security Dashboard</a>.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCENARIO 5: Mixed — Some Active, Some Dismissed -->
+    <div class="scenario-section">
+      <div class="scenario-header">
+        <span class="scenario-num">Scenario 5</span>
+        <h3>Multiple Findings — Mixed States</h3>
+      </div>
+      <p class="scenario-desc">A PR has multiple findings. One is dismissed as a nitpick, one is still active. The comment shows both states clearly.</p>
+
+      <div class="mockup-wrapper">
+        <div class="mockup-label mockup-label--proposed">Proposed Behavior</div>
+        <div class="gh-comment">
+          <div class="gh-header">
+            <div class="gh-avatar">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 2L3 7v10l9 5 9-5V7l-9-5z" stroke="#fff" stroke-width="1.5"/></svg>
+            </div>
+            <strong>dryrunsecurity</strong>
+            <span class="gh-badge">bot</span>
+            <span class="gh-time">commented 2 days ago &middot; edited 1 hour ago</span>
+          </div>
+          <div class="gh-body">
+            <div class="dr-banner">
+              <div class="dr-banner-left">
+                <svg class="dr-banner-logo" width="32" height="32" viewBox="0 0 32 32" fill="none">
+                  <path d="M16 2L4 9v14l12 7 12-7V9L16 2z" stroke="#fff" stroke-width="1.2" fill="none"/>
+                  <path d="M16 10l-6 3.5v7L16 24l6-3.5v-7L16 10z" fill="rgba(255,255,255,0.2)" stroke="#fff" stroke-width="0.8"/>
+                  <path d="M13 16l2 2 4-4" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <div class="dr-banner-text">DRYRUN<span>SECURITY</span></div>
+              </div>
+              <div class="dr-banner-right">Contextual Security Analysis</div>
+            </div>
+
+            <div class="gh-summary">
+              This pull request contains changes to authentication and database access patterns that introduce potential security risks.
+            </div>
+
+            <!-- Active finding -->
+            <div class="gh-finding">
+              <div class="gh-finding-header">
+                <span>▾</span>
+                <span class="severity severity--high"></span>
+                SQL Injection via Unsanitized Input in <code>pkg/api/search.go</code>
+                <span class="finding-id">(drs_c4291037)</span>
+                <span class="status-badge status-badge--active">Active</span>
+              </div>
+              <div class="gh-finding-body">
+                <table class="gh-finding-table">
+                  <tr>
+                    <th>Vulnerability</th>
+                    <td>SQL Injection via Unsanitized Input</td>
+                  </tr>
+                  <tr>
+                    <th>Description</th>
+                    <td>The search handler concatenates user input directly into a SQL query string without parameterization, allowing an attacker to inject arbitrary SQL.</td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+
+            <!-- Dismissed finding -->
+            <div class="gh-finding finding-dismissed">
+              <div class="gh-finding-header">
+                <span>▸</span>
+                <span class="severity severity--medium" style="opacity: 0.4;"></span>
+                <span style="opacity: 0.6;">Missing Tenant Isolation in Database Delete</span>
+                <span class="status-badge status-badge--nit">
+                  Nitpick
+                </span>
+              </div>
+              <div class="finding-history">
+                <div class="finding-history-entry">
+                  <svg width="12" height="12" viewBox="0 0 16 16" fill="#656d76"><path d="M8 0a8 8 0 100 16A8 8 0 008 0zm3.28 5.78l-4 4a.75.75 0 01-1.06 0l-2-2a.75.75 0 011.06-1.06L6.75 8.19l3.47-3.47a.75.75 0 111.06 1.06z"/></svg>
+                  Dismissed by <strong>@developer</strong> — "Low priority, service layer validates ownership"
+                </div>
+              </div>
+            </div>
+
+            <div class="gh-feedback">
+              <details>
+                <summary>Comment to provide feedback on these findings.</summary>
+                <div class="gh-feedback-body">
+                  Report false positive: <code>@dryrunsecurity fp [FINDING ID] [FEEDBACK]</code><br>
+                  Report low-impact: <code>@dryrunsecurity nit [FINDING ID] [FEEDBACK]</code><br><br>
+                  Example: <code>@dryrunsecurity fp drs_c4291037 Input is validated upstream</code>
+                </div>
+              </details>
+            </div>
+
+            <div class="gh-dashboard-link">
+              All finding details can be found in the <a href="#">DryRun Security Dashboard</a>.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ─── SUMMARY ─── -->
+  <section id="summary">
+    <div class="section-label">Summary</div>
+    <h2>Behavior Change Matrix</h2>
+    <p class="section-intro">Quick reference for how each scenario changes under the proposed workflow.</p>
+
+    <table class="summary-table">
+      <thead>
+        <tr>
+          <th>Scenario</th>
+          <th>Current Behavior</th>
+          <th>Proposed Default</th>
+          <th>Feature Flag Override</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>No findings</strong></td>
+          <td class="current-col">No comment posted</td>
+          <td class="proposed-col">Post "clean scan" comment</td>
+          <td class="flag-col">comment_on_clean_scan = OFF &rarr; suppress clean scan comment</td>
+        </tr>
+        <tr>
+          <td><strong>Draft PR<br>(with findings)</strong></td>
+          <td class="current-col">Scan runs, no comment posted</td>
+          <td class="proposed-col">Post comment with findings even in draft mode</td>
+          <td class="flag-col">comment_on_draft_pr = OFF &rarr; suppress all comments on draft PRs</td>
+        </tr>
+        <tr>
+          <td><strong>Active findings</strong></td>
+          <td>Post comment with details</td>
+          <td>No change</td>
+          <td class="flag-col">—</td>
+        </tr>
+        <tr>
+          <td><strong>Findings resolved<br>(code fix)</strong></td>
+          <td class="current-col">Delete comment</td>
+          <td class="proposed-col">Update to "All findings resolved" — show collapsed history</td>
+          <td class="flag-col">delete_resolved_comment = ON &rarr; delete comment when all clear</td>
+        </tr>
+        <tr>
+          <td><strong>Finding dismissed<br>(FP or Nit)</strong></td>
+          <td class="current-col">Remove entry, delete comment if last</td>
+          <td class="proposed-col">Mark with badge, dim the finding — keep visible</td>
+          <td class="flag-col">delete_resolved_comment = ON &rarr; delete comment when last finding dismissed</td>
+        </tr>
+        <tr>
+          <td><strong>All findings addressed<br>(mix of fixed + dismissed)</strong></td>
+          <td class="current-col">Delete comment</td>
+          <td class="proposed-col">Update to "All addressed" — collapsed summary of outcomes</td>
+          <td class="flag-col">delete_resolved_comment = ON &rarr; delete comment when all addressed</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div style="margin-top: 32px;">
+      <h3>Key Design Principles</h3>
+      <div class="problem-grid" style="margin-top: 12px;">
+        <div class="problem-card solution-card">
+          <h4>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="#1a7f37"><circle cx="8" cy="8" r="8"/><path d="M5 8l2 2 4-4" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Never Delete
+          </h4>
+          <p>The comment is never deleted. It transitions between states: clean, active, resolved, dismissed.</p>
+        </div>
+        <div class="problem-card solution-card">
+          <h4>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="#1a7f37"><circle cx="8" cy="8" r="8"/><path d="M5 8l2 2 4-4" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Always Post
+          </h4>
+          <p>Every scanned PR gets a comment, even with zero findings. Confirms coverage.</p>
+        </div>
+        <div class="problem-card solution-card">
+          <h4>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="#1a7f37"><circle cx="8" cy="8" r="8"/><path d="M5 8l2 2 4-4" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Preserve History
+          </h4>
+          <p>Resolved and dismissed findings collapse but remain accessible. Creates an audit trail for compliance.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ─── FEATURE FLAGS ─── -->
+  <section id="flags">
+    <div class="section-label">Admin Configuration</div>
+    <h2>Feature Flags</h2>
+    <p class="section-intro">
+      The proposed workflow ships as the out-of-the-box default. Admins can adjust comment behavior per account using the feature flags below. These live in the DryRun admin panel under account settings.
+    </p>
+
+    <!-- Flag 1 -->
+    <div class="flag-card">
+      <div class="flag-card-header">
+        <div class="flag-card-header-left">
+          <span class="flag-name">comment_on_clean_scan</span>
+          <span class="flag-default flag-default--on">Default: ON</span>
+        </div>
+        <div class="flag-toggle"></div>
+      </div>
+      <div class="flag-card-body">
+        <p>Controls whether DryRun posts a comment when a scan produces <strong>zero findings</strong>.</p>
+        <div class="flag-behavior">
+          <div class="flag-behavior-col flag-on">
+            <h5>When ON (default)</h5>
+            DryRun posts a "clean scan" comment on every PR it scans, even when there are no findings. Confirms to security teams and auditors that the PR was analyzed.
+          </div>
+          <div class="flag-behavior-col flag-off">
+            <h5>When OFF</h5>
+            No comment is posted on PRs with zero findings. DryRun only posts a comment when it detects a vulnerability. Once a finding is posted and later resolved, the rest of the proposed workflow still applies (comment updates, history retained).
+          </div>
+        </div>
+        <div class="flag-location">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="#8b949e"><path d="M2 2.5A2.5 2.5 0 014.5 0h8.75a.75.75 0 01.75.75v12.5a.75.75 0 01-.75.75h-2.5a.75.75 0 010-1.5h1.75v-2h-8a1 1 0 00-.714 1.7.75.75 0 01-1.072 1.05A2.495 2.495 0 012 11.5v-9zm10.5-1h-8a1 1 0 00-1 1v6.708A2.486 2.486 0 014.5 9h8V1.5z"/></svg>
+          Admin Panel &rarr; Account Settings &rarr; GitHub Integration &rarr; Comment Behavior
+        </div>
+      </div>
+    </div>
+
+    <!-- Flag 2 -->
+    <div class="flag-card">
+      <div class="flag-card-header">
+        <div class="flag-card-header-left">
+          <span class="flag-name">comment_on_draft_pr</span>
+          <span class="flag-default flag-default--on">Default: ON</span>
+        </div>
+        <div class="flag-toggle"></div>
+      </div>
+      <div class="flag-card-body">
+        <p>Controls whether DryRun posts comments on <strong>draft pull requests</strong>.</p>
+        <div class="flag-behavior">
+          <div class="flag-behavior-col flag-on">
+            <h5>When ON (default)</h5>
+            DryRun posts comments on draft PRs the same way it does on regular PRs — including findings, clean scan confirmations, and all state transitions. Developers get security feedback early, before the PR is ready for review.
+          </div>
+          <div class="flag-behavior-col flag-off">
+            <h5>When OFF</h5>
+            DryRun scans draft PRs but does <strong>not</strong> post any comment. Findings are still recorded in the DryRun dashboard. When the PR is moved out of draft, the comment is posted on the next scan with any accumulated findings.
+          </div>
+        </div>
+        <div class="flag-location">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="#8b949e"><path d="M2 2.5A2.5 2.5 0 014.5 0h8.75a.75.75 0 01.75.75v12.5a.75.75 0 01-.75.75h-2.5a.75.75 0 010-1.5h1.75v-2h-8a1 1 0 00-.714 1.7.75.75 0 01-1.072 1.05A2.495 2.495 0 012 11.5v-9zm10.5-1h-8a1 1 0 00-1 1v6.708A2.486 2.486 0 014.5 9h8V1.5z"/></svg>
+          Admin Panel &rarr; Account Settings &rarr; GitHub Integration &rarr; Comment Behavior
+        </div>
+      </div>
+    </div>
+
+    <!-- Flag 3 -->
+    <div class="flag-card">
+      <div class="flag-card-header">
+        <div class="flag-card-header-left">
+          <span class="flag-name">delete_resolved_comment</span>
+          <span class="flag-default flag-default--off">Default: OFF</span>
+        </div>
+        <div class="flag-toggle flag-toggle--off"></div>
+      </div>
+      <div class="flag-card-body">
+        <p>Controls whether DryRun <strong>deletes the comment</strong> once all findings in a PR are resolved or dismissed.</p>
+        <div class="flag-behavior">
+          <div class="flag-behavior-col flag-off">
+            <h5>When OFF (default)</h5>
+            The comment is never deleted. When all findings are resolved or dismissed, the comment transitions to an "All Clear" state with a collapsed history of what was found and how it was handled. Preserves the audit trail.
+          </div>
+          <div class="flag-behavior-col flag-on">
+            <h5>When ON</h5>
+            When all findings in a PR are resolved (via code fix) or dismissed (via FP/nit), DryRun deletes the comment entirely. This restores the current production behavior for teams that prefer a minimal GitHub footprint.
+          </div>
+        </div>
+        <p style="margin-top: 12px;"><strong>Note:</strong> This flag only affects what happens after findings are fully addressed. It does not change how findings are posted or updated while active. Even with this flag ON, the proposed workflow applies to active findings (badges, dimming on dismiss, etc.) — deletion only occurs at the final "all clear" transition.</p>
+        <div class="flag-location">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="#8b949e"><path d="M2 2.5A2.5 2.5 0 014.5 0h8.75a.75.75 0 01.75.75v12.5a.75.75 0 01-.75.75h-2.5a.75.75 0 010-1.5h1.75v-2h-8a1 1 0 00-.714 1.7.75.75 0 01-1.072 1.05A2.495 2.495 0 012 11.5v-9zm10.5-1h-8a1 1 0 00-1 1v6.708A2.486 2.486 0 014.5 9h8V1.5z"/></svg>
+          Admin Panel &rarr; Account Settings &rarr; GitHub Integration &rarr; Comment Behavior
+        </div>
+      </div>
+    </div>
+
+    <!-- Flag interaction summary -->
+    <div style="margin-top: 12px;">
+      <h3>Flag Interactions</h3>
+      <p class="section-intro" style="margin-bottom: 16px;">How the flags combine when multiple are changed from their defaults.</p>
+      <table class="summary-table">
+        <thead>
+          <tr>
+            <th>Configuration</th>
+            <th>Resulting Behavior</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>All defaults</strong><br><span style="font-size: 11px; color: var(--text-faint);">clean_scan=ON, draft=ON, delete=OFF</span></td>
+            <td>Full proposed workflow. Comment on every PR in every state. Never deleted.</td>
+          </tr>
+          <tr>
+            <td><strong>clean_scan=OFF</strong></td>
+            <td>No comment on PRs with zero findings. Comment appears only when a finding is detected, then follows the full lifecycle (update on resolve, retain history).</td>
+          </tr>
+          <tr>
+            <td><strong>draft=OFF</strong></td>
+            <td>No comments on draft PRs. DryRun scans silently and posts findings on the next scan after the PR leaves draft status.</td>
+          </tr>
+          <tr>
+            <td><strong>delete=ON</strong></td>
+            <td>Active findings behave as proposed (badges, dismiss, etc.), but once all findings are addressed the comment is deleted rather than retained.</td>
+          </tr>
+          <tr>
+            <td><strong>clean_scan=OFF + delete=ON</strong></td>
+            <td>Comments only appear when findings exist and disappear when resolved. Closest to today's behavior, but with improved handling while findings are active (badges, dimming, feedback visibility).</td>
+          </tr>
+          <tr>
+            <td><strong>All three changed</strong><br><span style="font-size: 11px; color: var(--text-faint);">clean_scan=OFF, draft=OFF, delete=ON</span></td>
+            <td>Mimics current production behavior on draft and clean scans, but retains the improved active-finding UX (badges, dismiss-in-place, feedback reasons). Comment deleted on resolve.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  DryRun Security &middot; Internal Proposal &middot; April 2026
+</footer>
+
+</body>
+</html>

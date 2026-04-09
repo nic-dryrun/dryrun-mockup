@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DryRun — PR Dashboard Mockup</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --font: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --mono: 'JetBrains Mono', 'Consolas', monospace;
+      --bg: #fafbfc;
+      --surface: #ffffff;
+      --surface-alt: #f6f8fa;
+      --text: #1a1d23;
+      --text-secondary: #5a5f6b;
+      --text-muted: #8b919e;
+      --border: #e3e6eb;
+      --border-light: #eef0f4;
+      --purple: #7c6ef0;
+      --purple-bg: #f0eeff;
+      --purple-border: #d8d3f7;
+      --green: #1a7f37;
+      --green-bg: #dafbe1;
+      --green-border: #aceebb;
+      --orange: #bf8700;
+      --orange-bg: #fff8c5;
+      --orange-border: #f5e0a0;
+      --red: #cf222e;
+      --red-bg: #ffebe9;
+      --blue: #0969da;
+      --blue-bg: #ddf4ff;
+      --gray-bg: #f3f4f6;
+      --yellow: #d4a017;
+    }
+
+    body {
+      font-family: var(--font);
+      font-size: 14px;
+      line-height: 1.5;
+      color: var(--text);
+      background: var(--bg);
+    }
+
+    /* ── MOCKUP BAR ── */
+    .mockup-bar {
+      background: linear-gradient(135deg, #1a1e3a, #2d3260);
+      padding: 10px 24px;
+      display: flex; align-items: center; justify-content: space-between;
+      color: #fff; font-size: 12px;
+    }
+    .mockup-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(124,110,240,0.3); padding: 3px 10px;
+      border-radius: 10px; font-size: 11px; font-weight: 600;
+    }
+
+    /* ── PAGE ── */
+    .page { max-width: 1200px; margin: 0 auto; padding: 24px; }
+
+    /* ── BREADCRUMB ── */
+    .breadcrumb { font-size: 13px; color: var(--text-muted); margin-bottom: 12px; }
+    .breadcrumb a { color: var(--text-muted); text-decoration: none; }
+    .breadcrumb a:hover { color: var(--text-secondary); text-decoration: underline; }
+
+    /* ── PR HEADER ── */
+    .pr-header { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 8px; }
+    .pr-title { font-size: 20px; font-weight: 700; color: var(--text); }
+    .pr-title span { font-weight: 400; color: var(--text-muted); }
+    .pr-latest { font-size: 12px; color: var(--text-muted); white-space: nowrap; }
+
+    /* ── META BAR ── */
+    .meta-bar {
+      display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
+      padding: 12px 0; margin-bottom: 20px;
+      border-bottom: 1px solid var(--border-light);
+      font-size: 13px; color: var(--text-secondary);
+    }
+    .meta-item { display: flex; align-items: center; gap: 6px; }
+    .meta-label { color: var(--text-muted); }
+    .risk-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .risk-dot--high { background: #cf222e; }
+    .risk-dot--medium { background: #d4a017; }
+    .risk-dot--low { background: #0969da; }
+    .risk-dot--clean { background: #1a7f37; }
+    .status-icon {
+      display: inline-flex; align-items: center; gap: 3px;
+      font-weight: 500;
+    }
+
+    /* ── SCAN TIMELINE ── */
+    .timeline-section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      margin-bottom: 20px;
+      overflow: hidden;
+    }
+    .timeline-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 20px;
+      background: var(--surface-alt);
+      border-bottom: 1px solid var(--border-light);
+    }
+    .timeline-header h3 {
+      font-size: 13px; font-weight: 600; color: var(--text);
+      display: flex; align-items: center; gap: 8px;
+    }
+    .timeline-header h3 svg { flex-shrink: 0; }
+    .timeline-toggle {
+      font-size: 12px; color: var(--purple); font-weight: 500;
+      cursor: pointer; background: none; border: none;
+      display: flex; align-items: center; gap: 4px;
+    }
+
+    .timeline-body { padding: 16px 20px; }
+    .timeline-track {
+      display: flex; align-items: stretch; gap: 0;
+      position: relative;
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+    .timeline-entry {
+      flex: 0 0 auto;
+      display: flex; flex-direction: column; align-items: center;
+      position: relative; padding: 0 16px;
+      cursor: pointer;
+      min-width: 120px;
+    }
+    .timeline-entry::before {
+      content: '';
+      position: absolute; top: 10px; left: 0; right: 0;
+      height: 2px; background: var(--border);
+    }
+    .timeline-entry:first-child::before { left: 50%; }
+    .timeline-entry:last-child::before { right: 50%; }
+    .timeline-node {
+      width: 20px; height: 20px; border-radius: 50%;
+      border: 2px solid var(--border);
+      background: var(--surface);
+      position: relative; z-index: 1;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .timeline-node-inner {
+      width: 8px; height: 8px; border-radius: 50%;
+    }
+    .timeline-entry--active .timeline-node {
+      border-color: var(--purple);
+      box-shadow: 0 0 0 3px var(--purple-bg);
+    }
+    .timeline-entry--active .timeline-node-inner { background: var(--purple); }
+    .timeline-entry--clean .timeline-node-inner { background: var(--green); }
+    .timeline-entry--findings .timeline-node-inner { background: var(--yellow); }
+    .timeline-entry--findings-red .timeline-node-inner { background: var(--red); }
+
+    .timeline-label {
+      margin-top: 8px; text-align: center;
+      font-size: 11px; line-height: 1.4;
+    }
+    .timeline-commit {
+      font-family: var(--mono); font-size: 11px;
+      color: var(--text-secondary); font-weight: 500;
+    }
+    .timeline-date { color: var(--text-muted); font-size: 10px; }
+    .timeline-findings-count {
+      font-size: 10px; font-weight: 600; margin-top: 2px;
+      padding: 1px 6px; border-radius: 8px;
+    }
+    .timeline-findings-count--warn { background: var(--orange-bg); color: var(--orange); }
+    .timeline-findings-count--clean { background: var(--green-bg); color: var(--green); }
+    .timeline-findings-count--danger { background: var(--red-bg); color: var(--red); }
+
+    .timeline-entry--active .timeline-label { font-weight: 600; }
+    .timeline-entry--active .timeline-commit { color: var(--purple); }
+
+    /* ── SUMMARY CARDS ── */
+    .summary-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 16px; margin-bottom: 20px;
+    }
+    @media (max-width: 768px) { .summary-grid { grid-template-columns: 1fr; } }
+    .summary-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px 24px;
+    }
+    .summary-card h3 {
+      font-size: 15px; font-weight: 600;
+      margin-bottom: 10px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .summary-card h3 .help-icon {
+      width: 18px; height: 18px; border-radius: 50%;
+      border: 1.5px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; color: var(--text-muted); cursor: help;
+    }
+    .summary-card p {
+      font-size: 13px; color: var(--text-secondary); line-height: 1.6;
+    }
+
+    /* ── FINDINGS SECTION ── */
+    .findings-section { margin-top: 4px; }
+    .findings-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 12px; flex-wrap: wrap; gap: 12px;
+    }
+    .findings-title-row {
+      display: flex; align-items: center; gap: 12px;
+    }
+    .findings-title {
+      font-size: 18px; font-weight: 700;
+    }
+    .add-policy-btn {
+      font-size: 12px; font-weight: 500;
+      padding: 5px 12px; border-radius: 6px;
+      border: 1px solid var(--border); background: var(--surface);
+      color: var(--text-secondary); cursor: pointer;
+    }
+
+    /* ── FILTER TABS ── */
+    .filter-tabs {
+      display: flex; gap: 2px; background: var(--surface-alt);
+      border: 1px solid var(--border); border-radius: 8px;
+      padding: 3px; flex-wrap: wrap;
+    }
+    .filter-tab {
+      font-size: 12px; font-weight: 500; padding: 5px 12px;
+      border-radius: 6px; cursor: pointer;
+      border: none; background: transparent;
+      color: var(--text-secondary);
+      display: flex; align-items: center; gap: 4px;
+      transition: all 0.15s;
+    }
+    .filter-tab:hover { background: var(--surface); }
+    .filter-tab--active {
+      background: var(--surface); color: var(--text);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+      font-weight: 600;
+    }
+    .filter-count {
+      font-size: 10px; font-weight: 700;
+      padding: 1px 6px; border-radius: 8px;
+    }
+    .filter-count--all { background: var(--gray-bg); color: var(--text-secondary); }
+    .filter-count--active { background: var(--orange-bg); color: var(--orange); }
+    .filter-count--resolved { background: var(--green-bg); color: var(--green); }
+    .filter-count--fp { background: var(--gray-bg); color: var(--text-muted); }
+    .filter-count--nit { background: var(--orange-bg); color: #7d6807; }
+
+    /* ── FINDINGS TABLE ── */
+    .findings-table { margin-top: 12px; }
+    .findings-col-header {
+      display: grid;
+      grid-template-columns: 44px 1fr 1fr 1fr 100px 36px;
+      padding: 8px 16px;
+      font-size: 12px; font-weight: 600; color: var(--text-muted);
+      text-transform: uppercase; letter-spacing: 0.03em;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .finding-row {
+      display: grid;
+      grid-template-columns: 44px 1fr 1fr 1fr 100px 36px;
+      align-items: center;
+      padding: 14px 16px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      margin-bottom: 8px;
+      transition: border-color 0.15s;
+      cursor: pointer;
+    }
+    .finding-row:hover { border-color: #c0c4cc; }
+
+    .finding-row--resolved {
+      background: #fcfcfc;
+      border-style: dashed;
+    }
+    .finding-row--resolved .finding-agent,
+    .finding-row--resolved .finding-type,
+    .finding-row--resolved .finding-file {
+      opacity: 0.5;
+    }
+
+    .finding-row--dismissed {
+      background: #fcfcfc;
+      border-style: dashed;
+    }
+    .finding-row--dismissed .finding-agent,
+    .finding-row--dismissed .finding-type,
+    .finding-row--dismissed .finding-file {
+      opacity: 0.45;
+    }
+
+    .finding-risk { display: flex; align-items: center; }
+    .finding-agent { font-size: 13px; font-weight: 500; }
+    .finding-type { font-size: 13px; color: var(--text-secondary); }
+    .finding-file {
+      font-size: 12px; font-family: var(--mono);
+      color: var(--text-secondary);
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .finding-expand {
+      display: flex; align-items: center; justify-content: center;
+      color: var(--text-muted);
+    }
+
+    /* ── STATUS BADGE ── */
+    .finding-status {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: 11px; font-weight: 600;
+      padding: 2px 8px; border-radius: 10px;
+      white-space: nowrap;
+    }
+    .finding-status--active {
+      background: var(--orange-bg); color: var(--orange);
+      border: 1px solid var(--orange-border);
+    }
+    .finding-status--resolved {
+      background: var(--green-bg); color: var(--green);
+      border: 1px solid var(--green-border);
+    }
+    .finding-status--fp {
+      background: var(--gray-bg); color: var(--text-muted);
+      border: 1px solid var(--border);
+    }
+    .finding-status--nit {
+      background: #fff8c5; color: #7d6807;
+      border: 1px solid #f5e0a0;
+    }
+
+    /* ── EXPANDED FINDING DETAIL ── */
+    .finding-detail {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-top: none;
+      border-radius: 0 0 8px 8px;
+      margin-top: -12px;
+      margin-bottom: 8px;
+      padding: 16px 20px;
+    }
+    .finding-detail-status {
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 10px 14px;
+      border-radius: 6px; margin-bottom: 12px;
+      font-size: 12px; line-height: 1.5;
+    }
+    .finding-detail-status svg { flex-shrink: 0; margin-top: 1px; }
+    .finding-detail-status--resolved {
+      background: var(--green-bg); border: 1px solid var(--green-border);
+      color: #15572a;
+    }
+    .finding-detail-status--fp {
+      background: var(--gray-bg); border: 1px solid var(--border);
+      color: var(--text-secondary);
+    }
+    .finding-detail-status--nit {
+      background: #fff8c5; border: 1px solid #f5e0a0;
+      color: #6b5b04;
+    }
+    .finding-detail-desc {
+      font-size: 13px; color: var(--text-secondary); line-height: 1.6;
+    }
+
+    /* ── ANNOTATION (change indicator) ── */
+    .change-indicator {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: 10px; font-weight: 600;
+      padding: 2px 7px; border-radius: 10px;
+      white-space: nowrap;
+    }
+    .change-indicator--new {
+      background: var(--purple-bg); color: var(--purple);
+      border: 1px solid var(--purple-border);
+    }
+
+    /* ── PR STATE SUMMARY ── */
+    .pr-state-summary {
+      display: flex; align-items: center; gap: 12px;
+      padding: 10px 16px;
+      background: var(--green-bg); border: 1px solid var(--green-border);
+      border-radius: 8px; margin-bottom: 16px;
+      font-size: 13px; color: #15572a;
+    }
+    .pr-state-summary svg { flex-shrink: 0; }
+    .pr-state-summary--warn {
+      background: var(--orange-bg); border-color: var(--orange-border);
+      color: #6b5300;
+    }
+
+    /* ── ANNOTATION BANNER ── */
+    .annotation-banner {
+      background: var(--purple-bg);
+      border: 1px solid var(--purple-border);
+      border-radius: 8px;
+      padding: 12px 16px;
+      margin-bottom: 20px;
+      display: flex; align-items: flex-start; gap: 10px;
+      font-size: 13px; color: #4338ca; line-height: 1.5;
+    }
+    .annotation-banner svg { flex-shrink: 0; margin-top: 2px; }
+  </style>
+</head>
+<body>
+
+<div class="mockup-bar">
+  <div style="display: flex; align-items: center; gap: 12px;">
+    <span class="mockup-badge">
+      <svg width="10" height="10" viewBox="0 0 16 16" fill="#c4b5fd"><circle cx="8" cy="8" r="8"/></svg>
+      PROPOSED MOCKUP
+    </span>
+    <span style="opacity: 0.6;">PR Dashboard — Finding Lifecycle Redesign</span>
+  </div>
+</div>
+
+<div class="page">
+
+  <!-- ANNOTATION -->
+  <div class="annotation-banner">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="#7c6ef0"><path d="M8 0a8 8 0 100 16A8 8 0 008 0zm0 3a1 1 0 110 2 1 1 0 010-2zm2 9H6v-1h1V7H6V6h3v6h1v1z"/></svg>
+    <div>
+      <strong>Proposed PR dashboard layout.</strong> New elements include the scan timeline <span class="change-indicator change-indicator--new">New</span>, finding status badges and filters <span class="change-indicator change-indicator--new">New</span>, and expanded detail panels with lifecycle history <span class="change-indicator change-indicator--new">New</span>. Summaries and agent/policy sections are unchanged.
+    </div>
+  </div>
+
+  <!-- BREADCRUMB -->
+  <div class="breadcrumb">
+    <a href="#">Repositories</a> &gt; <a href="#">DryRunSec/dryrun-api</a>
+  </div>
+
+  <!-- PR HEADER -->
+  <div class="pr-header">
+    <div class="pr-title">feat: add has_category filter to ... <span>#1465</span></div>
+    <div class="pr-latest">Latest Run: 2 hours ago</div>
+  </div>
+
+  <!-- META BAR -->
+  <div class="meta-bar">
+    <div class="meta-item">
+      <span class="meta-label">Risk:</span>
+      <span class="risk-dot risk-dot--medium"></span>
+    </div>
+    <div class="meta-item">
+      <span class="meta-label">Status:</span>
+      <span class="status-icon">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="#1a7f37"><path d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"/></svg>
+        Complete
+      </span>
+    </div>
+    <div class="meta-item">
+      <span class="meta-label">Findings:</span>
+      <strong>5 total</strong> <span style="color: var(--text-muted);">(2 active, 2 resolved, 1 false positive)</span>
+    </div>
+    <div class="meta-item">
+      <span class="meta-label">Run Time:</span> 22s
+    </div>
+    <div class="meta-item">
+      <span class="meta-label">Owner:</span> cnichols-dry
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════ -->
+  <!--           SCAN TIMELINE (NEW)           -->
+  <!-- ════════════════════════════════════════ -->
+  <div class="timeline-section">
+    <div class="timeline-header">
+      <h3>
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="#5a5f6b"><path d="M8 0a8 8 0 100 16A8 8 0 008 0zm.5 4.5v4l-2.75 1.63-.75-1.3L7.5 7.5V4.5h1z"/></svg>
+        Scan History
+        <span class="change-indicator change-indicator--new">New</span>
+      </h3>
+      <button class="timeline-toggle">
+        Show all scans
+        <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M6.22 3.22a.75.75 0 011.06 0l4.25 4.25a.75.75 0 010 1.06l-4.25 4.25a.75.75 0 01-1.06-1.06L9.94 8 6.22 4.28a.75.75 0 010-1.06z"/></svg>
+      </button>
+    </div>
+    <div class="timeline-body">
+      <div class="timeline-track">
+
+        <div class="timeline-entry timeline-entry--findings-red">
+          <div class="timeline-node"><div class="timeline-node-inner"></div></div>
+          <div class="timeline-label">
+            <div class="timeline-commit">a3f82c1</div>
+            <div class="timeline-date">Mar 15</div>
+            <div class="timeline-findings-count timeline-findings-count--danger">5 findings</div>
+          </div>
+        </div>
+
+        <div class="timeline-entry timeline-entry--findings">
+          <div class="timeline-node"><div class="timeline-node-inner"></div></div>
+          <div class="timeline-label">
+            <div class="timeline-commit">b7d94e2</div>
+            <div class="timeline-date">Mar 18</div>
+            <div class="timeline-findings-count timeline-findings-count--warn">4 findings</div>
+          </div>
+        </div>
+
+        <div class="timeline-entry timeline-entry--findings">
+          <div class="timeline-node"><div class="timeline-node-inner"></div></div>
+          <div class="timeline-label">
+            <div class="timeline-commit">e7b21d4</div>
+            <div class="timeline-date">Mar 22</div>
+            <div class="timeline-findings-count timeline-findings-count--warn">3 findings</div>
+          </div>
+        </div>
+
+        <div class="timeline-entry timeline-entry--active timeline-entry--findings">
+          <div class="timeline-node"><div class="timeline-node-inner"></div></div>
+          <div class="timeline-label">
+            <div class="timeline-commit">0595c66</div>
+            <div class="timeline-date">Apr 8 (latest)</div>
+            <div class="timeline-findings-count timeline-findings-count--warn">2 active</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- SUMMARY CARDS (unchanged from current) -->
+  <div class="summary-grid">
+    <div class="summary-card">
+      <h3>Pull Request Summary <span class="help-icon">?</span></h3>
+      <p>This PR adds filtering and search capabilities to existing findings endpoints and refactors the deep-scan query logic to reuse shared clauses. It introduces two new query parameters: <code style="font-family: var(--mono); font-size: 12px; background: var(--surface-alt); padding: 1px 4px; border-radius: 3px;">has_category</code> (boolean) and <code style="font-family: var(--mono); font-size: 12px; background: var(--surface-alt); padding: 1px 4px; border-radius: 3px;">search</code> (string).</p>
+    </div>
+    <div class="summary-card">
+      <h3>Code Security Summary <span class="help-icon">?</span></h3>
+      <p>This pull request introduces code that builds SQL identifier/fragment strings (JOIN/WHERE clauses and column names) by concatenating or fmt.Sprintf-ing user-influenced inputs into raw SQL and GORM calls, creating multiple critical SQL injection risks.</p>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════ -->
+  <!--          FINDINGS WITH LIFECYCLE         -->
+  <!-- ════════════════════════════════════════ -->
+  <div class="findings-section">
+    <div class="findings-header">
+      <div class="findings-title-row">
+        <span class="findings-title">Findings</span>
+        <button class="add-policy-btn">Add Code Policy +</button>
+      </div>
+
+      <!-- Filter tabs (NEW) -->
+      <div class="filter-tabs">
+        <button class="filter-tab filter-tab--active">
+          All <span class="filter-count filter-count--all">5</span>
+        </button>
+        <button class="filter-tab">
+          Active <span class="filter-count filter-count--active">2</span>
+        </button>
+        <button class="filter-tab">
+          Resolved <span class="filter-count filter-count--resolved">2</span>
+        </button>
+        <button class="filter-tab">
+          False Positive <span class="filter-count filter-count--fp">1</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Column headers -->
+    <div class="findings-col-header">
+      <div>Risk</div>
+      <div>Agent</div>
+      <div>Type</div>
+      <div>Filename</div>
+      <div>Status</div>
+      <div></div>
+    </div>
+
+    <!-- Finding 1: ACTIVE -->
+    <div class="finding-row">
+      <div class="finding-risk"><span class="risk-dot risk-dot--medium"></span></div>
+      <div class="finding-agent">SQL Injection Analyzer</div>
+      <div class="finding-type">Potential SQL Injection</div>
+      <div class="finding-file">pkg/models/repository_deep_scan_results.go</div>
+      <div><span class="finding-status finding-status--active">Active</span></div>
+      <div class="finding-expand">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M12.78 6.22a.75.75 0 010 1.06l-4.25 4.25a.75.75 0 01-1.06 0L3.22 7.28a.75.75 0 011.06-1.06L8 9.94l3.72-3.72a.75.75 0 011.06 0z"/></svg>
+      </div>
+    </div>
+
+    <!-- Finding 2: ACTIVE -->
+    <div class="finding-row">
+      <div class="finding-risk"><span class="risk-dot risk-dot--medium"></span></div>
+      <div class="finding-agent">SQL Injection Analyzer</div>
+      <div class="finding-type">Potential SQL Injection</div>
+      <div class="finding-file">pkg/models/repository_deep_scan_results.go</div>
+      <div><span class="finding-status finding-status--active">Active</span></div>
+      <div class="finding-expand">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M12.78 6.22a.75.75 0 010 1.06l-4.25 4.25a.75.75 0 01-1.06 0L3.22 7.28a.75.75 0 011.06-1.06L8 9.94l3.72-3.72a.75.75 0 011.06 0z"/></svg>
+      </div>
+    </div>
+
+    <!-- Finding 3: RESOLVED (expanded to show detail) -->
+    <div class="finding-row finding-row--resolved" style="border-radius: 8px 8px 0 0; margin-bottom: 0;">
+      <div class="finding-risk"><span class="risk-dot risk-dot--medium" style="opacity: 0.4;"></span></div>
+      <div class="finding-agent" style="text-decoration: line-through; text-decoration-color: #b0b5bc;">SQL Injection Analyzer</div>
+      <div class="finding-type">Potential SQL Injection</div>
+      <div class="finding-file">pkg/models/repository_deep_scan_results.go</div>
+      <div><span class="finding-status finding-status--resolved">
+        <svg width="10" height="10" viewBox="0 0 16 16" fill="#1a7f37"><path d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"/></svg>
+        Resolved</span>
+      </div>
+      <div class="finding-expand">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" style="transform: rotate(180deg);"><path d="M12.78 6.22a.75.75 0 010 1.06l-4.25 4.25a.75.75 0 01-1.06 0L3.22 7.28a.75.75 0 011.06-1.06L8 9.94l3.72-3.72a.75.75 0 011.06 0z"/></svg>
+      </div>
+    </div>
+    <div class="finding-detail">
+      <div class="finding-detail-status finding-detail-status--resolved">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="#1a7f37"><path d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"/></svg>
+        <div>
+          <strong>Resolved in commit <span style="font-family: var(--mono);">b7d94e2</span></strong> on Mar 18, 2026<br>
+          This finding was detected in the initial scan (<span style="font-family: var(--mono);">a3f82c1</span>) and was no longer present after the developer's next push.
+        </div>
+      </div>
+      <div class="finding-detail-desc">
+        The <code style="font-family: var(--mono); font-size: 12px; background: var(--surface-alt); padding: 1px 4px; border-radius: 3px;">buildSearchClause</code> function in line 142 was concatenating user input directly into a SQL WHERE clause. The developer replaced this with parameterized query placeholders.
+      </div>
+    </div>
+
+    <!-- Finding 4: RESOLVED (collapsed) -->
+    <div class="finding-row finding-row--resolved">
+      <div class="finding-risk"><span class="risk-dot risk-dot--medium" style="opacity: 0.4;"></span></div>
+      <div class="finding-agent" style="text-decoration: line-through; text-decoration-color: #b0b5bc;">SQL Injection Analyzer</div>
+      <div class="finding-type">Potential SQL Injection</div>
+      <div class="finding-file">pkg/models/repository_deep_scan_results.go</div>
+      <div><span class="finding-status finding-status--resolved">
+        <svg width="10" height="10" viewBox="0 0 16 16" fill="#1a7f37"><path d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"/></svg>
+        Resolved</span>
+      </div>
+      <div class="finding-expand">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M12.78 6.22a.75.75 0 010 1.06l-4.25 4.25a.75.75 0 01-1.06 0L3.22 7.28a.75.75 0 011.06-1.06L8 9.94l3.72-3.72a.75.75 0 011.06 0z"/></svg>
+      </div>
+    </div>
+
+    <!-- Finding 5: FALSE POSITIVE (expanded to show detail) -->
+    <div class="finding-row finding-row--dismissed" style="border-radius: 8px 8px 0 0; margin-bottom: 0;">
+      <div class="finding-risk"><span class="risk-dot risk-dot--medium" style="opacity: 0.3;"></span></div>
+      <div class="finding-agent" style="opacity: 0.45;">SQL Injection Analyzer</div>
+      <div class="finding-type">Potential SQL Injection</div>
+      <div class="finding-file">pkg/models/repository_deep_scan_results.go</div>
+      <div><span class="finding-status finding-status--fp">False Positive</span></div>
+      <div class="finding-expand">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" style="transform: rotate(180deg);"><path d="M12.78 6.22a.75.75 0 010 1.06l-4.25 4.25a.75.75 0 01-1.06 0L3.22 7.28a.75.75 0 011.06-1.06L8 9.94l3.72-3.72a.75.75 0 011.06 0z"/></svg>
+      </div>
+    </div>
+    <div class="finding-detail">
+      <div class="finding-detail-status finding-detail-status--fp">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="#656d76"><path d="M8 0a8 8 0 100 16A8 8 0 008 0zm3.28 5.78l-4 4a.75.75 0 01-1.06 0l-2-2a.75.75 0 011.06-1.06L6.75 8.19l3.47-3.47a.75.75 0 111.06 1.06z"/></svg>
+        <div>
+          <strong>Marked as false positive</strong> by <strong>cnichols-dry</strong> on Mar 22, 2026<br>
+          <em style="color: var(--text-muted);">"This input is already validated and sanitized by the middleware layer before reaching this function. Not exploitable."</em>
+        </div>
+      </div>
+      <div class="finding-detail-desc">
+        The <code style="font-family: var(--mono); font-size: 12px; background: var(--surface-alt); padding: 1px 4px; border-radius: 3px;">HasCategory</code> parameter on line 87 is flagged as user-influenced SQL input, but the value is constrained to a boolean by the HTTP handler's query parser before it reaches the model layer.
+      </div>
+    </div>
+
+  </div>
+
+  <!-- PR STATE SUMMARY -->
+  <div style="margin-top: 24px;">
+    <div class="pr-state-summary pr-state-summary--warn">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="#6b5300"><path d="M6.457 1.047c.659-1.234 2.427-1.234 3.086 0l6.082 11.378A1.75 1.75 0 0114.082 15H1.918a1.75 1.75 0 01-1.543-2.575L6.457 1.047zM8 5a.75.75 0 00-.75.75v2.5a.75.75 0 001.5 0v-2.5A.75.75 0 008 5zm0 9a1 1 0 100-2 1 1 0 000 2z"/></svg>
+      <div>
+        <strong>2 active findings remaining.</strong> 3 of the original 5 findings have been addressed (2 resolved via code fix, 1 marked as false positive). The scan timeline above shows how findings changed over the PR's lifecycle.
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

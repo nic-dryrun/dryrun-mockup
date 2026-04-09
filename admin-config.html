@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DryRun Security — Admin Config Mockup</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      --bg: #f8f9fb;
+      --surface: #ffffff;
+      --text: #1a1d23;
+      --text-secondary: #5a5f6b;
+      --text-muted: #8b919e;
+      --border: #e3e6eb;
+      --border-light: #eef0f4;
+      --purple: #7c6ef0;
+      --purple-hover: #6a5cd8;
+      --purple-bg: #f0eeff;
+      --purple-border: #d8d3f7;
+      --green: #22c55e;
+      --green-bg: #dcfce7;
+      --orange: #f59e0b;
+      --orange-text: #d97706;
+      --red: #ef4444;
+      --blue: #3b82f6;
+      --toggle-on: #7c6ef0;
+      --toggle-off: #c9cdd4;
+    }
+
+    html { -webkit-font-smoothing: antialiased; }
+    body {
+      font-family: var(--font);
+      font-size: 14px;
+      line-height: 1.5;
+      color: var(--text);
+      background: var(--bg);
+      min-height: 100vh;
+    }
+
+    /* ── TOP BAR (mockup indicator) ── */
+    .mockup-bar {
+      background: linear-gradient(135deg, #1a1e3a, #2d3260);
+      padding: 10px 24px;
+      display: flex; align-items: center; justify-content: space-between;
+      color: #fff; font-size: 12px; font-weight: 500;
+    }
+    .mockup-bar a {
+      color: rgba(255,255,255,0.7); text-decoration: none;
+      padding: 4px 12px; border-radius: 6px;
+      border: 1px solid rgba(255,255,255,0.2);
+      transition: all 0.15s;
+    }
+    .mockup-bar a:hover {
+      color: #fff; border-color: rgba(255,255,255,0.4);
+      background: rgba(255,255,255,0.08);
+    }
+    .mockup-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(124,110,240,0.3); padding: 3px 10px;
+      border-radius: 10px; font-size: 11px; font-weight: 600;
+    }
+
+    /* ── PAGE LAYOUT ── */
+    .page { max-width: 900px; margin: 0 auto; padding: 32px 24px 80px; }
+
+    .breadcrumb {
+      font-size: 13px; color: var(--text-muted); margin-bottom: 8px;
+    }
+    .breadcrumb a { color: var(--text-muted); text-decoration: none; }
+    .breadcrumb a:hover { color: var(--text-secondary); }
+
+    h1 {
+      font-size: 22px; font-weight: 700; color: var(--text);
+      margin-bottom: 28px;
+    }
+
+    /* ── SECTION HEADERS ── */
+    .config-section {
+      margin-bottom: 28px;
+    }
+    .config-section-header {
+      font-size: 11px; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.06em; color: var(--text-muted);
+      margin-bottom: 14px; padding-bottom: 8px;
+      border-bottom: 1px solid var(--border-light);
+      display: flex; align-items: center; gap: 8px;
+    }
+    .new-badge {
+      font-size: 9px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.04em; padding: 2px 6px; border-radius: 4px;
+      background: var(--purple-bg); color: var(--purple);
+      border: 1px solid var(--purple-border);
+    }
+
+    /* ── TOGGLE ROW ── */
+    .toggle-row {
+      display: flex; align-items: center; gap: 14px;
+      padding: 12px 0;
+    }
+    .toggle-row + .toggle-row {
+      border-top: 1px solid var(--border-light);
+    }
+    .toggle-label {
+      font-size: 14px; font-weight: 500; color: var(--text);
+      display: flex; align-items: center; gap: 8px;
+    }
+    .toggle-desc {
+      font-size: 12px; color: var(--text-muted); margin-top: 2px;
+      max-width: 520px; line-height: 1.45;
+    }
+    .toggle-left { flex: 1; }
+
+    /* ── TOGGLE SWITCH ── */
+    .toggle {
+      width: 42px; height: 24px; border-radius: 12px;
+      position: relative; flex-shrink: 0;
+      cursor: pointer; transition: background 0.2s;
+      border: none;
+    }
+    .toggle::after {
+      content: '';
+      position: absolute; width: 18px; height: 18px;
+      border-radius: 50%; background: #fff; top: 3px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+      transition: left 0.2s;
+    }
+    .toggle--on { background: var(--toggle-on); }
+    .toggle--on::after { left: 21px; }
+    .toggle--off { background: var(--toggle-off); }
+    .toggle--off::after { left: 3px; }
+
+    /* ── HELP ICON ── */
+    .help-icon {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 18px; height: 18px; border-radius: 50%;
+      border: 1.5px solid var(--purple); color: var(--purple);
+      font-size: 11px; font-weight: 600; cursor: help;
+      flex-shrink: 0;
+    }
+
+    /* ── SUB-SETTINGS (indented, conditionally visible) ── */
+    .sub-settings {
+      margin-left: 24px; padding-left: 20px;
+      border-left: 2px solid var(--border-light);
+      margin-top: 4px; margin-bottom: 8px;
+    }
+    .sub-settings .toggle-row { padding: 10px 0; }
+    .sub-settings .toggle-label { font-size: 13.5px; }
+
+    /* ── PROPOSED CHANGE INDICATOR ── */
+    .change-indicator {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: 10px; font-weight: 600;
+      padding: 2px 7px; border-radius: 10px;
+      white-space: nowrap; vertical-align: middle;
+    }
+    .change-indicator--new {
+      background: var(--purple-bg); color: var(--purple);
+      border: 1px solid var(--purple-border);
+    }
+    .change-indicator--updated {
+      background: #fef3c7; color: #92400e;
+      border: 1px solid #fcd34d;
+    }
+    .change-indicator--unchanged {
+      background: #f3f4f6; color: #6b7280;
+      border: 1px solid #e5e7eb;
+    }
+
+    /* ── TOOLTIP ── */
+    .tooltip-trigger { position: relative; }
+    .tooltip-content {
+      display: none; position: absolute; bottom: calc(100% + 8px); left: 50%;
+      transform: translateX(-50%);
+      background: var(--text); color: #fff; font-size: 12px;
+      padding: 8px 12px; border-radius: 6px; width: 280px;
+      line-height: 1.45; font-weight: 400; z-index: 10;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    .tooltip-trigger:hover .tooltip-content { display: block; }
+    .tooltip-content::after {
+      content: ''; position: absolute; top: 100%; left: 50%;
+      transform: translateX(-50%);
+      border: 6px solid transparent; border-top-color: var(--text);
+    }
+
+    /* ── DIVIDER ── */
+    .config-divider {
+      border: none; border-top: 1px solid var(--border);
+      margin: 24px 0;
+    }
+
+    /* ── POLICY CARDS ── */
+    .policy-header {
+      display: flex; align-items: center; gap: 12px;
+      margin-bottom: 14px;
+    }
+    .policy-header h3 {
+      font-size: 14px; font-weight: 600; color: var(--text);
+    }
+    .policy-btn {
+      font-size: 12px; font-weight: 500;
+      padding: 6px 14px; border-radius: 6px;
+      border: 1px solid var(--border); background: var(--surface);
+      color: var(--text-secondary); cursor: pointer;
+      transition: all 0.15s;
+    }
+    .policy-btn:hover {
+      border-color: var(--text-muted); color: var(--text);
+    }
+
+    .agent-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px 20px;
+      display: flex; align-items: center;
+      margin-bottom: 10px;
+    }
+    .agent-card-name {
+      flex: 1; font-size: 13.5px; font-weight: 500;
+    }
+    .agent-card-controls {
+      display: flex; align-items: center; gap: 24px;
+    }
+    .agent-control {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 12px; color: var(--text-secondary);
+    }
+    .agent-toggle {
+      width: 36px; height: 20px; border-radius: 10px;
+      position: relative; border: none; cursor: pointer;
+    }
+    .agent-toggle::after {
+      content: ''; position: absolute;
+      width: 14px; height: 14px; border-radius: 50%;
+      background: #fff; top: 3px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.15);
+    }
+    .agent-toggle--on { background: var(--toggle-on); }
+    .agent-toggle--on::after { left: 19px; }
+    .agent-toggle--off { background: var(--toggle-off); }
+    .agent-toggle--off::after { left: 3px; }
+
+    .risk-level {
+      font-size: 12px; font-weight: 500;
+    }
+    .risk-level span { color: var(--orange-text); }
+    .risk-level .info { color: var(--blue); }
+
+    .remove-btn {
+      width: 22px; height: 22px; border-radius: 50%;
+      border: 1.5px solid var(--orange-text); background: none;
+      color: var(--orange-text); font-size: 14px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; line-height: 1;
+    }
+
+    /* ── COMPARISON COLUMNS ── */
+    .compare-wrapper {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 24px;
+      margin-top: 32px; margin-bottom: 48px;
+    }
+    @media (max-width: 768px) {
+      .compare-wrapper { grid-template-columns: 1fr; }
+    }
+    .compare-col {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .compare-col-header {
+      padding: 12px 20px;
+      font-size: 12px; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-bottom: 1px solid var(--border-light);
+    }
+    .compare-col-header--current {
+      background: #fef2f2; color: #991b1b;
+    }
+    .compare-col-header--proposed {
+      background: #f0eeff; color: var(--purple);
+    }
+    .compare-col-body { padding: 20px; }
+
+    /* ── ANNOTATION BANNER ── */
+    .annotation-banner {
+      background: var(--purple-bg);
+      border: 1px solid var(--purple-border);
+      border-radius: 8px;
+      padding: 12px 16px;
+      margin-bottom: 24px;
+      display: flex; align-items: flex-start; gap: 10px;
+      font-size: 13px; color: #4338ca; line-height: 1.5;
+    }
+    .annotation-banner svg { flex-shrink: 0; margin-top: 2px; }
+
+    /* ── SECTION LABEL ── */
+    .agents-section-label {
+      font-size: 13px; font-weight: 600; color: var(--text);
+      margin-bottom: 12px; margin-top: 8px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- MOCKUP INDICATOR BAR -->
+<div class="mockup-bar">
+  <div style="display: flex; align-items: center; gap: 12px;">
+    <span class="mockup-badge">
+      <svg width="10" height="10" viewBox="0 0 16 16" fill="#c4b5fd"><circle cx="8" cy="8" r="8"/></svg>
+      PROPOSED MOCKUP
+    </span>
+    <span style="opacity: 0.6;">Admin Configuration — Comment Behavior Redesign</span>
+  </div>
+  <span style="opacity: 0.6;">Admin Config Mockup</span>
+</div>
+
+<div class="page">
+
+  <!-- COMPARISON: CURRENT vs PROPOSED -->
+  <div style="margin-bottom: 40px;">
+    <h1 style="margin-bottom: 8px;">Admin Configuration Mockup</h1>
+    <p style="color: var(--text-secondary); font-size: 14px; max-width: 600px; margin-bottom: 0;">
+      Side-by-side comparison of the current config layout vs. the proposed redesign, followed by the full proposed config page below.
+    </p>
+  </div>
+
+  <div class="compare-wrapper">
+    <!-- CURRENT -->
+    <div class="compare-col">
+      <div class="compare-col-header compare-col-header--current">Current Config</div>
+      <div class="compare-col-body">
+        <div class="toggle-row">
+          <div class="toggle-left">
+            <div class="toggle-label">Issue Comment Enabled</div>
+            <div class="toggle-desc">Master toggle. When off, DryRun never posts any GitHub comment.</div>
+          </div>
+          <div class="toggle toggle--on"></div>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-left">
+            <div class="toggle-label">Show Comment for No Findings</div>
+            <div class="toggle-desc">When on, post a comment even when there are no findings. When off, delete the comment after all findings resolve.</div>
+          </div>
+          <div class="toggle toggle--on"></div>
+        </div>
+        <div style="padding: 16px 0 0; font-size: 12px; color: var(--text-muted);">
+          No draft PR control. No granular resolve/dismiss behavior.
+        </div>
+      </div>
+    </div>
+
+    <!-- PROPOSED -->
+    <div class="compare-col">
+      <div class="compare-col-header compare-col-header--proposed">Proposed Config</div>
+      <div class="compare-col-body">
+        <div class="toggle-row">
+          <div class="toggle-left">
+            <div class="toggle-label">Issue Comment Enabled <span class="change-indicator change-indicator--unchanged">Unchanged</span></div>
+            <div class="toggle-desc">Master toggle. When off, DryRun never posts any GitHub comment.</div>
+          </div>
+          <div class="toggle toggle--on"></div>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-left">
+            <div class="toggle-label">Comment on Clean Scans <span class="change-indicator change-indicator--updated">Renamed</span></div>
+            <div class="toggle-desc">Post a confirmation comment even when no vulnerabilities are found.</div>
+          </div>
+          <div class="toggle toggle--on"></div>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-left">
+            <div class="toggle-label">Comment on Draft PRs <span class="change-indicator change-indicator--new">New</span></div>
+            <div class="toggle-desc">Post comments on PRs while in draft status.</div>
+          </div>
+          <div class="toggle toggle--on"></div>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-left">
+            <div class="toggle-label">Retain Comment When Resolved <span class="change-indicator change-indicator--new">New</span></div>
+            <div class="toggle-desc">Keep the comment with an "All Clear" status instead of deleting when findings are resolved.</div>
+          </div>
+          <div class="toggle toggle--on"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="config-divider" style="margin-bottom: 40px;">
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!--       FULL PROPOSED CONFIG PAGE MOCKUP       -->
+  <!-- ═══════════════════════════════════════════ -->
+
+  <div class="annotation-banner">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="#7c6ef0"><path d="M8 0a8 8 0 100 16A8 8 0 008 0zm0 3a1 1 0 110 2 1 1 0 010-2zm2 9H6v-1h1V7H6V6h3v6h1v1z"/></svg>
+    <div>
+      <strong>Proposed layout below.</strong> Items marked <span class="change-indicator change-indicator--new" style="margin: 0 2px;">New</span> are additions. Items marked <span class="change-indicator change-indicator--updated" style="margin: 0 2px;">Renamed</span> replace an existing toggle. Everything else is unchanged from the current config.
+    </div>
+  </div>
+
+  <!-- Breadcrumb -->
+  <div class="breadcrumb">
+    <a href="#">Settings</a> &gt; <a href="#">Configurations</a>
+  </div>
+  <h1>Default Configuration</h1>
+
+  <!-- ── COMMENT BEHAVIOR ── -->
+  <div class="config-section">
+    <div class="config-section-header">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="#8b919e"><path d="M0 1.75C0 .784.784 0 1.75 0h12.5C15.216 0 16 .784 16 1.75v9.5A1.75 1.75 0 0114.25 13H8.06l-2.573 2.573A1.458 1.458 0 013 14.543V13H1.75A1.75 1.75 0 010 11.25v-9.5zM1.75 1.5a.25.25 0 00-.25.25v9.5c0 .138.112.25.25.25h2a.75.75 0 01.75.75v2.19l2.72-2.72a.749.749 0 01.53-.22h6.5a.25.25 0 00.25-.25v-9.5a.25.25 0 00-.25-.25H1.75z"/></svg>
+      GitHub Comment Behavior
+    </div>
+
+    <!-- Master toggle -->
+    <div class="toggle-row">
+      <div class="toggle-left">
+        <div class="toggle-label">
+          Issue Comment Enabled
+        </div>
+        <div class="toggle-desc">
+          Master control for all GitHub PR comments. When disabled, DryRun scans PRs but never posts any comment.
+        </div>
+      </div>
+      <div class="toggle toggle--on"></div>
+    </div>
+
+    <!-- Sub-settings (shown when Issue Comment is ON) -->
+    <div class="sub-settings">
+
+      <!-- Comment on Clean Scans (renamed from "Show Comment for No Findings") -->
+      <div class="toggle-row">
+        <div class="toggle-left">
+          <div class="toggle-label">
+            Comment on Clean Scans
+            <span class="change-indicator change-indicator--updated">Renamed</span>
+            <span class="tooltip-trigger help-icon">?
+              <span class="tooltip-content">Previously "Show Comment for No Findings." Controls whether DryRun posts a comment when a scan produces zero vulnerabilities.</span>
+            </span>
+          </div>
+          <div class="toggle-desc">
+            Post a confirmation comment even when no security vulnerabilities are detected, proving the PR was scanned.
+          </div>
+        </div>
+        <div class="toggle toggle--on"></div>
+      </div>
+
+      <!-- Comment on Draft PRs (NEW) -->
+      <div class="toggle-row">
+        <div class="toggle-left">
+          <div class="toggle-label">
+            Comment on Draft PRs
+            <span class="change-indicator change-indicator--new">New</span>
+            <span class="tooltip-trigger help-icon">?
+              <span class="tooltip-content">When enabled, DryRun posts comments on draft PRs just like regular PRs. When disabled, scans still run but comments are held until the PR leaves draft status.</span>
+            </span>
+          </div>
+          <div class="toggle-desc">
+            Post findings and scan results on pull requests while they are in draft mode. When disabled, scans run silently and findings appear on the next scan after the PR is marked ready.
+          </div>
+        </div>
+        <div class="toggle toggle--on"></div>
+      </div>
+
+      <!-- Retain Comment When Resolved (NEW) -->
+      <div class="toggle-row">
+        <div class="toggle-left">
+          <div class="toggle-label">
+            Retain Comment When Resolved
+            <span class="change-indicator change-indicator--new">New</span>
+            <span class="tooltip-trigger help-icon">?
+              <span class="tooltip-content">When enabled, the comment updates to an "All Clear" state showing what was found and how it was handled. When disabled, the comment is deleted once all findings are resolved or dismissed.</span>
+            </span>
+          </div>
+          <div class="toggle-desc">
+            Keep the comment with a resolved status and collapsed finding history instead of deleting it when all findings are addressed. Preserves the audit trail.
+          </div>
+        </div>
+        <div class="toggle toggle--on"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <hr class="config-divider">
+
+  <!-- ── PR BLOCKING ── -->
+  <div class="config-section">
+    <div class="config-section-header">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="#8b919e"><path d="M4.25 7.25a.75.75 0 000 1.5h7.5a.75.75 0 000-1.5h-7.5z"/><path d="M8 0a8 8 0 100 16A8 8 0 008 0zM1.5 8a6.5 6.5 0 1113 0 6.5 6.5 0 01-13 0z"/></svg>
+      PR Blocking &amp; Notifications
+    </div>
+
+    <div class="toggle-row">
+      <div class="toggle-left">
+        <div class="toggle-label">PR Blocking Enabled</div>
+        <div class="toggle-desc">Block PRs from merging when critical vulnerabilities are detected.</div>
+      </div>
+      <div class="toggle toggle--off"></div>
+    </div>
+
+    <div class="toggle-row">
+      <div class="toggle-left">
+        <div class="toggle-label">Notifications Enabled</div>
+        <div class="toggle-desc">Send notifications when new findings are detected.</div>
+      </div>
+      <div class="toggle toggle--off"></div>
+    </div>
+  </div>
+
+  <hr class="config-divider">
+
+  <!-- ── POLICY ENFORCEMENT AGENT ── -->
+  <div class="config-section">
+    <div class="policy-header">
+      <h3>Policy Enforcement Agent</h3>
+      <button class="policy-btn">Add Policy +</button>
+      <button class="policy-btn">Create Policy +</button>
+      <span class="tooltip-trigger help-icon">?
+        <span class="tooltip-content">Policy agents enforce custom rules on PRs. Blocking policies prevent merge. Silent mode suppresses the finding from the comment.</span>
+      </span>
+    </div>
+
+    <div class="agent-card">
+      <div class="agent-card-name">Dependency License Check v1</div>
+      <div class="agent-card-controls">
+        <div class="agent-control">Blocking <div class="agent-toggle agent-toggle--on"></div></div>
+        <div class="agent-control">Silent Mode <div class="agent-toggle agent-toggle--off"></div></div>
+        <button class="remove-btn">&minus;</button>
+      </div>
+    </div>
+
+    <div class="agent-card">
+      <div class="agent-card-name">No Default Env Var Values</div>
+      <div class="agent-card-controls">
+        <div class="agent-control">Blocking <div class="agent-toggle agent-toggle--on"></div></div>
+        <div class="agent-control">Silent Mode <div class="agent-toggle agent-toggle--off"></div></div>
+        <button class="remove-btn">&minus;</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── CODE SECURITY AGENTS ── -->
+  <div class="config-section">
+    <div class="agents-section-label">Code Security Agents</div>
+
+    <div class="agent-card">
+      <div class="agent-card-name">Cross-Site Scripting Analyzer</div>
+      <div class="agent-card-controls">
+        <div class="agent-control">Blocking <div class="agent-toggle agent-toggle--off"></div></div>
+        <div class="agent-control">Silent Mode <div class="agent-toggle agent-toggle--off"></div></div>
+        <div class="risk-level">Risk Level: <span>Risky</span> ▾</div>
+      </div>
+    </div>
+
+    <div class="agent-card">
+      <div class="agent-card-name">General Security Analyzer</div>
+      <div class="agent-card-controls">
+        <div class="agent-control">Blocking <div class="agent-toggle agent-toggle--off"></div></div>
+        <div class="agent-control">Silent Mode <div class="agent-toggle agent-toggle--off"></div></div>
+        <div class="risk-level">Risk Level: <span class="info">Info</span> ▾</div>
+      </div>
+    </div>
+
+    <div class="agent-card">
+      <div class="agent-card-name">IDOR Analyzer</div>
+      <div class="agent-card-controls">
+        <div class="agent-control">Blocking <div class="agent-toggle agent-toggle--off"></div></div>
+        <div class="agent-control">Silent Mode <div class="agent-toggle agent-toggle--off"></div></div>
+        <div class="risk-level">Risk Level: <span>Risky</span> ▾</div>
+      </div>
+    </div>
+
+    <div class="agent-card">
+      <div class="agent-card-name">Mass Assignment</div>
+      <div class="agent-card-controls">
+        <div class="agent-control">Blocking <div class="agent-toggle agent-toggle--off"></div></div>
+        <div class="agent-control">Silent Mode <div class="agent-toggle agent-toggle--off"></div></div>
+        <div class="risk-level">Risk Level: <span>Risky</span> ▾</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>
