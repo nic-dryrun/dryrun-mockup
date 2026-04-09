@@ -224,6 +224,84 @@
     .compare-col-body { padding: 16px; font-size: 12.5px; color: var(--text-sec); line-height: 1.55; }
     .compare-col-body ul { margin: 8px 0 0 18px; }
     .compare-col-body li { margin-bottom: 4px; }
+    /* ── REPORT MODAL ── */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0; z-index: 1000;
+      background: rgba(0,0,0,0.5); align-items: center; justify-content: center;
+      padding: 24px;
+    }
+    .modal {
+      background: var(--surface); border-radius: 12px;
+      width: 100%; max-width: 840px; max-height: 90vh;
+      overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+      position: relative;
+    }
+    .modal-topbar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 24px; background: var(--surface-alt);
+      border-bottom: 1px solid var(--border-light);
+      position: sticky; top: 0; z-index: 1;
+    }
+    .modal-topbar-left { display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 600; color: var(--text); }
+    .modal-topbar-actions { display: flex; align-items: center; gap: 8px; }
+    .modal-btn {
+      font-size: 12px; font-weight: 500; padding: 5px 12px; border-radius: 6px;
+      border: 1px solid var(--border); background: var(--surface); color: var(--text-sec);
+      cursor: pointer;
+    }
+    .modal-btn:hover { background: var(--surface-alt); }
+    .modal-close {
+      width: 28px; height: 28px; border-radius: 6px; border: 1px solid var(--border);
+      background: var(--surface); cursor: pointer;
+      display: flex; align-items: center; justify-content: center; color: var(--text-muted);
+    }
+    .modal-close:hover { background: var(--red-bg); color: var(--red); border-color: #ffcecb; }
+
+    .rpt { padding: 32px 40px 48px; }
+    @media (max-width: 600px) { .rpt { padding: 20px 16px 32px; } }
+    .rpt-header { margin-bottom: 28px; padding-bottom: 20px; border-bottom: 2px solid var(--border); }
+    .rpt-badge { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; padding: 3px 10px; border-radius: 4px; background: var(--orange-bg); color: var(--orange); margin-bottom: 10px; display: inline-block; }
+    .rpt h1 { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+    .rpt-meta { font-size: 12px; color: var(--text-muted); display: flex; flex-wrap: wrap; gap: 16px; margin-top: 8px; }
+    .rpt-meta span { display: flex; align-items: center; gap: 4px; }
+    .rpt h2 { font-size: 15px; font-weight: 700; color: var(--text); margin: 28px 0 10px; padding-bottom: 6px; border-bottom: 1px solid var(--border-light); display: flex; align-items: center; gap: 8px; }
+    .rpt h2 .sec-num { font-size: 11px; font-weight: 700; color: var(--purple); background: var(--purple-bg); padding: 2px 7px; border-radius: 6px; }
+    .rpt h3 { font-size: 13px; font-weight: 600; color: var(--text); margin: 16px 0 6px; }
+    .rpt p { font-size: 13px; color: var(--text-sec); line-height: 1.65; margin-bottom: 8px; }
+    .rpt code { font-family: var(--mono); font-size: 12px; background: var(--surface-alt); padding: 1px 5px; border-radius: 3px; }
+    .rpt ul { margin: 6px 0 12px 20px; font-size: 13px; color: var(--text-sec); line-height: 1.6; }
+    .rpt li { margin-bottom: 4px; }
+    .rpt-kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 12px 0 16px; }
+    @media (max-width: 600px) { .rpt-kpi-grid { grid-template-columns: repeat(2, 1fr); } }
+    .rpt-kpi { background: var(--surface-alt); border: 1px solid var(--border-light); border-radius: 8px; padding: 12px; text-align: center; }
+    .rpt-kpi-val { font-size: 24px; font-weight: 700; }
+    .rpt-kpi-label { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+    .rpt-kpi-val.red { color: var(--red); }
+    .rpt-kpi-val.orange { color: var(--orange); }
+    .rpt-kpi-val.green { color: var(--green); }
+    .rpt-kpi-val.blue { color: var(--blue); }
+    .rpt-table { width: 100%; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; font-size: 12.5px; margin: 10px 0 16px; }
+    .rpt-table th { background: var(--surface-alt); text-align: left; padding: 8px 12px; font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.03em; color: var(--text-muted); border-bottom: 1px solid var(--border); }
+    .rpt-table td { padding: 8px 12px; border-bottom: 1px solid var(--border-light); vertical-align: top; color: var(--text-sec); }
+    .rpt-table tr:last-child td { border-bottom: none; }
+    .rpt-sev { font-size: 11px; font-weight: 600; padding: 2px 7px; border-radius: 4px; white-space: nowrap; }
+    .rpt-sev.crit { background: var(--red-bg); color: var(--red); }
+    .rpt-sev.high { background: var(--orange-bg); color: #92400e; }
+    .rpt-sev.med { background: #fff8c5; color: #6b5300; }
+    .rpt-sev.low { background: var(--blue-bg); color: var(--blue); }
+    .rpt-tag { font-size: 11px; padding: 2px 7px; border-radius: 4px; background: var(--surface-alt); border: 1px solid var(--border-light); color: var(--text-sec); white-space: nowrap; display: inline-block; margin: 1px 2px; }
+    .rpt-callout { padding: 12px 16px; border-radius: 8px; font-size: 12.5px; line-height: 1.55; margin: 10px 0 14px; }
+    .rpt-callout.warn { background: var(--orange-bg); border: 1px solid var(--orange-border); color: #6b5300; }
+    .rpt-callout.info { background: var(--blue-bg); border: 1px solid var(--blue-border); color: #0550ae; }
+    .rpt-callout.good { background: var(--green-bg); border: 1px solid var(--green-border); color: #15572a; }
+    .rpt-rec { display: flex; align-items: flex-start; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border-light); }
+    .rpt-rec:last-child { border-bottom: none; }
+    .rpt-rec-pri { font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 4px; white-space: nowrap; margin-top: 2px; }
+    .pri-crit { background: var(--red-bg); color: var(--red); }
+    .pri-high { background: var(--orange-bg); color: #92400e; }
+    .pri-med { background: #fff8c5; color: #6b5300; }
+    .rpt-rec-body { font-size: 12.5px; color: var(--text-sec); line-height: 1.5; }
+    .rpt-rec-body strong { color: var(--text); }
   </style>
 </head>
 <body>
@@ -336,7 +414,24 @@
 
   <div class="workflow-grid">
 
-    <!-- 1. Feature Ships -->
+    <!-- 1. Security Reviews (promoted to first position) -->
+    <div class="wf-card" style="border-color: var(--purple); box-shadow: 0 0 0 1px var(--purple-border);">
+      <div class="wf-card-top">
+        <div class="wf-icon ic-orange">
+          <svg width="18" height="18" viewBox="0 0 16 16" fill="#bf8700"><path d="M9.585.52a2.678 2.678 0 00-3.17 0l-.928.68a1.178 1.178 0 01-.518.215L3.83 1.59a2.678 2.678 0 00-2.24 2.24l-.175 1.14a1.178 1.178 0 01-.215.518l-.68.928a2.678 2.678 0 000 3.17l.68.928c.113.153.186.33.215.518l.175 1.138a2.678 2.678 0 002.24 2.24l1.138.175c.187.029.365.102.518.215l.928.68a2.678 2.678 0 003.17 0l.928-.68a1.17 1.17 0 01.518-.215l1.138-.175a2.678 2.678 0 002.241-2.24l.175-1.138c.029-.187.102-.365.215-.518l.68-.928a2.678 2.678 0 000-3.17l-.68-.928a1.179 1.179 0 01-.215-.518L14.41 3.83a2.678 2.678 0 00-2.24-2.24l-1.138-.175a1.179 1.179 0 01-.518-.215L9.585.52z"/></svg>
+        </div>
+        <div>
+          <h3>Security Review</h3>
+        </div>
+      </div>
+      <p>Comprehensive security review of a repository — app profile, auth, APIs, findings, trends, and prioritized recommendations.</p>
+      <div class="wf-card-footer">
+        <span class="wf-output"><svg width="12" height="12" viewBox="0 0 16 16" fill="#8b919e"><path d="M3 3a2 2 0 012-2h6a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V3z"/></svg> Review report</span>
+        <button class="wf-run-btn" onclick="document.getElementById('reportModal').style.display='flex'">Run workflow</button>
+      </div>
+    </div>
+
+    <!-- 2. Feature Ships -->
     <div class="wf-card">
       <div class="wf-card-top">
         <div class="wf-icon ic-green">
@@ -438,22 +533,7 @@
       </div>
     </div>
 
-    <!-- 7. Security Reviews -->
-    <div class="wf-card">
-      <div class="wf-card-top">
-        <div class="wf-icon ic-orange">
-          <svg width="18" height="18" viewBox="0 0 16 16" fill="#bf8700"><path d="M9.585.52a2.678 2.678 0 00-3.17 0l-.928.68a1.178 1.178 0 01-.518.215L3.83 1.59a2.678 2.678 0 00-2.24 2.24l-.175 1.14a1.178 1.178 0 01-.215.518l-.68.928a2.678 2.678 0 000 3.17l.68.928c.113.153.186.33.215.518l.175 1.138a2.678 2.678 0 002.24 2.24l1.138.175c.187.029.365.102.518.215l.928.68a2.678 2.678 0 003.17 0l.928-.68a1.17 1.17 0 01.518-.215l1.138-.175a2.678 2.678 0 002.241-2.24l.175-1.138c.029-.187.102-.365.215-.518l.68-.928a2.678 2.678 0 000-3.17l-.68-.928a1.179 1.179 0 01-.215-.518L14.41 3.83a2.678 2.678 0 00-2.24-2.24l-1.138-.175a1.179 1.179 0 01-.518-.215L9.585.52zM7.303 1.77l.927-.68a1.178 1.178 0 011.4 0l.928.68c.29.212.63.35.988.393l1.14.175c.483.074.87.46.943.943l.175 1.138c.043.358.182.699.393.99l.68.927a1.178 1.178 0 010 1.4l-.68.928c-.211.29-.35.63-.393.988l-.175 1.14a1.178 1.178 0 01-.943.943l-1.14.175a2.678 2.678 0 00-.988.393l-.928.68a1.178 1.178 0 01-1.4 0l-.927-.68a2.678 2.678 0 00-.99-.393l-1.138-.175a1.178 1.178 0 01-.943-.943l-.175-1.14a2.678 2.678 0 00-.393-.988l-.68-.928a1.178 1.178 0 010-1.4l.68-.927c.212-.29.35-.632.393-.99l.175-1.138a1.178 1.178 0 01.943-.943l1.14-.175c.357-.043.698-.181.988-.393zM11.28 6.78a.75.75 0 00-1.06-1.06L7 8.94 5.78 7.72a.75.75 0 00-1.06 1.06l1.75 1.75a.75.75 0 001.06 0l3.75-3.75z"/></svg>
-        </div>
-        <div>
-          <h3>Security Reviews</h3>
-        </div>
-      </div>
-      <p>Comprehensive security review report for a repo or org over a time period. Findings, trends, and action items.</p>
-      <div class="wf-card-footer">
-        <span class="wf-output"><svg width="12" height="12" viewBox="0 0 16 16" fill="#8b919e"><path d="M3 3a2 2 0 012-2h6a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V3z"/></svg> Review report</span>
-        <button class="wf-run-btn">Run workflow</button>
-      </div>
-    </div>
+    <!-- 7. Security Reviews (moved to first, interactive version below) -->
 
     <!-- 8. PR Variant Analysis -->
     <div class="wf-card">
@@ -630,6 +710,206 @@
     </div>
   </div>
 
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!--              SECURITY REVIEW REPORT MODAL           -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="reportModal" onclick="if(event.target===this)this.style.display='none'">
+  <div class="modal">
+    <div class="modal-topbar">
+      <div class="modal-topbar-left">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="#bf8700"><path d="M3 3a2 2 0 012-2h6a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V3z"/></svg>
+        Security Review Report
+      </div>
+      <div class="modal-topbar-actions">
+        <button class="modal-btn">Export PDF</button>
+        <button class="modal-btn">Share</button>
+        <button class="modal-close" onclick="document.getElementById('reportModal').style.display='none'">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M3.72 3.72a.75.75 0 011.06 0L8 6.94l3.22-3.22a.75.75 0 111.06 1.06L9.06 8l3.22 3.22a.75.75 0 11-1.06 1.06L8 9.06l-3.22 3.22a.75.75 0 01-1.06-1.06L6.94 8 3.72 4.78a.75.75 0 010-1.06z"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="rpt">
+      <!-- HEADER -->
+      <div class="rpt-header">
+        <div class="rpt-badge">Security Review</div>
+        <h1>DryRunSec/dryrun-api</h1>
+        <p style="font-size: 14px; color: var(--text-sec); margin-bottom: 0;">Comprehensive repository security review generated by Code Security Intelligence</p>
+        <div class="rpt-meta">
+          <span><svg width="12" height="12" viewBox="0 0 16 16" fill="#8b919e"><path d="M4.75 0a.75.75 0 01.75.75V2h5V.75a.75.75 0 011.5 0V2h1.25c.966 0 1.75.784 1.75 1.75v10.5A1.75 1.75 0 0113.25 16H2.75A1.75 1.75 0 011 14.25V3.75C1 2.784 1.784 2 2.75 2H4V.75A.75.75 0 014.75 0z"/></svg> Apr 9, 2026</span>
+          <span><svg width="12" height="12" viewBox="0 0 16 16" fill="#8b919e"><path d="M8 0a8 8 0 100 16A8 8 0 008 0z"/></svg> Analysis period: Mar 1 – Apr 9, 2026</span>
+          <span><svg width="12" height="12" viewBox="0 0 16 16" fill="#8b919e"><path d="M2 1.75C2 .784 2.784 0 3.75 0h8.5C13.216 0 14 .784 14 1.75v12.5A1.75 1.75 0 0112.25 16h-8.5A1.75 1.75 0 012 14.25V1.75z"/></svg> 247 PRs analyzed</span>
+        </div>
+      </div>
+
+      <!-- 1. EXECUTIVE SUMMARY -->
+      <h2><span class="sec-num">1</span> Executive Summary</h2>
+      <p>DryRunSec/dryrun-api is a Go-based backend API service handling authentication, repository scanning orchestration, and finding management. Over the analysis period, 247 pull requests were scanned, producing 38 total findings — 14 currently active, 19 resolved, and 5 dismissed. The application presents a <strong>moderate risk posture</strong> with recurring SQL injection patterns in the data access layer and incomplete tenant isolation in several model methods.</p>
+
+      <div class="rpt-kpi-grid">
+        <div class="rpt-kpi"><div class="rpt-kpi-val red">3</div><div class="rpt-kpi-label">Critical</div></div>
+        <div class="rpt-kpi"><div class="rpt-kpi-val orange">11</div><div class="rpt-kpi-label">High</div></div>
+        <div class="rpt-kpi"><div class="rpt-kpi-val blue">18</div><div class="rpt-kpi-label">Medium</div></div>
+        <div class="rpt-kpi"><div class="rpt-kpi-val green">63%</div><div class="rpt-kpi-label">Resolved rate</div></div>
+      </div>
+
+      <div class="rpt-callout warn">
+        <strong>Key concern:</strong> 3 critical SQL injection findings remain active in <code>pkg/models/</code>. These allow unsanitized user input into raw SQL queries and should be prioritized for remediation before the next release.</div>
+
+      <!-- 2. APPLICATION PROFILE -->
+      <h2><span class="sec-num">2</span> Application Profile</h2>
+      <table class="rpt-table">
+        <tr><th style="width: 160px;">Property</th><th>Details</th></tr>
+        <tr><td><strong>Primary Language</strong></td><td>Go 1.22</td></tr>
+        <tr><td><strong>Framework</strong></td><td>Gin (HTTP), GORM (ORM), Wire (DI)</td></tr>
+        <tr><td><strong>Data Stores</strong></td><td>PostgreSQL (primary), Redis (cache/sessions), Pinecone (vector search)</td></tr>
+        <tr><td><strong>External Integrations</strong></td><td>GitHub API, Stripe (billing), SendGrid (email), OpenAI API, Pinecone API</td></tr>
+        <tr><td><strong>Deployment</strong></td><td>Kubernetes (GKE) with Helm charts, GitHub Actions CI/CD</td></tr>
+        <tr><td><strong>Repository Size</strong></td><td>142K LOC across 387 files, 12 active contributors</td></tr>
+      </table>
+
+      <!-- 3. AUTHENTICATION & AUTHORIZATION -->
+      <h2><span class="sec-num">3</span> Authentication &amp; Authorization</h2>
+
+      <h3>Authentication Methods Detected</h3>
+      <table class="rpt-table">
+        <tr><th>Method</th><th>Location</th><th>Assessment</th></tr>
+        <tr><td>JWT Bearer tokens</td><td><code>pkg/middleware/auth.go</code></td><td><span class="rpt-sev high">Token expiry set to 30 days — recommend reducing to 24h with refresh tokens</span></td></tr>
+        <tr><td>GitHub OAuth</td><td><code>pkg/auth/github.go</code></td><td><span class="rpt-sev low">Standard implementation, scopes properly constrained</span></td></tr>
+        <tr><td>API Key (service-to-service)</td><td><code>pkg/middleware/apikey.go</code></td><td><span class="rpt-sev med">Keys stored in env vars, no rotation policy detected</span></td></tr>
+      </table>
+
+      <h3>Authorization Patterns</h3>
+      <p>The application uses a role-based model (<code>admin</code>, <code>member</code>, <code>viewer</code>) enforced through middleware. However, 4 endpoints in the admin API bypass the authorization middleware by registering routes before the middleware is applied. Additionally, tenant isolation is enforced at the service layer but <strong>not at the data access layer</strong> — the <code>DeleteDrift</code> and <code>UpdateScanResult</code> model methods accept an account UUID but do not use it in database queries.</p>
+
+      <div class="rpt-callout warn"><strong>Gap identified:</strong> Model-layer tenant isolation is missing on 3 data access methods. While the service layer currently validates ownership, these methods are vulnerable to misuse if called from a new code path that skips the service layer check.</div>
+
+      <!-- 4. API SURFACE -->
+      <h2><span class="sec-num">4</span> API Surface &amp; Routes</h2>
+      <p>The application exposes 67 HTTP endpoints across 4 route groups. DryRun mapped all routes, middleware chains, and parameter handling.</p>
+      <table class="rpt-table">
+        <tr><th>Route Group</th><th>Endpoints</th><th>Auth Required</th><th>Notes</th></tr>
+        <tr><td><code>/api/v1/</code></td><td>42</td><td>Yes (JWT)</td><td>Primary API — repos, scans, findings, PRs</td></tr>
+        <tr><td><code>/api/admin/</code></td><td>11</td><td>Yes (JWT + admin role)</td><td>Account mgmt, billing, feature flags</td></tr>
+        <tr><td><code>/webhooks/</code></td><td>8</td><td>Signature verification</td><td>GitHub, Stripe webhooks</td></tr>
+        <tr><td><code>/internal/</code></td><td>6</td><td>API Key</td><td>Service-to-service (scanner agents)</td></tr>
+      </table>
+
+      <!-- 5. APPLICATION WORKFLOW -->
+      <h2><span class="sec-num">5</span> Application Workflow &amp; Data Flow</h2>
+      <p>The core workflow follows this pattern: GitHub webhooks trigger scan orchestration, which dispatches to analyzer agents via internal API. Agents return findings that are stored in PostgreSQL and indexed in Pinecone for semantic search. The LLM inference layer (<code>pkg/inference/</code>) queries Pinecone precedents to power the Insights/CSI features.</p>
+
+      <h3>Trust Boundaries Identified</h3>
+      <ul>
+        <li><strong>External → API Gateway:</strong> All user input enters through Gin handlers. Input validation is inconsistent — some endpoints use struct tags, others perform manual checks.</li>
+        <li><strong>API → Database:</strong> GORM is used for most queries, but 7 raw SQL queries exist in <code>pkg/models/</code> that bypass GORM’s parameterization.</li>
+        <li><strong>API → LLM (OpenAI):</strong> Prompts are constructed with user-controlled finding data concatenated directly into templates. The <code>NitpickFilterService</code> is particularly vulnerable to prompt injection.</li>
+        <li><strong>Webhook → Internal:</strong> GitHub webhook payloads are signature-verified, but Stripe webhook verification is missing on 2 endpoints.</li>
+      </ul>
+
+      <!-- 6. VULNERABILITY FINDINGS -->
+      <h2><span class="sec-num">6</span> Vulnerability Findings</h2>
+      <p>38 total findings across the analysis period. Breakdown by category and status:</p>
+
+      <table class="rpt-table">
+        <tr><th>Category</th><th>Severity</th><th>Count</th><th>Active</th><th>Resolved</th><th>Dismissed</th></tr>
+        <tr><td>SQL Injection</td><td><span class="rpt-sev crit">Critical</span></td><td>3</td><td>3</td><td>0</td><td>0</td></tr>
+        <tr><td>Missing Authorization</td><td><span class="rpt-sev high">High</span></td><td>4</td><td>2</td><td>1</td><td>1</td></tr>
+        <tr><td>IDOR / Tenant Isolation</td><td><span class="rpt-sev high">High</span></td><td>3</td><td>2</td><td>1</td><td>0</td></tr>
+        <tr><td>Prompt Injection</td><td><span class="rpt-sev high">High</span></td><td>2</td><td>2</td><td>0</td><td>0</td></tr>
+        <tr><td>Hardcoded Credentials</td><td><span class="rpt-sev high">High</span></td><td>2</td><td>0</td><td>2</td><td>0</td></tr>
+        <tr><td>Path Traversal</td><td><span class="rpt-sev med">Medium</span></td><td>5</td><td>2</td><td>2</td><td>1</td></tr>
+        <tr><td>Insecure Deserialization</td><td><span class="rpt-sev med">Medium</span></td><td>3</td><td>0</td><td>3</td><td>0</td></tr>
+        <tr><td>Information Disclosure</td><td><span class="rpt-sev med">Medium</span></td><td>6</td><td>1</td><td>4</td><td>1</td></tr>
+        <tr><td>Cryptographic Weakness</td><td><span class="rpt-sev med">Medium</span></td><td>4</td><td>1</td><td>3</td><td>0</td></tr>
+        <tr><td>Other (CSRF, SSRF, XSS)</td><td><span class="rpt-sev low">Low</span></td><td>6</td><td>1</td><td>3</td><td>2</td></tr>
+      </table>
+
+      <!-- 7. VULNERABILITY TRENDS -->
+      <h2><span class="sec-num">7</span> Trends &amp; Developer Patterns</h2>
+      <p>Over the 5-week analysis period, findings per PR decreased from 0.42 to 0.18, indicating improving developer security awareness. The average time to resolve a finding dropped from 6.2 days to 2.8 days.</p>
+
+      <div class="rpt-kpi-grid">
+        <div class="rpt-kpi"><div class="rpt-kpi-val green">∙57%</div><div class="rpt-kpi-label">Findings/PR trend</div></div>
+        <div class="rpt-kpi"><div class="rpt-kpi-val green">2.8d</div><div class="rpt-kpi-label">Avg resolve time</div></div>
+        <div class="rpt-kpi"><div class="rpt-kpi-val blue">12</div><div class="rpt-kpi-label">Active contributors</div></div>
+        <div class="rpt-kpi"><div class="rpt-kpi-val orange">13%</div><div class="rpt-kpi-label">FP dismissal rate</div></div>
+      </div>
+
+      <div class="rpt-callout good"><strong>Positive trend:</strong> SQL injection findings dropped by 40% after the team adopted parameterized query patterns in Week 3. However, the remaining 3 critical findings are in legacy model methods that predate the new pattern.</div>
+
+      <h3>Top Contributors by Finding Resolution</h3>
+      <table class="rpt-table">
+        <tr><th>Developer</th><th>PRs</th><th>Findings Created</th><th>Findings Resolved</th><th>Avg Resolve Time</th></tr>
+        <tr><td>cnichols-dry</td><td>34</td><td>8</td><td>7</td><td>1.5 days</td></tr>
+        <tr><td>peterkarman1</td><td>28</td><td>6</td><td>4</td><td>3.2 days</td></tr>
+        <tr><td>wickett</td><td>22</td><td>3</td><td>3</td><td>0.8 days</td></tr>
+        <tr><td>sarah-eng</td><td>19</td><td>5</td><td>5</td><td>2.1 days</td></tr>
+      </table>
+
+      <!-- 8. FRAMEWORKS & DEPENDENCIES -->
+      <h2><span class="sec-num">8</span> Dependencies &amp; Supply Chain</h2>
+      <p>The application has 89 direct Go module dependencies. DryRun identified 2 dependencies with known CVEs and 4 with outdated major versions.</p>
+      <table class="rpt-table">
+        <tr><th>Dependency</th><th>Current</th><th>Issue</th><th>Severity</th></tr>
+        <tr><td><code>golang.org/x/crypto</code></td><td>v0.17.0</td><td>CVE-2024-45337 — SSH transport vulnerability</td><td><span class="rpt-sev high">High</span></td></tr>
+        <tr><td><code>github.com/gin-gonic/gin</code></td><td>v1.9.1</td><td>v1.10.0 available — security fixes for multipart parsing</td><td><span class="rpt-sev med">Medium</span></td></tr>
+      </table>
+
+      <!-- 9. RECOMMENDATIONS -->
+      <h2><span class="sec-num">9</span> Prioritized Recommendations</h2>
+
+      <div class="rpt-rec">
+        <span class="rpt-rec-pri pri-crit">P0 — CRITICAL</span>
+        <div class="rpt-rec-body"><strong>Remediate 3 active SQL injection findings in <code>pkg/models/</code>.</strong> Replace raw SQL string concatenation with GORM parameterized queries or prepared statements. Affected methods: <code>buildSearchClause</code>, <code>buildCategoryFilter</code>, <code>buildSortClause</code>.</div>
+      </div>
+      <div class="rpt-rec">
+        <span class="rpt-rec-pri pri-crit">P0 — CRITICAL</span>
+        <div class="rpt-rec-body"><strong>Add tenant isolation to data access layer.</strong> Ensure all model methods that accept an account UUID actually filter queries by it. Affected: <code>DeleteDrift</code>, <code>UpdateScanResult</code>, <code>PurgeFindingsByRepo</code>.</div>
+      </div>
+      <div class="rpt-rec">
+        <span class="rpt-rec-pri pri-high">P1 — HIGH</span>
+        <div class="rpt-rec-body"><strong>Mitigate prompt injection in NitpickFilterService.</strong> Implement structural isolation (XML tags or delimiters) for user-controlled data in LLM prompts. Do not rely on natural language instructions alone.</div>
+      </div>
+      <div class="rpt-rec">
+        <span class="rpt-rec-pri pri-high">P1 — HIGH</span>
+        <div class="rpt-rec-body"><strong>Add Stripe webhook signature verification</strong> to the 2 unprotected endpoints in <code>pkg/handlers/stripe_webhook.go</code>. Use <code>stripe.ConstructEvent()</code> for all incoming Stripe payloads.</div>
+      </div>
+      <div class="rpt-rec">
+        <span class="rpt-rec-pri pri-high">P1 — HIGH</span>
+        <div class="rpt-rec-body"><strong>Reduce JWT expiry from 30 days to 24 hours</strong> and implement refresh token rotation. Update <code>pkg/middleware/auth.go</code> token generation.</div>
+      </div>
+      <div class="rpt-rec">
+        <span class="rpt-rec-pri pri-med">P2 — MEDIUM</span>
+        <div class="rpt-rec-body"><strong>Update <code>golang.org/x/crypto</code></strong> to v0.31.0+ to patch CVE-2024-45337. Run <code>go get -u golang.org/x/crypto</code> and validate SSH transport behavior.</div>
+      </div>
+      <div class="rpt-rec">
+        <span class="rpt-rec-pri pri-med">P2 — MEDIUM</span>
+        <div class="rpt-rec-body"><strong>Standardize input validation</strong> across all API endpoints. Adopt a consistent validation library (e.g., <code>go-playground/validator</code>) with struct tags rather than ad-hoc manual checks.</div>
+      </div>
+
+      <!-- 10. COMPLIANCE -->
+      <h2><span class="sec-num">10</span> Compliance &amp; CWE Mapping</h2>
+      <p>Active findings map to the following CWEs. This mapping can be used for SOC 2, ISO 27001, or regulatory reporting.</p>
+      <div style="margin-top: 8px;">
+        <span class="rpt-tag">CWE-89: SQL Injection</span>
+        <span class="rpt-tag">CWE-862: Missing Authorization</span>
+        <span class="rpt-tag">CWE-639: IDOR</span>
+        <span class="rpt-tag">CWE-74: Injection (Prompt)</span>
+        <span class="rpt-tag">CWE-22: Path Traversal</span>
+        <span class="rpt-tag">CWE-200: Information Disclosure</span>
+        <span class="rpt-tag">CWE-327: Crypto Weakness</span>
+        <span class="rpt-tag">CWE-352: CSRF</span>
+        <span class="rpt-tag">CWE-918: SSRF</span>
+      </div>
+
+      <div style="margin-top: 28px; padding-top: 16px; border-top: 1px solid var(--border-light); font-size: 11px; color: var(--text-muted);">
+        Generated by DryRun Code Security Intelligence · Apr 9, 2026 · Data sources: DeepScan, PR Scanning, CSI Database
+      </div>
+    </div>
+  </div>
 </div>
 
 </body>
