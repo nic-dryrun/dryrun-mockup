@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DryRun — Interacting with Findings</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --font: 'Inter', -apple-system, sans-serif;
+      --mono: 'JetBrains Mono', monospace;
+      --bg: #0f1117;
+      --surface: #181b23;
+      --surface-alt: #1e2130;
+      --surface-hover: #252839;
+      --border: #2a2d3a;
+      --border-light: #333648;
+      --text: #e2e4ea;
+      --text-sec: #9399a8;
+      --text-muted: #6b7084;
+      --purple: #8b7cf8;
+      --purple-dim: rgba(139,124,248,0.15);
+      --cyan: #4ecdc4;
+      --cyan-dim: rgba(78,205,196,0.15);
+      --orange: #f0a43a;
+      --orange-dim: rgba(240,164,58,0.15);
+      --red: #f06449;
+      --red-dim: rgba(240,100,73,0.15);
+      --green: #4ade80;
+      --green-dim: rgba(74,222,128,0.15);
+      --blue: #60a5fa;
+      --blue-dim: rgba(96,165,250,0.15);
+      --pink: #f472b6;
+      --pink-dim: rgba(244,114,182,0.15);
+    }
+    body { font-family: var(--font); font-size: 13px; line-height: 1.5; color: var(--text); background: var(--bg); overflow-x: hidden; }
+
+    /* ── MOCKUP BAR ── */
+    .mockup-bar { background: linear-gradient(135deg, #1a1e3a, #2d3260); padding: 8px 20px; display: flex; align-items: center; gap: 12px; font-size: 12px; color: #fff; }
+    .mockup-badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(139,124,248,0.3); padding: 3px 10px; border-radius: 10px; font-size: 11px; font-weight: 600; }
+
+    /* ── LAYOUT ── */
+    .page { padding: 20px; }
+
+    /* ── TOP BAR ── */
+    .top-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; }
+    .top-bar h1 { font-size: 18px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+    .top-controls { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+    /* ── PILLS / BUTTONS ── */
+    .pill-group { display: flex; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
+    .pill { font-size: 11px; font-weight: 500; padding: 6px 12px; color: var(--text-sec); border: none; background: transparent; cursor: pointer; font-family: var(--font); }
+    .pill:hover { color: var(--text); background: var(--surface-alt); }
+    .pill--active { color: var(--cyan); background: var(--surface-alt); }
+    .filter-btn { font-size: 11px; font-weight: 500; padding: 6px 14px; border-radius: 6px; border: 1px solid var(--border); background: var(--surface); color: var(--text-sec); cursor: pointer; display: flex; align-items: center; gap: 5px; font-family: var(--font); }
+    .filter-btn:hover { border-color: var(--purple); color: var(--text); }
+    .filter-btn svg { flex-shrink: 0; }
+    .dropdown { font-size: 11px; padding: 6px 10px; border-radius: 6px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-family: var(--font); cursor: pointer; appearance: none; padding-right: 24px; background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='%236b7084' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 8px center; }
+
+    /* ── KPI ROW ── */
+    .kpi-row { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; margin-bottom: 20px; }
+    @media (max-width: 900px) { .kpi-row { grid-template-columns: repeat(3, 1fr); } }
+    .kpi { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; }
+    .kpi-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 4px; }
+    .kpi-val { font-size: 26px; font-weight: 700; line-height: 1.2; }
+    .kpi-sub { font-size: 10px; color: var(--text-muted); margin-top: 2px; display: flex; align-items: center; gap: 4px; }
+    .kpi-delta { font-weight: 600; }
+    .kpi-delta.up { color: var(--red); }
+    .kpi-delta.down { color: var(--green); }
+    .kpi-delta.neutral { color: var(--text-muted); }
+
+    /* ── CHART AREA ── */
+    .chart-section { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 0; margin-bottom: 20px; overflow: hidden; }
+    .chart-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; border-bottom: 1px solid var(--border); }
+    .chart-title { font-size: 13px; font-weight: 600; }
+    .chart-legend { display: flex; gap: 14px; }
+    .legend-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--text-sec); }
+    .legend-dot { width: 8px; height: 8px; border-radius: 2px; }
+    .chart-body { padding: 20px; position: relative; height: 220px; }
+
+    /* SVG area chart */
+    .area-chart { width: 100%; height: 100%; }
+
+    /* ── SPLIT BOTTOM ── */
+    .split-bottom { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+    @media (max-width: 900px) { .split-bottom { grid-template-columns: 1fr; } }
+
+    /* ── TABLE PANEL ── */
+    .table-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+    .table-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid var(--border); }
+    .table-header-left { display: flex; align-items: center; gap: 8px; }
+    .table-title { font-size: 13px; font-weight: 600; }
+    .group-by { font-size: 11px; padding: 4px 10px; border-radius: 5px; border: 1px solid var(--border); background: var(--surface-alt); color: var(--text-sec); cursor: pointer; font-family: var(--font); display: flex; align-items: center; gap: 4px; }
+    .table-body { max-height: 420px; overflow-y: auto; }
+    .t-row { display: grid; grid-template-columns: 1fr 80px 70px 80px; align-items: center; padding: 10px 16px; border-bottom: 1px solid var(--border); cursor: pointer; transition: background 0.1s; font-size: 12px; }
+    .t-row:hover { background: var(--surface-hover); }
+    .t-row-head { font-size: 10px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; padding: 8px 16px; background: var(--surface-alt); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 1; }
+    .t-name { font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .t-count { text-align: center; font-weight: 600; font-family: var(--mono); font-size: 13px; }
+    .t-bar { height: 6px; border-radius: 3px; background: var(--border); overflow: hidden; }
+    .t-bar-fill { height: 100%; border-radius: 3px; }
+    .t-trend { text-align: right; font-size: 11px; font-weight: 600; }
+    .t-trend.up { color: var(--red); }
+    .t-trend.down { color: var(--green); }
+    .t-trend.flat { color: var(--text-muted); }
+
+    /* ── RIGHT PANELS ── */
+    .right-stack { display: flex; flex-direction: column; gap: 16px; }
+    .dist-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+    .dist-header { padding: 12px 16px; border-bottom: 1px solid var(--border); font-size: 13px; font-weight: 600; display: flex; align-items: center; justify-content: space-between; }
+    .dist-body { padding: 16px; }
+
+    /* Bar chart rows */
+    .bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .bar-row:last-child { margin-bottom: 0; }
+    .bar-label { width: 100px; font-size: 11px; color: var(--text-sec); text-align: right; flex-shrink: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .bar-track { flex: 1; height: 20px; background: var(--surface-alt); border-radius: 4px; overflow: hidden; position: relative; }
+    .bar-fill { height: 100%; border-radius: 4px; display: flex; align-items: center; justify-content: flex-end; padding-right: 6px; font-size: 10px; font-weight: 600; color: #fff; min-width: 28px; }
+    .bar-val { width: 36px; text-align: right; font-size: 12px; font-weight: 600; font-family: var(--mono); flex-shrink: 0; }
+
+    /* Summary bubbles */
+    .bubble-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+    .bubble { text-align: center; padding: 12px 6px; }
+    .bubble-circle { width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 6px; font-size: 18px; font-weight: 700; border: 2px solid; }
+    .bubble-label { font-size: 10px; color: var(--text-muted); }
+
+    /* Donut chart (CSS only) */
+    .donut-wrap { display: flex; align-items: center; gap: 20px; }
+    .donut { width: 120px; height: 120px; border-radius: 50%; position: relative; flex-shrink: 0; }
+    .donut-center { position: absolute; inset: 20px; border-radius: 50%; background: var(--surface); display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    .donut-center-val { font-size: 22px; font-weight: 700; }
+    .donut-center-label { font-size: 10px; color: var(--text-muted); }
+    .donut-legend { display: flex; flex-direction: column; gap: 6px; }
+    .donut-legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text-sec); }
+    .donut-legend-dot { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
+    .donut-legend-val { margin-left: auto; font-weight: 600; font-family: var(--mono); color: var(--text); }
+
+    /* ── HEATMAP ── */
+    .heatmap-grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 3px; }
+    .hm-cell { aspect-ratio: 1; border-radius: 3px; position: relative; }
+    .hm-cell:hover { outline: 1px solid var(--text-sec); outline-offset: 1px; }
+    .hm-labels { display: grid; grid-template-columns: repeat(12, 1fr); gap: 3px; margin-top: 4px; }
+    .hm-label { font-size: 9px; color: var(--text-muted); text-align: center; }
+    .hm-row-label { font-size: 10px; color: var(--text-muted); text-align: right; padding-right: 8px; display: flex; align-items: center; justify-content: flex-end; }
+    .hm-row { display: grid; grid-template-columns: 60px repeat(12, 1fr); gap: 3px; margin-bottom: 3px; }
+
+    /* scan type badges */
+    .scan-badge { font-size: 10px; font-weight: 600; padding: 2px 6px; border-radius: 4px; }
+    .sb-pr { background: var(--purple-dim); color: var(--purple); }
+    .sb-deep { background: var(--cyan-dim); color: var(--cyan); }
+    .sb-secrets { background: var(--orange-dim); color: var(--orange); }
+    .sb-iac { background: var(--blue-dim); color: var(--blue); }
+    .sb-sca { background: var(--pink-dim); color: var(--pink); }
+  </style>
+</head>
+<body>
+
+<div class="mockup-bar">
+  <span class="mockup-badge"><svg width="10" height="10" viewBox="0 0 16 16" fill="#c4b5fd"><circle cx="8" cy="8" r="8"/></svg> PROPOSED MOCKUP</span>
+  <span style="opacity: 0.6;">Code Security Intelligence — Interacting with Findings</span>
+</div>
+
+<div class="page">
+
+  <!-- TOP BAR -->
+  <div class="top-bar">
+    <h1>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8b7cf8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+      Interacting with Findings
+    </h1>
+    <div class="top-controls">
+      <div class="pill-group">
+        <button class="pill">7d</button>
+        <button class="pill pill--active">30d</button>
+        <button class="pill">90d</button>
+        <button class="pill">6m</button>
+        <button class="pill">1y</button>
+        <button class="pill">Custom</button>
+      </div>
+      <select class="dropdown"><option>All Repositories</option></select>
+      <select class="dropdown"><option>All Severities</option></select>
+      <select class="dropdown"><option>All Scan Types</option></select>
+      <button class="filter-btn">
+        <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M.75 3h14.5a.75.75 0 010 1.5H.75a.75.75 0 010-1.5zm3 4h8.5a.75.75 0 010 1.5h-8.5a.75.75 0 010-1.5zm3 4h2.5a.75.75 0 010 1.5h-2.5a.75.75 0 010-1.5z"/></svg>
+        Filters (0)
+      </button>
+    </div>
+  </div>
+
+  <!-- KPI ROW -->
+  <div class="kpi-row">
+    <div class="kpi">
+      <div class="kpi-label">Total Scans</div>
+      <div class="kpi-val" style="color: var(--purple);">4,218</div>
+      <div class="kpi-sub"><span class="kpi-delta down">↓ 3%</span> vs. prev period</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">PRs Scanned</div>
+      <div class="kpi-val" style="color: var(--cyan);">1,847</div>
+      <div class="kpi-sub"><span class="kpi-delta up">↑ 12%</span> vs. prev period</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Total Findings</div>
+      <div class="kpi-val" style="color: var(--orange);">312</div>
+      <div class="kpi-sub"><span class="kpi-delta down">↓ 18%</span> vs. prev period</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Active</div>
+      <div class="kpi-val" style="color: var(--red);">47</div>
+      <div class="kpi-sub">14 Critical · 33 High</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Resolved Rate</div>
+      <div class="kpi-val" style="color: var(--green);">72%</div>
+      <div class="kpi-sub"><span class="kpi-delta down">↑ 8%</span> improvement</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Avg Resolve Time</div>
+      <div class="kpi-val" style="color: var(--blue);">2.4d</div>
+      <div class="kpi-sub"><span class="kpi-delta down">↓ 1.3d</span> faster</div>
+    </div>
+  </div>
+
+  <!-- MAIN CHART: Findings Over Time -->
+  <div class="chart-section">
+    <div class="chart-header">
+      <div class="chart-title">Findings Over Time</div>
+      <div class="chart-legend">
+        <span class="legend-item"><span class="legend-dot" style="background: var(--red);"></span> Critical</span>
+        <span class="legend-item"><span class="legend-dot" style="background: var(--orange);"></span> High</span>
+        <span class="legend-item"><span class="legend-dot" style="background: #fbbf24;"></span> Medium</span>
+        <span class="legend-item"><span class="legend-dot" style="background: var(--blue);"></span> Low</span>
+        <span class="legend-item"><span class="legend-dot" style="background: var(--green);"></span> Resolved</span>
+      </div>
+    </div>
+    <div class="chart-body">
+      <svg class="area-chart" viewBox="0 0 800 180" preserveAspectRatio="none">
+        <!-- Grid lines -->
+        <line x1="0" y1="45" x2="800" y2="45" stroke="#2a2d3a" stroke-width="0.5"/>
+        <line x1="0" y1="90" x2="800" y2="90" stroke="#2a2d3a" stroke-width="0.5"/>
+        <line x1="0" y1="135" x2="800" y2="135" stroke="#2a2d3a" stroke-width="0.5"/>
+        <!-- Resolved (green, bottom layer) -->
+        <path d="M0,180 L0,100 C50,95 100,90 133,92 C166,94 200,85 266,80 C333,75 400,70 466,65 C533,60 600,50 666,45 C733,40 800,35 800,35 L800,180Z" fill="rgba(74,222,128,0.15)" stroke="none"/>
+        <path d="M0,100 C50,95 100,90 133,92 C166,94 200,85 266,80 C333,75 400,70 466,65 C533,60 600,50 666,45 C733,40 800,35 800,35" fill="none" stroke="var(--green)" stroke-width="1.5"/>
+        <!-- Medium (yellow, middle) -->
+        <path d="M0,180 L0,120 C50,125 100,130 133,128 C166,120 200,115 266,110 C333,108 400,112 466,118 C533,115 600,120 666,125 C733,128 800,130 800,130 L800,180Z" fill="rgba(251,191,36,0.12)" stroke="none"/>
+        <path d="M0,120 C50,125 100,130 133,128 C166,120 200,115 266,110 C333,108 400,112 466,118 C533,115 600,120 666,125 C733,128 800,130 800,130" fill="none" stroke="#fbbf24" stroke-width="1.5"/>
+        <!-- High (orange) -->
+        <path d="M0,180 L0,140 C50,138 100,145 133,150 C166,148 200,140 266,135 C333,130 400,138 466,142 C533,140 600,145 666,148 C733,150 800,152 800,152 L800,180Z" fill="rgba(240,164,58,0.12)" stroke="none"/>
+        <path d="M0,140 C50,138 100,145 133,150 C166,148 200,140 266,135 C333,130 400,138 466,142 C533,140 600,145 666,148 C733,150 800,152 800,152" fill="none" stroke="var(--orange)" stroke-width="1.5"/>
+        <!-- Critical (red, top spikes) -->
+        <path d="M0,170 C50,168 100,172 133,165 C166,170 200,168 266,160 C333,165 400,170 466,172 C533,168 600,170 666,165 C733,168 800,170 800,170" fill="none" stroke="var(--red)" stroke-width="2" stroke-dasharray="4,3"/>
+        <!-- Date labels -->
+        <text x="0" y="178" fill="#6b7084" font-size="9" font-family="Inter">Mar 10</text>
+        <text x="133" y="178" fill="#6b7084" font-size="9" font-family="Inter">Mar 17</text>
+        <text x="266" y="178" fill="#6b7084" font-size="9" font-family="Inter">Mar 24</text>
+        <text x="400" y="178" fill="#6b7084" font-size="9" font-family="Inter">Mar 31</text>
+        <text x="533" y="178" fill="#6b7084" font-size="9" font-family="Inter">Apr 2</text>
+        <text x="666" y="178" fill="#6b7084" font-size="9" font-family="Inter">Apr 5</text>
+        <text x="770" y="178" fill="#6b7084" font-size="9" font-family="Inter">Apr 9</text>
+      </svg>
+    </div>
+  </div>
+
+  <!-- SPLIT BOTTOM -->
+  <div class="split-bottom">
+
+    <!-- LEFT: Findings Table -->
+    <div class="table-panel">
+      <div class="table-header">
+        <div class="table-header-left">
+          <span class="table-title">Findings by Analyzer</span>
+          <button class="group-by">Group By: Analyzer ▾</button>
+        </div>
+        <div style="display: flex; gap: 6px;">
+          <span class="scan-badge sb-pr">PR</span>
+          <span class="scan-badge sb-deep">DeepScan</span>
+          <span class="scan-badge sb-secrets">Secrets</span>
+          <span class="scan-badge sb-sca">SCA</span>
+        </div>
+      </div>
+      <div class="table-body">
+        <div class="t-row t-row-head">
+          <div>Analyzer</div>
+          <div style="text-align: center;">Findings</div>
+          <div>Distribution</div>
+          <div style="text-align: right;">Trend</div>
+        </div>
+        <div class="t-row">
+          <div class="t-name">SQL Injection</div>
+          <div class="t-count" style="color: var(--red);">42</div>
+          <div><div class="t-bar"><div class="t-bar-fill" style="width: 85%; background: var(--red);"></div></div></div>
+          <div class="t-trend down">↓ 22%</div>
+        </div>
+        <div class="t-row">
+          <div class="t-name">General Security</div>
+          <div class="t-count" style="color: var(--orange);">38</div>
+          <div><div class="t-bar"><div class="t-bar-fill" style="width: 76%; background: var(--orange);"></div></div></div>
+          <div class="t-trend up">↑ 5%</div>
+        </div>
+        <div class="t-row">
+          <div class="t-name">IDOR</div>
+          <div class="t-count" style="color: var(--orange);">31</div>
+          <div><div class="t-bar"><div class="t-bar-fill" style="width: 62%; background: var(--orange);"></div></div></div>
+          <div class="t-trend down">↓ 14%</div>
+        </div>
+        <div class="t-row">
+          <div class="t-name">Cross-Site Scripting</div>
+          <div class="t-count" style="color: #fbbf24;">28</div>
+          <div><div class="t-bar"><div class="t-bar-fill" style="width: 56%; background: #fbbf24;"></div></div></div>
+          <div class="t-trend flat">— 0%</div>
+        </div>
+        <div class="t-row">
+          <div class="t-name">Dependency License</div>
+          <div class="t-count" style="color: var(--blue);">24</div>
+          <div><div class="t-bar"><div class="t-bar-fill" style="width: 48%; background: var(--blue);"></div></div></div>
+          <div class="t-trend down">↓ 8%</div>
+        </div>
+        <div class="t-row">
+          <div class="t-name">Secrets Detection</div>
+          <div class="t-count" style="color: var(--orange);">19</div>
+          <div><div class="t-bar"><div class="t-bar-fill" style="width: 38%; background: var(--orange);"></div></div></div>
+          <div class="t-trend down">↓ 31%</div>
+        </div>
+        <div class="t-row">
+          <div class="t-name">Mass Assignment</div>
+          <div class="t-count" style="color: #fbbf24;">16</div>
+          <div><div class="t-bar"><div class="t-bar-fill" style="width: 32%; background: #fbbf24;"></div></div></div>
+          <div class="t-trend up">↑ 12%</div>
+        </div>
+        <div class="t-row">
+          <div class="t-name">Prompt Injection</div>
+          <div class="t-count" style="color: var(--red);">14</div>
+          <div><div class="t-bar"><div class="t-bar-fill" style="width: 28%; background: var(--red);"></div></div></div>
+          <div class="t-trend up">↑ 40%</div>
+        </div>
+        <div class="t-row">
+          <div class="t-name">Path Traversal</div>
+          <div class="t-count" style="color: #fbbf24;">12</div>
+          <div><div class="t-bar"><div class="t-bar-fill" style="width: 24%; background: #fbbf24;"></div></div></div>
+          <div class="t-trend down">↓ 6%</div>
+        </div>
+        <div class="t-row">
+          <div class="t-name">IaC Misconfiguration</div>
+          <div class="t-count" style="color: var(--blue);">11</div>
+          <div><div class="t-bar"><div class="t-bar-fill" style="width: 22%; background: var(--blue);"></div></div></div>
+          <div class="t-trend flat">— 0%</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Distributions -->
+    <div class="right-stack">
+
+      <!-- Severity Donut + Legend -->
+      <div class="dist-panel">
+        <div class="dist-header">
+          <span>Severity Distribution</span>
+          <span style="font-size: 11px; color: var(--text-muted);">312 total</span>
+        </div>
+        <div class="dist-body">
+          <div class="donut-wrap">
+            <div class="donut" style="background: conic-gradient(var(--red) 0% 9%, var(--orange) 9% 33%, #fbbf24 33% 65%, var(--blue) 65% 85%, var(--green) 85% 100%);">
+              <div class="donut-center">
+                <div class="donut-center-val">312</div>
+                <div class="donut-center-label">Findings</div>
+              </div>
+            </div>
+            <div class="donut-legend">
+              <div class="donut-legend-item"><span class="donut-legend-dot" style="background: var(--red);"></span> Critical <span class="donut-legend-val">28</span></div>
+              <div class="donut-legend-item"><span class="donut-legend-dot" style="background: var(--orange);"></span> High <span class="donut-legend-val">76</span></div>
+              <div class="donut-legend-item"><span class="donut-legend-dot" style="background: #fbbf24;"></span> Medium <span class="donut-legend-val">99</span></div>
+              <div class="donut-legend-item"><span class="donut-legend-dot" style="background: var(--blue);"></span> Low <span class="donut-legend-val">62</span></div>
+              <div class="donut-legend-item"><span class="donut-legend-dot" style="background: var(--green);"></span> Info <span class="donut-legend-val">47</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Status Breakdown -->
+      <div class="dist-panel">
+        <div class="dist-header">Status Breakdown</div>
+        <div class="dist-body">
+          <div class="bar-row"><span class="bar-label">Active</span><div class="bar-track"><div class="bar-fill" style="width: 15%; background: var(--red);">47</div></div><span class="bar-val" style="color: var(--red);">47</span></div>
+          <div class="bar-row"><span class="bar-label">Resolved</span><div class="bar-track"><div class="bar-fill" style="width: 72%; background: var(--green);">224</div></div><span class="bar-val" style="color: var(--green);">224</span></div>
+          <div class="bar-row"><span class="bar-label">False Positive</span><div class="bar-track"><div class="bar-fill" style="width: 10%; background: var(--text-muted);">32</div></div><span class="bar-val" style="color: var(--text-muted);">32</span></div>
+          <div class="bar-row"><span class="bar-label">Nitpick</span><div class="bar-track"><div class="bar-fill" style="width: 3%; background: #fbbf24;">9</div></div><span class="bar-val" style="color: #fbbf24;">9</span></div>
+        </div>
+      </div>
+
+      <!-- Summary Bubbles -->
+      <div class="dist-panel">
+        <div class="dist-header">Coverage Summary</div>
+        <div class="dist-body">
+          <div class="bubble-row">
+            <div class="bubble">
+              <div class="bubble-circle" style="color: var(--purple); border-color: var(--purple); background: var(--purple-dim);">14</div>
+              <div class="bubble-label">Repos</div>
+            </div>
+            <div class="bubble">
+              <div class="bubble-circle" style="color: var(--cyan); border-color: var(--cyan); background: var(--cyan-dim);">6</div>
+              <div class="bubble-label">Orgs</div>
+            </div>
+            <div class="bubble">
+              <div class="bubble-circle" style="color: var(--blue); border-color: var(--blue); background: var(--blue-dim);">38</div>
+              <div class="bubble-label">Committers</div>
+            </div>
+            <div class="bubble">
+              <div class="bubble-circle" style="color: var(--orange); border-color: var(--orange); background: var(--orange-dim);">10</div>
+              <div class="bubble-label">Analyzers</div>
+            </div>
+            <div class="bubble">
+              <div class="bubble-circle" style="color: var(--green); border-color: var(--green); background: var(--green-dim);">5</div>
+              <div class="bubble-label">Scan Types</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- BOTTOM ROW: Top Repos + Top Committers -->
+  <div class="split-bottom">
+    <div class="dist-panel">
+      <div class="dist-header">Top Repositories by Findings</div>
+      <div class="dist-body">
+        <div class="bar-row"><span class="bar-label">dryrun-api</span><div class="bar-track"><div class="bar-fill" style="width: 82%; background: var(--purple);">86</div></div><span class="bar-val">86</span></div>
+        <div class="bar-row"><span class="bar-label">reposture</span><div class="bar-track"><div class="bar-fill" style="width: 58%; background: var(--purple);">61</div></div><span class="bar-val">61</span></div>
+        <div class="bar-row"><span class="bar-label">analyzers</span><div class="bar-track"><div class="bar-fill" style="width: 43%; background: var(--purple);">45</div></div><span class="bar-val">45</span></div>
+        <div class="bar-row"><span class="bar-label">scanner-agent</span><div class="bar-track"><div class="bar-fill" style="width: 32%; background: var(--purple);">34</div></div><span class="bar-val">34</span></div>
+        <div class="bar-row"><span class="bar-label">dashboard-ui</span><div class="bar-track"><div class="bar-fill" style="width: 24%; background: var(--purple);">25</div></div><span class="bar-val">25</span></div>
+      </div>
+    </div>
+
+    <div class="dist-panel">
+      <div class="dist-header">
+        <span>Developer Activity</span>
+        <span style="font-size: 11px; color: var(--text-muted);">Findings introduced / resolved</span>
+      </div>
+      <div class="dist-body">
+        <div class="bar-row"><span class="bar-label">cnichols-dry</span><div class="bar-track"><div class="bar-fill" style="width: 30%; background: var(--red);" title="Introduced: 24"></div><div class="bar-fill" style="width: 55%; background: var(--green); position: absolute; left: 30%;" title="Resolved: 44"></div></div><span class="bar-val" style="color: var(--green);">+20</span></div>
+        <div class="bar-row"><span class="bar-label">peterkarman1</span><div class="bar-track"><div class="bar-fill" style="width: 25%; background: var(--red);"></div><div class="bar-fill" style="width: 38%; background: var(--green); position: absolute; left: 25%;"></div></div><span class="bar-val" style="color: var(--green);">+10</span></div>
+        <div class="bar-row"><span class="bar-label">wickett</span><div class="bar-track"><div class="bar-fill" style="width: 12%; background: var(--red);"></div><div class="bar-fill" style="width: 30%; background: var(--green); position: absolute; left: 12%;"></div></div><span class="bar-val" style="color: var(--green);">+14</span></div>
+        <div class="bar-row"><span class="bar-label">sarah-eng</span><div class="bar-track"><div class="bar-fill" style="width: 20%; background: var(--red);"></div><div class="bar-fill" style="width: 22%; background: var(--green); position: absolute; left: 20%;"></div></div><span class="bar-val" style="color: var(--green);">+2</span></div>
+        <div class="bar-row"><span class="bar-label">devops-bot</span><div class="bar-track"><div class="bar-fill" style="width: 18%; background: var(--red);"></div><div class="bar-fill" style="width: 15%; background: var(--green); position: absolute; left: 18%;"></div></div><span class="bar-val" style="color: var(--red);">-3</span></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>
