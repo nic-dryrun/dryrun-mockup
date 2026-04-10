@@ -605,16 +605,17 @@
     .badge-new { background: var(--purple-bg); color: var(--purple); border: 1px solid var(--purple-border); }
     .badge-upd { background: #fef3c7; color: #92400e; border: 1px solid #fcd34d; }
   
-/* Override .main for non-app-shell context */
+/* Override wizard for inline page context */
 .main { flex: 1; overflow-y: visible; }
-.wizard-header { position: static; }
+.wizard-header { position: static; padding: 20px 0 0; background: transparent; border-bottom: 1px solid var(--border); }
+.step-content { padding: 28px 0 40px; }
+.form-footer { border-top: 1px solid var(--border-light); padding-top: 16px; }
 </style>
 
 </div><!-- /page -->
 
 <!-- ══ WIZARD ══ -->
-<div style="display:flex;min-height:60vh;">
-<!-- No sidebar in admin-config context -->
+<div style="max-width:900px;margin:0 auto;padding:0 24px 80px;">
 <div class="main">
 
   <!-- WIZARD HEADER -->
