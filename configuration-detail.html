@@ -635,7 +635,7 @@
   <!-- ══ STEP 5: REVIEW & SAVE ══ -->
   <div class="step-content" id="step-5">
     <div class="step-heading">Review &amp; Save</div>
-    <div class="step-subheading">Confirm your configuration before saving. Click any section to jump back and edit.</div>
+    <div class="step-subheading">Confirm your configuration before saving. Click Edit on any section to go back and change it.</div>
 
     <div class="summary-grid">
 
@@ -646,13 +646,7 @@
           Core Analyzers
           <button class="card-btn" onclick="goToStep(1)" style="margin-left:auto;font-size:10px;padding:2px 8px;">Edit</button>
         </div>
-        <div class="summary-item"><span class="dot-on"></span> Cross-Site Scripting Analyzer</div>
-        <div class="summary-item"><span class="dot-on"></span> General Security Analyzer</div>
-        <div class="summary-item"><span class="dot-on"></span> IDOR Analyzer</div>
-        <div class="summary-item"><span class="dot-on"></span> Mass Assignment</div>
-        <div class="summary-item"><span class="dot-on"></span> Secrets Analyzer</div>
-        <div class="summary-item"><span class="dot-on"></span> Server-Side Request Forgery Analyzer</div>
-        <div class="summary-item"><span class="dot-on"></span> SQL Injection Analyzer</div>
+        <div id="sum-analyzers"><!-- populated by buildSummary() --></div>
       </div>
 
       <!-- Custom policies summary -->
@@ -662,8 +656,7 @@
           Custom Code Policies
           <button class="card-btn" onclick="goToStep(1)" style="margin-left:auto;font-size:10px;padding:2px 8px;">Edit</button>
         </div>
-        <div class="summary-item"><span class="dot-on"></span> Dependency License Check v1</div>
-        <div class="summary-item"><span class="dot-on"></span> No Default Env Var Values</div>
+        <div id="sum-policies"><!-- populated by buildSummary() --></div>
       </div>
 
       <!-- Comment visibility summary -->
@@ -673,12 +666,7 @@
           Comment Visibility
           <button class="card-btn" onclick="goToStep(2)" style="margin-left:auto;font-size:10px;padding:2px 8px;">Edit</button>
         </div>
-        <div id="sum-comments">
-          <div class="summary-item"><span class="dot-on"></span> Issue comments enabled</div>
-          <div class="summary-item"><span class="dot-on"></span> Comment on clean scans</div>
-          <div class="summary-item"><span class="dot-on"></span> Comment on draft PRs</div>
-          <div class="summary-item"><span class="dot-on"></span> Retain comment when resolved</div>
-        </div>
+        <div id="sum-comments"><!-- populated by buildSummary() --></div>
       </div>
 
       <!-- Integrations summary -->
@@ -695,28 +683,14 @@
         </div>
       </div>
 
-      <!-- Blocking summary — full width -->
+      <!-- Blocking summary — full width, dynamic -->
       <div class="summary-card" style="grid-column:1/-1;">
         <div class="summary-card-title">
           <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M4.47.22A.749.749 0 015 0h6c.199 0 .389.079.53.22l4.25 4.25c.141.14.22.331.22.53v6a.749.749 0 01-.22.53l-4.25 4.25A.749.749 0 0111 16H5a.749.749 0 01-.53-.22L.22 11.53A.749.749 0 010 11V5c0-.199.079-.389.22-.53L4.47.22z"/></svg>
           Blocking
           <button class="card-btn" onclick="goToStep(4)" style="margin-left:auto;font-size:10px;padding:2px 8px;">Edit</button>
         </div>
-        <div style="display:flex;align-items:center;gap:10px;padding:4px 0 8px;">
-          <span style="font-size:13px;font-weight:600;color:var(--orange);">Global threshold: High+</span>
-          <span style="font-size:12px;color:var(--text-muted);">PRs with high or critical findings are blocked from merging</span>
-        </div>
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:4px;">
-          <div class="summary-item"><span class="dot-off"></span> Cross-Site Scripting — not blocking</div>
-          <div class="summary-item"><span class="dot-off"></span> General Security — not blocking</div>
-          <div class="summary-item"><span class="dot-off"></span> IDOR — not blocking</div>
-          <div class="summary-item"><span class="dot-off"></span> Mass Assignment — not blocking</div>
-          <div class="summary-item"><span class="dot-on"></span> Secrets — blocking (Any)</div>
-          <div class="summary-item"><span class="dot-off"></span> SSRF — not blocking</div>
-          <div class="summary-item"><span class="dot-off"></span> SQL Injection — not blocking</div>
-          <div class="summary-item"><span class="dot-on"></span> License Check — blocking (Any)</div>
-          <div class="summary-item"><span class="dot-off"></span> No Default Env Vars — not blocking</div>
-        </div>
+        <div id="sum-blocking"><!-- populated by buildSummary() --></div>
       </div>
 
     </div><!-- /summary-grid -->
@@ -763,6 +737,9 @@ function goToStep(n) {
     }
   }
   currentStep = n;
+
+  // Build summary when entering step 5
+  if (n === 5) buildSummary();
 
   // Scroll to top of main
   document.querySelector('.main').scrollTo({ top: 0, behavior: 'smooth' });
@@ -869,6 +846,92 @@ function togglePerAnalyzer(btn) {
     sel.disabled = isOn;
     sel.style.opacity = isOn ? '0.4' : '1';
   }
+}
+
+// ── SUMMARY BUILDER ──
+function dot(on) {
+  return on
+    ? '<span class="dot-on"></span>'
+    : '<span class="dot-off"></span>';
+}
+function sumRow(on, label, detail) {
+  const color = on ? '' : 'color:var(--text-muted);';
+  return `<div class="summary-item" style="${color}">${dot(on)} ${label}${detail ? `<span style="font-size:11px;color:var(--text-muted);margin-left:6px;">${detail}</span>` : ''}</div>`;
+}
+
+function buildSummary() {
+
+  // ── ANALYZERS (step 1 core) ──
+  const analyzerRows = document.querySelectorAll('#step-1 .card:first-of-type tbody tr');
+  let analyzerHtml = '';
+  analyzerRows.forEach(row => {
+    const name = row.querySelector('.atbl-name').textContent;
+    const on = row.querySelector('.sm-tog').classList.contains('sm-tog--on');
+    analyzerHtml += sumRow(on, name);
+  });
+  document.getElementById('sum-analyzers').innerHTML = analyzerHtml;
+
+  // ── POLICIES (step 1 custom) ──
+  const policyRows = document.querySelectorAll('#step-1 .card:last-of-type tbody tr');
+  let policyHtml = '';
+  policyRows.forEach(row => {
+    const name = row.querySelector('.atbl-name').textContent;
+    const on = row.querySelector('.sm-tog').classList.contains('sm-tog--on');
+    policyHtml += sumRow(on, name);
+  });
+  if (!policyHtml) policyHtml = '<div class="summary-item" style="color:var(--text-muted);">No custom policies added</div>';
+  document.getElementById('sum-policies').innerHTML = policyHtml;
+
+  // ── COMMENT VISIBILITY (step 2) ──
+  const masterOn = document.getElementById('master-comment').classList.contains('tog--on');
+  const subToggles = document.querySelectorAll('#comment-sub .tog');
+  const subNames = ['Comment on Clean Scans', 'Comment on Draft PRs', 'Retain Comment When Resolved'];
+  let commentHtml = sumRow(masterOn, 'Issue comments ' + (masterOn ? 'enabled' : 'disabled'));
+  if (masterOn) {
+    subToggles.forEach((tog, i) => {
+      const on = tog.classList.contains('tog--on');
+      commentHtml += sumRow(on, subNames[i]);
+    });
+  } else {
+    commentHtml += '<div class="summary-item" style="color:var(--text-muted);font-size:12px;padding-left:13px;">All sub-settings inactive — comments are off</div>';
+  }
+  document.getElementById('sum-comments').innerHTML = commentHtml;
+
+  // ── BLOCKING (step 4) ──
+  let blockHtml = '';
+
+  if (blockMode === 'off') {
+    blockHtml = `<div style="display:flex;align-items:center;gap:8px;padding:6px 0 10px;">
+      <span style="font-size:13px;font-weight:600;color:var(--text-muted);">No blocking</span>
+      <span style="font-size:12px;color:var(--text-muted);">PRs are never blocked from merging — findings are advisory only</span>
+    </div>`;
+
+  } else if (blockMode === 'global') {
+    const selectedChip = document.querySelector('.sev-chip.selected');
+    const sevLabel = selectedChip ? selectedChip.textContent.trim() : 'High+';
+    const sevColors = { 'Medium+': 'var(--purple)', 'High+': 'var(--orange)', 'Critical only': 'var(--red)' };
+    const color = sevColors[sevLabel] || 'var(--orange)';
+    blockHtml = `<div style="display:flex;align-items:center;gap:10px;padding:6px 0 10px;">
+      <span style="font-size:13px;font-weight:700;color:${color};">Global threshold: ${sevLabel}</span>
+      <span style="font-size:12px;color:var(--text-muted);">All analyzers block on ${sevLabel} findings or above</span>
+    </div>`;
+
+  } else if (blockMode === 'per') {
+    blockHtml = `<div style="padding:4px 0 10px;font-size:12px;color:var(--text-sec);">Per-analyzer blocking rules:</div>`;
+    const perRows = document.querySelectorAll('#per-analyzer-table tbody tr');
+    blockHtml += '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;">';
+    perRows.forEach(row => {
+      const name = row.querySelector('.atbl-name').textContent;
+      const blocking = row.querySelector('.sm-tog').classList.contains('sm-tog--on');
+      const sel = row.querySelector('.sev-sel');
+      const sev = (blocking && sel) ? sel.value || sel.options[sel.selectedIndex]?.text : null;
+      const detail = blocking && sev ? `(${sev})` : null;
+      blockHtml += sumRow(blocking, name, detail);
+    });
+    blockHtml += '</div>';
+  }
+
+  document.getElementById('sum-blocking').innerHTML = blockHtml;
 }
 
 // ── SAVE ──
