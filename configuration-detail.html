@@ -164,6 +164,11 @@
     .dot-on { width: 7px; height: 7px; border-radius: 50%; background: var(--green); flex-shrink: 0; display: inline-block; }
     .dot-off { width: 7px; height: 7px; border-radius: 50%; background: var(--border); flex-shrink: 0; display: inline-block; }
 
+
+    /* HELP TIP */
+    .help-tip { display: inline-flex; align-items: center; justify-content: center; width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid var(--border); font-size: 10px; font-weight: 600; color: var(--text-muted); cursor: help; flex-shrink: 0; position: relative; vertical-align: middle; margin-left: 2px; }
+    .help-tip:hover { border-color: var(--purple); color: var(--purple); }
+
     /* BADGE */
     .badge { display: inline-flex; align-items: center; font-size: 10px; font-weight: 600; padding: 1px 6px; border-radius: 8px; }
     .badge-new { background: var(--purple-bg); color: var(--purple); border: 1px solid var(--purple-border); }
@@ -364,37 +369,89 @@
   <!-- ══ STEP 2: COMMENT VISIBILITY ══ -->
   <div class="step-content" id="step-2">
     <div class="step-heading">Comment Visibility</div>
-    <div class="step-subheading">Control when and how DryRun posts comments to pull requests.</div>
+    <div class="step-subheading">Control when and how DryRun posts comments to pull requests for repos in this configuration.</div>
 
     <div class="card">
+
+      <!-- Master toggle -->
       <div class="opt-row">
         <div class="opt-label">
-          <div class="opt-name">Issue Comment Enabled</div>
-          <div class="opt-hint">Master switch — when off, DryRun never posts any PR comment for repos in this config</div>
+          <div class="opt-name" style="font-size:14px;font-weight:600;">
+            Issue Comment Enabled
+            <span class="help-tip" tabindex="0" title="Master control for all GitHub PR comments. When disabled, DryRun scans PRs but never posts any comment to GitHub.">?</span>
+          </div>
+          <div class="opt-hint">Master control — when off, DryRun scans PRs silently and never posts any GitHub comment</div>
         </div>
         <button class="tog tog--on" id="master-comment" onclick="toggleMaster(this)"></button>
       </div>
+
+      <!-- Sub-settings -->
       <div id="comment-sub">
+
+        <!-- Comment on Clean Scans -->
         <div class="opt-row opt-sub">
           <div class="opt-label">
-            <div class="opt-name">Comment on Clean Scans <span class="badge badge-upd">Renamed</span></div>
-            <div class="opt-hint">Post a comment even when no findings are detected</div>
+            <div class="opt-name">
+              Comment on Clean Scans
+              <span class="badge badge-upd">Renamed</span>
+              <span class="help-tip" tabindex="0" title="Previously 'Show Comment for No Findings.' Controls whether DryRun posts a comment when a scan produces zero vulnerabilities.">?</span>
+            </div>
+            <div class="opt-hint">Post a confirmation comment even when no vulnerabilities are detected, proving the PR was scanned</div>
           </div>
           <button class="tog tog--on" onclick="toggleTog(this)"></button>
         </div>
+
+        <!-- Comment on Draft PRs -->
         <div class="opt-row opt-sub">
           <div class="opt-label">
-            <div class="opt-name">Comment on Draft PRs <span class="badge badge-new">New</span></div>
-            <div class="opt-hint">Scans still run silently when this is off</div>
+            <div class="opt-name">
+              Comment on Draft PRs
+              <span class="badge badge-new">New</span>
+              <span class="help-tip" tabindex="0" title="When enabled, DryRun posts comments on draft PRs just like regular PRs. When disabled, scans still run but comments are held until the PR leaves draft status.">?</span>
+            </div>
+            <div class="opt-hint">Post findings on PRs while in draft mode — when off, scans run silently until the PR is marked ready</div>
           </div>
           <button class="tog tog--on" onclick="toggleTog(this)"></button>
         </div>
+
+        <!-- Retain Comment When Resolved -->
         <div class="opt-row opt-sub">
           <div class="opt-label">
-            <div class="opt-name">Retain Comment When Resolved <span class="badge badge-new">New</span></div>
-            <div class="opt-hint">Shows "All Clear" instead of deleting the comment</div>
+            <div class="opt-name">
+              Retain Comment When Resolved
+              <span class="badge badge-new">New</span>
+              <span class="help-tip" tabindex="0" title="When enabled, the comment updates to an 'All Clear' state showing what was found and how it was handled. When disabled, the comment is deleted once all findings are resolved or dismissed.">?</span>
+            </div>
+            <div class="opt-hint">Keep the comment with an "All Clear" resolved state instead of deleting it — preserves the audit trail</div>
           </div>
           <button class="tog tog--on" onclick="toggleTog(this)"></button>
+        </div>
+
+      </div><!-- /comment-sub -->
+    </div>
+
+    <!-- What the comment looks like -->
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;">
+      <div style="padding:10px 16px;background:var(--surface-alt);border-bottom:1px solid var(--border-light);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted);display:flex;align-items:center;gap:8px;">
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M0 1.75C0 .784.784 0 1.75 0h12.5C15.216 0 16 .784 16 1.75v9.5A1.75 1.75 0 0114.25 13H8.06l-2.573 2.573A1.458 1.458 0 013 14.543V13H1.75A1.75 1.75 0 010 11.25v-9.5z"/></svg>
+        Comment State Preview
+        <span style="font-size:10px;font-weight:500;color:var(--text-muted);text-transform:none;letter-spacing:0;margin-left:4px;">Based on your current settings</span>
+      </div>
+      <div style="padding:16px;display:grid;grid-template-columns:1fr 1fr;gap:10px;" id="comment-preview">
+        <div style="border:1px solid var(--green-border);border-radius:8px;padding:12px;background:var(--green-bg);">
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--green);margin-bottom:6px;">✓ Will post comment when...</div>
+          <div id="prev-will" style="font-size:12px;color:var(--green);line-height:1.8;">
+            Findings are detected<br>
+            No findings detected (clean scan)<br>
+            PR is in draft status
+          </div>
+        </div>
+        <div style="border:1px solid var(--border);border-radius:8px;padding:12px;background:var(--surface-alt);">
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-muted);margin-bottom:6px;">When resolved...</div>
+          <div id="prev-resolve" style="font-size:12px;color:var(--text-sec);line-height:1.8;">
+            Comment updates to "All Clear" state<br>
+            Finding history is retained
+          </div>
         </div>
       </div>
     </div>
