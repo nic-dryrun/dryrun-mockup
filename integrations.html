@@ -404,6 +404,7 @@
             <div class="event-item"><input type="checkbox" checked><span class="hook-badge">HOOK</span><span class="event-item-label">New vulnerabilities (PR)</span><select class="risk-select"><option>All</option><option selected>High + Critical</option><option>Critical only</option></select></div>
             <div class="event-item"><input type="checkbox" checked><span class="hook-badge">HOOK</span><span class="event-item-label">PR blocked</span></div>
             <div class="event-item"><input type="checkbox"><span class="hook-badge">HOOK</span><span class="event-item-label">PR merged with issues</span></div>
+            <div class="event-item"><input type="checkbox"><span class="hook-badge">HOOK</span><span class="event-item-label">Finding dismissed</span><span style="font-size:10px;color:var(--text-muted);">FP &amp; Nitpick</span></div>
           </div>
         </div>
 
@@ -597,6 +598,37 @@
   ],
   <span class="json-key">"github_url"</span>: <span class="json-str">"https://github.com/DryRunSec/dryrun-api/pull/415"</span>,
   <span class="json-key">"dashboard_url"</span>: <span class="json-str">"https://app.dryrun.security/pull-requests/415?org=DryRunSec"</span>
+}</pre>
+        </div>
+      </div>
+
+      <!-- finding_dismissed -->
+      <div class="payload-card" onclick="this.classList.toggle('open')">
+        <div class="payload-card-header">
+          <div class="payload-event-name"><code style="font-family:var(--mono);">finding_dismissed</code><span class="event-tag event-tag--new">New</span></div>
+          <svg class="payload-chevron" width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M12.78 6.22a.75.75 0 010 1.06l-4.25 4.25a.75.75 0 01-1.06 0L3.22 7.28a.75.75 0 011.06-1.06L8 9.94l3.72-3.72a.75.75 0 011.06 0z"/></svg>
+        </div>
+        <div class="payload-card-body">
+          <div class="payload-desc">Fired when a developer dismisses a finding as a false positive or nitpick — either via a <code style="font-family:var(--mono);font-size:11px;">@dryrunsecurity fp</code> / <code style="font-family:var(--mono);font-size:11px;">@dryrunsecurity nit</code> GitHub comment from the PR, or via Triage in the Risk Register. Includes the reason, feedback text, who dismissed it, and from where.</div>
+          <pre class="json">{
+  <span class="json-key">"event"</span>: <span class="json-str">"finding_dismissed"</span>,
+  <span class="json-key">"event_id"</span>: <span class="json-str">"evt_a1b2c3d0"</span>,
+  <span class="json-key">"org"</span>: <span class="json-str">"DryRunSec"</span>,
+  <span class="json-key">"repo_name"</span>: <span class="json-str">"dryrun-api"</span>,
+  <span class="json-key">"timestamp"</span>: <span class="json-str">"2026-04-10T14:35:00Z"</span>,
+  <span class="json-key">"finding_id"</span>: <span class="json-str">"drs_b8948228"</span>,
+  <span class="json-key">"finding_type"</span>: <span class="json-str">"Missing Tenant Isolation in Database Delete"</span>,
+  <span class="json-key">"severity"</span>: <span class="json-str">"high"</span>,
+  <span class="json-key">"filename"</span>: <span class="json-str">"pkg/models/drift.go"</span>,
+  <span class="json-key">"dismissal_type"</span>: <span class="json-str">"false_positive"</span>, <span class="json-comment">// "false_positive" | "nitpick" | "accepted_risk" | "wont_fix"</span>
+  <span class="json-key">"dismissed_by"</span>: <span class="json-str">"cnichols-dry"</span>,
+  <span class="json-key">"dismissed_from"</span>: <span class="json-str">"github_comment"</span>, <span class="json-comment">// "github_comment" | "risk_register"</span>
+  <span class="json-key">"feedback"</span>: <span class="json-str">"This code is not user-facing — input is validated upstream by the service layer"</span>,
+  <span class="json-key">"pr_number"</span>: <span class="json-num">412</span>,
+  <span class="json-key">"pr_title"</span>: <span class="json-str">"fix: move db creds to vault"</span>,
+  <span class="json-key">"github_comment_url"</span>: <span class="json-str">"https://github.com/DryRunSec/dryrun-api/pull/412#issuecomment-1234567"</span>,
+  <span class="json-key">"fingerprint_created"</span>: <span class="json-bool">true</span>, <span class="json-comment">// true when dismissal_type is "false_positive" — suppresses in future scans</span>
+  <span class="json-key">"dashboard_url"</span>: <span class="json-str">"https://app.dryrun.security/pull-requests/412?org=DryRunSec"</span>
 }</pre>
         </div>
       </div>
