@@ -395,7 +395,7 @@
           <div class="event-group-header" onclick="this.parentElement.classList.toggle('open')">
             <input type="checkbox" checked onclick="event.stopPropagation()">
             <span class="event-group-label">PR Events</span>
-            <span class="event-count">3 of 5</span>
+            <span class="event-count">3 of 7</span>
             <svg class="event-chevron" width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M12.78 6.22a.75.75 0 010 1.06l-4.25 4.25a.75.75 0 01-1.06 0L3.22 7.28a.75.75 0 011.06-1.06L8 9.94l3.72-3.72a.75.75 0 011.06 0z"/></svg>
           </div>
           <div class="event-group-items">
@@ -414,12 +414,11 @@
           <div class="event-group-header" onclick="this.parentElement.classList.toggle('open')">
             <input type="checkbox" checked onclick="event.stopPropagation()">
             <span class="event-group-label">Vulnerability Events</span>
-            <span class="event-count">2 of 4</span>
+            <span class="event-count">2 of 3</span>
             <svg class="event-chevron" width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M12.78 6.22a.75.75 0 010 1.06l-4.25 4.25a.75.75 0 01-1.06 0L3.22 7.28a.75.75 0 011.06-1.06L8 9.94l3.72-3.72a.75.75 0 011.06 0z"/></svg>
           </div>
           <div class="event-group-items">
             <div class="event-item"><input type="checkbox" checked><span class="hook-badge">HOOK</span><span class="event-item-label">New vulnerabilities (full scan)</span><select class="risk-select"><option>All</option><option selected>High + Critical</option><option>Critical only</option></select></div>
-            <div class="event-item"><input type="checkbox"><span class="hook-badge">HOOK</span><span class="event-item-label">Vulnerability patched</span></div>
             <div class="event-item"><input type="checkbox" checked><span class="hook-badge">HOOK</span><span class="event-item-label">Vulnerability reopened</span></div>
             <div class="event-item"><input type="checkbox"><span class="hook-badge">HOOK</span><span class="event-item-label">SCA new CVE</span><select class="risk-select"><option selected>All</option><option>High + Critical</option><option>Critical only</option></select></div>
           </div>
@@ -731,33 +730,6 @@
     }
   ],
   <span class="json-key">"dashboard_url"</span>: <span class="json-str">"https://app.dryrun.security/repositories/dryrun-api?org=DryRunSec"</span>
-}</pre>
-        </div>
-      </div>
-
-      <!-- vulnerability_patched -->
-      <div class="payload-card" onclick="this.classList.toggle('open')">
-        <div class="payload-card-header">
-          <div class="payload-event-name"><code style="font-family:var(--mono);">vulnerability_patched</code><span class="event-tag event-tag--new">New</span></div>
-          <svg class="payload-chevron" width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M12.78 6.22a.75.75 0 010 1.06l-4.25 4.25a.75.75 0 01-1.06 0L3.22 7.28a.75.75 0 011.06-1.06L8 9.94l3.72-3.72a.75.75 0 011.06 0z"/></svg>
-        </div>
-        <div class="payload-card-body">
-          <div class="payload-desc">Fired when a previously open finding is no longer detected on a subsequent scan (either PR scan or full scan).</div>
-          <pre class="json">{
-  <span class="json-key">"event"</span>: <span class="json-str">"vulnerability_patched"</span>,
-  <span class="json-key">"event_id"</span>: <span class="json-str">"evt_a1b2c3e1"</span>,
-  <span class="json-key">"org"</span>: <span class="json-str">"DryRunSec"</span>,
-  <span class="json-key">"repo_name"</span>: <span class="json-str">"dryrun-api"</span>,
-  <span class="json-key">"timestamp"</span>: <span class="json-str">"2026-04-03T11:20:00Z"</span>,
-  <span class="json-key">"finding_id"</span>: <span class="json-str">"drs_b8948228"</span>,
-  <span class="json-key">"finding_type"</span>: <span class="json-str">"Hardcoded Database Credentials"</span>,
-  <span class="json-key">"severity"</span>: <span class="json-str">"high"</span>,
-  <span class="json-key">"resolved_by_scan_type"</span>: <span class="json-str">"pr"</span>, <span class="json-comment">// "pr" | "full_scan"</span>
-  <span class="json-key">"resolved_in_pr"</span>: <span class="json-num">412</span>,
-  <span class="json-key">"resolved_by"</span>: <span class="json-str">"wickett"</span>,
-  <span class="json-key">"commit_sha"</span>: <span class="json-str">"e7b21d4"</span>,
-  <span class="json-key">"originally_detected_at"</span>: <span class="json-str">"2026-01-05T09:00:00Z"</span>,
-  <span class="json-key">"dashboard_url"</span>: <span class="json-str">"https://app.dryrun.security/pull-requests/412?org=DryRunSec"</span>
 }</pre>
         </div>
       </div>
