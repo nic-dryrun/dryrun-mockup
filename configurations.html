@@ -142,132 +142,112 @@
 
 
 
-  <table class="config-table" style="width:100%;">
-    <thead>
-      <tr>
-        <th style="width:30%;">Name</th>
-        <th style="width:18%;">Repositories</th>
-        <th>Active Settings</th>
-        <th style="width:40px;"></th>
-      </tr>
-    </thead>
-  </table>
+  <!-- CONFIG TABLE — unified columns -->
+  <div style="border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-top:4px;">
 
-  <!-- DEFAULT CONFIG ROW -->
-  <a href="configuration-detail.html" style="text-decoration:none;display:block;">
-  <div class="config-row" style="margin-top:8px;">
-    <table style="width:100%;border-collapse:collapse;">
-      <tr>
-        <td style="padding:14px 16px;width:30%;">
-          <div class="config-name">Default Configuration <span class="default-badge">Default</span>
-            <svg width="14" height="14" viewBox="0 0 16 16" fill="var(--text-muted)" style="cursor:help;" title="Applies to all repos not assigned to another config."><path d="M8 0a8 8 0 100 16A8 8 0 008 0zm0 3a1 1 0 110 2 1 1 0 010-2zm2 9H6v-1h1V7H6V6h3v6h1v1z"/></svg>
-          </div>
-          <div class="config-desc">Applied to all repos not in another config</div>
-        </td>
-        <td style="padding:14px 16px;width:18%;">
-          <div class="repo-count">31 repos</div>
-          <div class="repo-note">All except 3 assigned</div>
-        </td>
-        <td style="padding:14px 16px;">
-          <div class="status-pills">
-            <span class="pill pill-on"><svg width="9" height="9" viewBox="0 0 16 16" fill="currentColor"><path d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"/></svg> Comments on</span>
-            <span class="pill pill-on"><svg width="9" height="9" viewBox="0 0 16 16" fill="currentColor"><path d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"/></svg> Comment on clean scans</span>
-            <span class="pill pill-warn">Blocking: Critical</span>
-            <span class="pill pill-on"><svg width="9" height="9" viewBox="0 0 16 16" fill="currentColor"><path d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"/></svg> Notifications: 1 webhook</span>
-            <span class="pill pill-off">Blocking: 2 agents</span>
-          </div>
-        </td>
-        <td style="padding:14px 16px;text-align:right;">
-          <button class="menu-btn" onclick="event.preventDefault();event.stopPropagation();">
-            <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 9a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm-5.5 0a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm11 0a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"/></svg>
-          </button>
-        </td>
-      </tr>
-    </table>
-  </div>
-  </a>
+    <!-- Header -->
+    <div style="display:grid;grid-template-columns:1fr 100px 180px 160px 160px 36px;padding:8px 16px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-muted);background:var(--surface-alt);border-bottom:1px solid var(--border);">
+      <div>Configuration</div>
+      <div>Repos</div>
+      <div>Comments</div>
+      <div>Blocking</div>
+      <div>Integrations</div>
+      <div></div>
+    </div>
 
-  <!-- dd_vuln_repo -->
-  <div class="config-row">
-    <table style="width:100%;border-collapse:collapse;">
-      <tr>
-        <td style="padding:14px 16px;width:30%;">
-          <div class="config-name">dd_vuln_repo</div>
-          <div class="config-desc">DryRunSec/dd_vuln_repo</div>
-        </td>
-        <td style="padding:14px 16px;width:18%;">
-          <div class="repo-count">1 repo</div>
-          <div class="repo-note">dd_vuln_repo</div>
-        </td>
-        <td style="padding:14px 16px;">
-          <div class="status-pills">
-            <span class="pill pill-on"><svg width="9" height="9" viewBox="0 0 16 16" fill="currentColor"><path d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"/></svg> Comments on</span>
-            <span class="pill pill-off">No clean scan comment</span>
-            <span class="pill pill-warn">Blocking: High</span>
-            <span class="pill pill-off">No notifications</span>
-          </div>
-        </td>
-        <td style="padding:14px 16px;text-align:right;">
-          <button class="menu-btn"><svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 9a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm-5.5 0a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm11 0a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"/></svg></button>
-        </td>
-      </tr>
-    </table>
-  </div>
+    <!-- Row: Default -->
+    <a href="configuration-detail.html" style="text-decoration:none;color:inherit;display:block;">
+    <div style="display:grid;grid-template-columns:1fr 100px 180px 160px 160px 36px;align-items:center;padding:12px 16px;border-bottom:1px solid var(--border-light);background:var(--surface);" onmouseover="this.style.background='#f8f7ff'" onmouseout="this.style.background='var(--surface)'">
+      <div>
+        <div style="font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px;">Default Configuration <span class="default-badge">Default</span></div>
+        <div style="font-size:11px;color:var(--text-muted);margin-top:1px;">All repos not assigned to another config</div>
+      </div>
+      <div style="font-size:13px;font-weight:500;">31 repos</div>
+      <div>
+        <div style="font-size:12px;font-weight:500;color:var(--green);display:flex;align-items:center;gap:4px;"><svg width="10" height="10" viewBox="0 0 16 16" fill="currentColor"><path d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"/></svg> Enabled</div>
+        <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">Clean scans · Draft PRs</div>
+      </div>
+      <div>
+        <div style="font-size:12px;font-weight:500;color:var(--orange);display:flex;align-items:center;gap:4px;"><svg width="10" height="10" viewBox="0 0 16 16" fill="currentColor"><path d="M4.47.22A.749.749 0 015 0h6c.199 0 .389.079.53.22l4.25 4.25c.141.14.22.331.22.53v6a.749.749 0 01-.22.53l-4.25 4.25A.749.749 0 0111 16H5a.749.749 0 01-.53-.22L.22 11.53A.749.749 0 010 11V5c0-.199.079-.389.22-.53L4.47.22z"/></svg> High+</div>
+        <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">2 agents enforcing</div>
+      </div>
+      <div>
+        <div style="font-size:12px;font-weight:500;color:var(--green);display:flex;align-items:center;gap:4px;"><svg width="10" height="10" viewBox="0 0 16 16" fill="currentColor"><path d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"/></svg> 1 webhook</div>
+        <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">Security Alerts — Tines</div>
+      </div>
+      <div style="text-align:right;"><button class="menu-btn" onclick="event.preventDefault();event.stopPropagation();"><svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 9a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm-5.5 0a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm11 0a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"/></svg></button></div>
+    </div>
+    </a>
 
-  <!-- django-config -->
-  <div class="config-row">
-    <table style="width:100%;border-collapse:collapse;">
-      <tr>
-        <td style="padding:14px 16px;width:30%;">
-          <div class="config-name">django-config</div>
-          <div class="config-desc">DryRunSec/django-api</div>
-        </td>
-        <td style="padding:14px 16px;width:18%;">
-          <div class="repo-count">1 repo</div>
-        </td>
-        <td style="padding:14px 16px;">
-          <div class="status-pills">
-            <span class="pill pill-on"><svg width="9" height="9" viewBox="0 0 16 16" fill="currentColor"><path d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"/></svg> Comments on</span>
-            <span class="pill pill-off">Blocking off</span>
-            <span class="pill pill-off">No notifications</span>
-          </div>
-        </td>
-        <td style="padding:14px 16px;text-align:right;">
-          <button class="menu-btn"><svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 9a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm-5.5 0a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm11 0a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"/></svg></button>
-        </td>
-      </tr>
-    </table>
-  </div>
+    <!-- Row: dd_vuln_repo -->
+    <div style="display:grid;grid-template-columns:1fr 100px 180px 160px 160px 36px;align-items:center;padding:12px 16px;border-bottom:1px solid var(--border-light);background:var(--surface);cursor:pointer;" onmouseover="this.style.background='#f8f7ff'" onmouseout="this.style.background='var(--surface)'">
+      <div>
+        <div style="font-size:13px;font-weight:600;">dd_vuln_repo</div>
+        <div style="font-size:11px;color:var(--text-muted);margin-top:1px;">DryRunSec/dd_vuln_repo</div>
+      </div>
+      <div style="font-size:13px;font-weight:500;">1 repo</div>
+      <div>
+        <div style="font-size:12px;font-weight:500;color:var(--green);display:flex;align-items:center;gap:4px;"><svg width="10" height="10" viewBox="0 0 16 16" fill="currentColor"><path d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"/></svg> Enabled</div>
+        <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">No clean scan comment</div>
+      </div>
+      <div>
+        <div style="font-size:12px;font-weight:500;color:var(--orange);display:flex;align-items:center;gap:4px;"><svg width="10" height="10" viewBox="0 0 16 16" fill="currentColor"><path d="M4.47.22A.749.749 0 015 0h6c.199 0 .389.079.53.22l4.25 4.25c.141.14.22.331.22.53v6a.749.749 0 01-.22.53l-4.25 4.25A.749.749 0 0111 16H5a.749.749 0 01-.53-.22L.22 11.53A.749.749 0 010 11V5c0-.199.079-.389.22-.53L4.47.22z"/></svg> High+</div>
+        <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">Default analyzers</div>
+      </div>
+      <div>
+        <div style="font-size:12px;font-weight:500;color:var(--text-muted);display:flex;align-items:center;gap:4px;"><svg width="10" height="10" viewBox="0 0 16 16" fill="currentColor"><path d="M3.72 3.72a.75.75 0 011.06 0L8 6.94l3.22-3.22a.75.75 0 111.06 1.06L9.06 8l3.22 3.22a.75.75 0 11-1.06 1.06L8 9.06l-3.22 3.22a.75.75 0 01-1.06-1.06L6.94 8 3.72 4.78a.75.75 0 010-1.06z"/></svg> None</div>
+      </div>
+      <div style="text-align:right;"><button class="menu-btn"><svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 9a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm-5.5 0a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm11 0a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"/></svg></button></div>
+    </div>
 
-  <!-- g1 -->
-  <div class="config-row">
-    <table style="width:100%;border-collapse:collapse;">
-      <tr>
-        <td style="padding:14px 16px;width:30%;">
-          <div class="config-name">g1</div>
-          <div class="config-desc">DryRunSec/g1-service</div>
-        </td>
-        <td style="padding:14px 16px;width:18%;">
-          <div class="repo-count">1 repo</div>
-        </td>
-        <td style="padding:14px 16px;">
-          <div class="status-pills">
-            <span class="pill pill-on"><svg width="9" height="9" viewBox="0 0 16 16" fill="currentColor"><path d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"/></svg> Comments on</span>
-            <span class="pill pill-warn">Blocking: Critical</span>
-            <span class="pill pill-on"><svg width="9" height="9" viewBox="0 0 16 16" fill="currentColor"><path d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"/></svg> Notifications: 1 webhook</span>
-          </div>
-        </td>
-        <td style="padding:14px 16px;text-align:right;">
-          <button class="menu-btn"><svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 9a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm-5.5 0a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm11 0a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"/></svg></button>
-        </td>
-      </tr>
-    </table>
-  </div>
+    <!-- Row: django-config -->
+    <div style="display:grid;grid-template-columns:1fr 100px 180px 160px 160px 36px;align-items:center;padding:12px 16px;border-bottom:1px solid var(--border-light);background:var(--surface);cursor:pointer;" onmouseover="this.style.background='#f8f7ff'" onmouseout="this.style.background='var(--surface)'">
+      <div>
+        <div style="font-size:13px;font-weight:600;">django-config</div>
+        <div style="font-size:11px;color:var(--text-muted);margin-top:1px;">DryRunSec/django-api</div>
+      </div>
+      <div style="font-size:13px;font-weight:500;">1 repo</div>
+      <div>
+        <div style="font-size:12px;font-weight:500;color:var(--green);display:flex;align-items:center;gap:4px;"><svg width="10" height="10" viewBox="0 0 16 16" fill="currentColor"><path d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"/></svg> Enabled</div>
+        <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">Findings only</div>
+      </div>
+      <div>
+        <div style="font-size:12px;font-weight:500;color:var(--text-muted);display:flex;align-items:center;gap:4px;"><svg width="10" height="10" viewBox="0 0 16 16" fill="currentColor"><path d="M3.72 3.72a.75.75 0 011.06 0L8 6.94l3.22-3.22a.75.75 0 111.06 1.06L9.06 8l3.22 3.22a.75.75 0 11-1.06 1.06L8 9.06l-3.22 3.22a.75.75 0 01-1.06-1.06L6.94 8 3.72 4.78a.75.75 0 010-1.06z"/></svg> Off</div>
+      </div>
+      <div>
+        <div style="font-size:12px;font-weight:500;color:var(--text-muted);display:flex;align-items:center;gap:4px;"><svg width="10" height="10" viewBox="0 0 16 16" fill="currentColor"><path d="M3.72 3.72a.75.75 0 011.06 0L8 6.94l3.22-3.22a.75.75 0 111.06 1.06L9.06 8l3.22 3.22a.75.75 0 11-1.06 1.06L8 9.06l-3.22 3.22a.75.75 0 01-1.06-1.06L6.94 8 3.72 4.78a.75.75 0 010-1.06z"/></svg> None</div>
+      </div>
+      <div style="text-align:right;"><button class="menu-btn"><svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 9a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm-5.5 0a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm11 0a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"/></svg></button></div>
+    </div>
 
-  <!-- ADD NEW -->
-  <div class="add-new-row" style="margin-top:12px;">
-    <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" style="vertical-align:-2px;margin-right:4px;"><path d="M7.75 2a.75.75 0 01.75.75V7h4.25a.75.75 0 010 1.5H8.5v4.25a.75.75 0 01-1.5 0V8.5H2.75a.75.75 0 010-1.5H7V2.75A.75.75 0 017.75 2z"/></svg>
-    Add New Configuration
+    <!-- Row: g1 -->
+    <div style="display:grid;grid-template-columns:1fr 100px 180px 160px 160px 36px;align-items:center;padding:12px 16px;border-bottom:1px solid var(--border-light);background:var(--surface);cursor:pointer;" onmouseover="this.style.background='#f8f7ff'" onmouseout="this.style.background='var(--surface)'">
+      <div>
+        <div style="font-size:13px;font-weight:600;">g1</div>
+        <div style="font-size:11px;color:var(--text-muted);margin-top:1px;">DryRunSec/g1-service</div>
+      </div>
+      <div style="font-size:13px;font-weight:500;">1 repo</div>
+      <div>
+        <div style="font-size:12px;font-weight:500;color:var(--green);display:flex;align-items:center;gap:4px;"><svg width="10" height="10" viewBox="0 0 16 16" fill="currentColor"><path d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"/></svg> Enabled</div>
+        <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">Findings only</div>
+      </div>
+      <div>
+        <div style="font-size:12px;font-weight:500;color:var(--orange);display:flex;align-items:center;gap:4px;"><svg width="10" height="10" viewBox="0 0 16 16" fill="currentColor"><path d="M4.47.22A.749.749 0 015 0h6c.199 0 .389.079.53.22l4.25 4.25c.141.14.22.331.22.53v6a.749.749 0 01-.22.53l-4.25 4.25A.749.749 0 0111 16H5a.749.749 0 01-.53-.22L.22 11.53A.749.749 0 010 11V5c0-.199.079-.389.22-.53L4.47.22z"/></svg> Critical only</div>
+        <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">Default analyzers</div>
+      </div>
+      <div>
+        <div style="font-size:12px;font-weight:500;color:var(--green);display:flex;align-items:center;gap:4px;"><svg width="10" height="10" viewBox="0 0 16 16" fill="currentColor"><path d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"/></svg> 1 webhook</div>
+        <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">Ops Monitoring</div>
+      </div>
+      <div style="text-align:right;"><button class="menu-btn"><svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 9a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm-5.5 0a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm11 0a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"/></svg></button></div>
+    </div>
+
+    <!-- Add new row -->
+    <div class="add-new-row" style="margin:0;border-radius:0;border-top:1px solid var(--border-light);">
+      <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M7.75 2a.75.75 0 01.75.75V7h4.25a.75.75 0 010 1.5H8.5v4.25a.75.75 0 01-1.5 0V8.5H2.75a.75.75 0 010-1.5H7V2.75A.75.75 0 017.75 2z"/></svg>
+      Add New Configuration
+    </div>
+
   </div>
 
   <!-- ══════════════════════════════════════════ -->
