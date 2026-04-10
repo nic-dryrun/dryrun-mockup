@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DryRun — Notification Configuration Mockup</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --font: 'Inter', -apple-system, sans-serif;
+      --mono: 'JetBrains Mono', monospace;
+      --bg: #fafbfc;
+      --surface: #ffffff;
+      --surface-alt: #f6f8fa;
+      --text: #1a1d23;
+      --text-sec: #5a5f6b;
+      --text-muted: #8b919e;
+      --border: #e3e6eb;
+      --border-light: #eef0f4;
+      --purple: #7c6ef0;
+      --purple-bg: #f0eeff;
+      --purple-border: #d8d3f7;
+      --green: #1a7f37;
+      --green-bg: #dafbe1;
+      --orange: #bf8700;
+      --orange-bg: #fff8c5;
+      --red: #cf222e;
+      --red-bg: #ffebe9;
+      --blue: #0969da;
+      --blue-bg: #ddf4ff;
+      --blue-border: #b6d8ff;
+      --gray-bg: #f3f4f6;
+    }
+    body { font-family: var(--font); font-size: 14px; line-height: 1.5; color: var(--text); background: var(--bg); }
+
+    .mockup-bar { background: linear-gradient(135deg, #1a1e3a, #2d3260); padding: 10px 24px; display: flex; align-items: center; gap: 12px; font-size: 12px; color: #fff; }
+    .mockup-badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(124,110,240,0.3); padding: 3px 10px; border-radius: 10px; font-size: 11px; font-weight: 600; }
+    .mockup-breadcrumb { padding: 8px 24px; font-size: 12px; color: #8b919e; background: #fff; border-bottom: 1px solid #e8ecf0; }
+    .mockup-breadcrumb a { color: var(--purple); text-decoration: none; }
+    .mockup-breadcrumb a:hover { text-decoration: underline; }
+
+    .page { max-width: 860px; margin: 0 auto; padding: 32px 24px 60px; }
+
+    .annotation-banner { background: var(--purple-bg); border: 1px solid var(--purple-border); border-radius: 8px; padding: 12px 16px; margin-bottom: 24px; display: flex; align-items: flex-start; gap: 10px; font-size: 13px; color: #4338ca; line-height: 1.5; }
+    .annotation-banner svg { flex-shrink: 0; margin-top: 2px; }
+
+    /* Header */
+    .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
+    .page-header h1 { font-size: 20px; font-weight: 700; }
+    .add-btn { display: flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); font-size: 13px; font-weight: 500; color: var(--text-sec); cursor: pointer; font-family: var(--font); transition: all 0.15s; }
+    .add-btn:hover { border-color: var(--purple); color: var(--purple); }
+
+    /* ── WEBHOOK CARD ── */
+    .webhook-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; margin-bottom: 20px; overflow: hidden; }
+    .webhook-card-header { padding: 16px 20px; background: var(--surface-alt); border-bottom: 1px solid var(--border-light); display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .webhook-name-input { font-size: 14px; font-weight: 600; font-family: var(--font); color: var(--text); background: transparent; border: none; outline: none; flex: 1; min-width: 160px; }
+    .webhook-name-input::placeholder { color: var(--text-muted); font-weight: 400; }
+    .webhook-actions { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+    .action-btn { font-size: 12px; font-weight: 500; padding: 5px 12px; border-radius: 6px; border: 1px solid var(--border); background: var(--surface); color: var(--text-sec); cursor: pointer; font-family: var(--font); }
+    .action-btn:hover { background: var(--surface-alt); }
+    .action-btn--danger { color: var(--red); border-color: #ffcecb; }
+    .action-btn--danger:hover { background: var(--red-bg); }
+    .wh-toggle { width: 40px; height: 22px; border-radius: 11px; position: relative; border: none; cursor: pointer; flex-shrink: 0; }
+    .wh-toggle--on { background: var(--purple); }
+    .wh-toggle--off { background: var(--border); }
+    .wh-toggle::after { content: ''; position: absolute; width: 16px; height: 16px; border-radius: 50%; background: #fff; top: 3px; box-shadow: 0 1px 2px rgba(0,0,0,0.15); }
+    .wh-toggle--on::after { left: 21px; }
+    .wh-toggle--off::after { left: 3px; }
+    .toggle-label { font-size: 12px; font-weight: 500; color: var(--text-sec); }
+
+    .webhook-card-body { padding: 20px; }
+
+    /* URL field */
+    .field-group { margin-bottom: 16px; }
+    .field-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-muted); margin-bottom: 6px; }
+    .field-input { width: 100%; padding: 9px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 13px; font-family: var(--mono); color: var(--text); background: var(--surface); }
+    .field-input::placeholder { color: var(--text-muted); font-family: var(--font); }
+    .field-input:focus { outline: none; border-color: var(--purple); }
+
+    /* ── EVENTS SECTION ── */
+    .events-section { border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+    .events-header { padding: 10px 14px; background: var(--surface-alt); border-bottom: 1px solid var(--border-light); font-size: 12px; font-weight: 600; color: var(--text-sec); display: flex; align-items: center; justify-content: space-between; }
+    .events-header span { text-transform: uppercase; letter-spacing: 0.04em; }
+    .events-header-note { font-size: 11px; font-weight: 400; color: var(--text-muted); text-transform: none; letter-spacing: 0; }
+
+    .event-group { border-bottom: 1px solid var(--border-light); }
+    .event-group:last-child { border-bottom: none; }
+    .event-group-header { padding: 10px 14px; display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 12px; font-weight: 600; color: var(--text-sec); background: var(--surface); transition: background 0.1s; }
+    .event-group-header:hover { background: var(--surface-alt); }
+    .event-group-header input[type=checkbox] { width: 14px; height: 14px; accent-color: var(--purple); cursor: pointer; flex-shrink: 0; }
+    .event-group-label { flex: 1; }
+    .event-count { font-size: 10px; font-weight: 600; padding: 1px 6px; border-radius: 8px; background: var(--purple-bg); color: var(--purple); }
+    .event-chevron { color: var(--text-muted); transition: transform 0.2s; }
+    .event-group.open .event-chevron { transform: rotate(180deg); }
+    .event-group-items { display: none; background: var(--surface); }
+    .event-group.open .event-group-items { display: block; }
+
+    .event-item { display: flex; align-items: center; gap: 10px; padding: 8px 14px 8px 36px; border-top: 1px solid var(--border-light); font-size: 13px; color: var(--text); }
+    .event-item input[type=checkbox] { width: 14px; height: 14px; accent-color: var(--purple); cursor: pointer; flex-shrink: 0; }
+    .event-item-label { flex: 1; }
+    .event-item-note { font-size: 11px; color: var(--text-muted); }
+    .risk-select { font-size: 11px; padding: 3px 24px 3px 8px; border: 1px solid var(--border); border-radius: 5px; background: var(--surface); color: var(--text); font-family: var(--font); cursor: pointer; appearance: none; background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='%236b7084' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 7px center; }
+    .event-item--disabled { opacity: 0.4; pointer-events: none; }
+    .hook-badge { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; padding: 2px 6px; border-radius: 4px; background: var(--blue-bg); color: var(--blue); border: 1px solid var(--blue-border); flex-shrink: 0; }
+
+    /* subscription summary */
+    .subs-summary { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 12px; }
+    .sub-tag { font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: 10px; background: var(--purple-bg); color: var(--purple); border: 1px solid var(--purple-border); display: flex; align-items: center; gap: 4px; }
+    .sub-tag-risk { font-size: 10px; color: #6b5bcc; }
+  </style>
+</head>
+<body>
+
+<div class="mockup-bar">
+  <span class="mockup-badge"><svg width="10" height="10" viewBox="0 0 16 16" fill="#c4b5fd"><circle cx="8" cy="8" r="8"/></svg> PROPOSED MOCKUP</span>
+  <span style="opacity:0.6;">Notifications — Webhook Configuration Redesign</span>
+</div>
+<div class="mockup-breadcrumb"><a href="index.html">Mockups</a> / <span>Notifications / Webhook Configuration</span></div>
+
+<div class="page">
+
+  <div class="annotation-banner">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="#7c6ef0"><path d="M8 0a8 8 0 100 16A8 8 0 008 0zm0 3a1 1 0 110 2 1 1 0 010-2zm2 9H6v-1h1V7H6V6h3v6h1v1z"/></svg>
+    <div><strong>Proposed notification redesign.</strong> Each webhook now subscribes to one or more specific events — not just "PR scanned with risk." Risk level filters only appear for vulnerability events. Multiple webhooks can each receive different event subsets.</div>
+  </div>
+
+  <div class="page-header">
+    <h1>Webhooks</h1>
+    <button class="add-btn">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M7.75 2a.75.75 0 01.75.75V7h4.25a.75.75 0 010 1.5H8.5v4.25a.75.75 0 01-1.5 0V8.5H2.75a.75.75 0 010-1.5H7V2.75A.75.75 0 017.75 2z"/></svg>
+      Add Webhook
+    </button>
+  </div>
+
+  <!-- ══════════════════════════════════════════ -->
+  <!--           WEBHOOK 1 — Security Alerts      -->
+  <!-- ══════════════════════════════════════════ -->
+  <div class="webhook-card">
+    <div class="webhook-card-header">
+      <button class="wh-toggle wh-toggle--on"></button>
+      <span class="toggle-label">Enabled</span>
+      <input type="text" class="webhook-name-input" value="Security Alerts — Tines">
+      <div class="webhook-actions">
+        <button class="action-btn">Test</button>
+        <button class="action-btn action-btn--danger">Remove</button>
+      </div>
+    </div>
+    <div class="webhook-card-body">
+      <div class="field-group">
+        <div class="field-label">Webhook URL</div>
+        <input type="text" class="field-input" value="https://aged-snow-3554.tines.com/webhook/new-story-for-security">
+      </div>
+
+      <div class="events-section">
+        <div class="events-header">
+          <span>Event Subscriptions</span>
+          <span class="events-header-note">Select which events trigger this webhook</span>
+        </div>
+
+        <!-- PR Events -->
+        <div class="event-group open">
+          <div class="event-group-header" onclick="this.parentElement.classList.toggle('open')">
+            <input type="checkbox" checked onclick="event.stopPropagation()">
+            <span class="event-group-label">PR Events</span>
+            <span class="event-count">3 of 4</span>
+            <svg class="event-chevron" width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M12.78 6.22a.75.75 0 010 1.06l-4.25 4.25a.75.75 0 01-1.06 0L3.22 7.28a.75.75 0 011.06-1.06L8 9.94l3.72-3.72a.75.75 0 011.06 0z"/></svg>
+          </div>
+          <div class="event-group-items">
+            <div class="event-item event-item--disabled">
+              <input type="checkbox">
+              <span class="hook-badge">HOOK</span>
+              <span class="event-item-label">PR scan started</span>
+            </div>
+            <div class="event-item">
+              <input type="checkbox" checked>
+              <span class="hook-badge">HOOK</span>
+              <span class="event-item-label">PR scan complete</span>
+            </div>
+            <div class="event-item">
+              <input type="checkbox" checked>
+              <span class="hook-badge">HOOK</span>
+              <span class="event-item-label">New vulnerabilities (PR)</span>
+              <select class="risk-select"><option>All severities</option><option selected>High + Critical</option><option>Critical only</option></select>
+            </div>
+            <div class="event-item">
+              <input type="checkbox" checked>
+              <span class="hook-badge">HOOK</span>
+              <span class="event-item-label">PR blocked</span>
+            </div>
+            <div class="event-item">
+              <input type="checkbox">
+              <span class="hook-badge">HOOK</span>
+              <span class="event-item-label">PR merged with issues</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Vulnerability Events -->
+        <div class="event-group open">
+          <div class="event-group-header" onclick="this.parentElement.classList.toggle('open')">
+            <input type="checkbox" checked onclick="event.stopPropagation()">
+            <span class="event-group-label">Vulnerability Events</span>
+            <span class="event-count">2 of 4</span>
+            <svg class="event-chevron" width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M12.78 6.22a.75.75 0 010 1.06l-4.25 4.25a.75.75 0 01-1.06 0L3.22 7.28a.75.75 0 011.06-1.06L8 9.94l3.72-3.72a.75.75 0 011.06 0z"/></svg>
+          </div>
+          <div class="event-group-items">
+            <div class="event-item">
+              <input type="checkbox" checked>
+              <span class="hook-badge">HOOK</span>
+              <span class="event-item-label">New vulnerabilities (full scan)</span>
+              <select class="risk-select"><option>All severities</option><option selected>High + Critical</option><option>Critical only</option></select>
+            </div>
+            <div class="event-item">
+              <input type="checkbox">
+              <span class="hook-badge">HOOK</span>
+              <span class="event-item-label">Vulnerability patched</span>
+            </div>
+            <div class="event-item">
+              <input type="checkbox" checked>
+              <span class="hook-badge">HOOK</span>
+              <span class="event-item-label">Vulnerability reopened</span>
+            </div>
+            <div class="event-item">
+              <input type="checkbox">
+              <span class="hook-badge">HOOK</span>
+              <span class="event-item-label">SCA new CVE</span>
+              <select class="risk-select"><option selected>All severities</option><option>High + Critical</option><option>Critical only</option></select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Scan Events -->
+        <div class="event-group">
+          <div class="event-group-header" onclick="this.parentElement.classList.toggle('open')">
+            <input type="checkbox" onclick="event.stopPropagation()">
+            <span class="event-group-label">Scan Events</span>
+            <span style="font-size:10px;color:var(--text-muted);">None selected</span>
+            <svg class="event-chevron" width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M12.78 6.22a.75.75 0 010 1.06l-4.25 4.25a.75.75 0 01-1.06 0L3.22 7.28a.75.75 0 011.06-1.06L8 9.94l3.72-3.72a.75.75 0 011.06 0z"/></svg>
+          </div>
+          <div class="event-group-items">
+            <div class="event-item">
+              <input type="checkbox">
+              <span class="hook-badge">HOOK</span>
+              <span class="event-item-label">Scan started</span>
+            </div>
+            <div class="event-item">
+              <input type="checkbox">
+              <span class="hook-badge">HOOK</span>
+              <span class="event-item-label">Scan complete</span>
+            </div>
+            <div class="event-item">
+              <input type="checkbox">
+              <span class="hook-badge">HOOK</span>
+              <span class="event-item-label">Scan failed</span>
+            </div>
+            <div class="event-item">
+              <input type="checkbox">
+              <span class="hook-badge">HOOK</span>
+              <span class="event-item-label">Scan scheduled</span>
+            </div>
+            <div class="event-item">
+              <input type="checkbox">
+              <span class="hook-badge">HOOK</span>
+              <span class="event-item-label">Long running scan</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Other Events -->
+        <div class="event-group">
+          <div class="event-group-header" onclick="this.parentElement.classList.toggle('open')">
+            <input type="checkbox" onclick="event.stopPropagation()">
+            <span class="event-group-label">Other Events</span>
+            <span style="font-size:10px;color:var(--text-muted);">None selected</span>
+            <svg class="event-chevron" width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M12.78 6.22a.75.75 0 010 1.06l-4.25 4.25a.75.75 0 01-1.06 0L3.22 7.28a.75.75 0 011.06-1.06L8 9.94l3.72-3.72a.75.75 0 011.06 0z"/></svg>
+          </div>
+          <div class="event-group-items">
+            <div class="event-item">
+              <input type="checkbox">
+              <span class="hook-badge">HOOK</span>
+              <span class="event-item-label">Audit log event</span>
+            </div>
+            <div class="event-item">
+              <input type="checkbox">
+              <span class="hook-badge">HOOK</span>
+              <span class="event-item-label">Report complete</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Subscription Summary -->
+      <div style="margin-top: 14px;">
+        <div style="font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-muted); margin-bottom: 6px;">Currently subscribed to</div>
+        <div class="subs-summary">
+          <span class="sub-tag">PR scan complete</span>
+          <span class="sub-tag">New vulnerabilities (PR) <span class="sub-tag-risk">· High+</span></span>
+          <span class="sub-tag">PR blocked</span>
+          <span class="sub-tag">New vulnerabilities (full scan) <span class="sub-tag-risk">· High+</span></span>
+          <span class="sub-tag">Vulnerability reopened</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════ -->
+  <!--           WEBHOOK 2 — Ops Monitoring       -->
+  <!-- ══════════════════════════════════════════ -->
+  <div class="webhook-card">
+    <div class="webhook-card-header">
+      <button class="wh-toggle wh-toggle--on"></button>
+      <span class="toggle-label">Enabled</span>
+      <input type="text" class="webhook-name-input" value="Ops Monitoring — PagerDuty">
+      <div class="webhook-actions">
+        <button class="action-btn">Test</button>
+        <button class="action-btn action-btn--danger">Remove</button>
+      </div>
+    </div>
+    <div class="webhook-card-body">
+      <div class="field-group">
+        <div class="field-label">Webhook URL</div>
+        <input type="text" class="field-input" value="https://events.pagerduty.com/integration/abc123/enqueue">
+      </div>
+
+      <div class="events-section">
+        <div class="events-header">
+          <span>Event Subscriptions</span>
+          <span class="events-header-note">Select which events trigger this webhook</span>
+        </div>
+
+        <!-- PR Events collapsed -->
+        <div class="event-group">
+          <div class="event-group-header" onclick="this.parentElement.classList.toggle('open')">
+            <input type="checkbox" onclick="event.stopPropagation()">
+            <span class="event-group-label">PR Events</span>
+            <span style="font-size:10px;color:var(--text-muted);">None selected</span>
+            <svg class="event-chevron" width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M12.78 6.22a.75.75 0 010 1.06l-4.25 4.25a.75.75 0 01-1.06 0L3.22 7.28a.75.75 0 011.06-1.06L8 9.94l3.72-3.72a.75.75 0 011.06 0z"/></svg>
+          </div>
+          <div class="event-group-items">
+            <div class="event-item"><input type="checkbox"><span class="hook-badge">HOOK</span><span class="event-item-label">PR scan started</span></div>
+            <div class="event-item"><input type="checkbox"><span class="hook-badge">HOOK</span><span class="event-item-label">PR scan complete</span></div>
+            <div class="event-item"><input type="checkbox"><span class="hook-badge">HOOK</span><span class="event-item-label">New vulnerabilities (PR)</span><select class="risk-select"><option>All severities</option><option>High + Critical</option><option>Critical only</option></select></div>
+            <div class="event-item"><input type="checkbox"><span class="hook-badge">HOOK</span><span class="event-item-label">PR blocked</span></div>
+            <div class="event-item"><input type="checkbox"><span class="hook-badge">HOOK</span><span class="event-item-label">PR merged with issues</span></div>
+          </div>
+        </div>
+
+        <!-- Vulnerability Events collapsed -->
+        <div class="event-group">
+          <div class="event-group-header" onclick="this.parentElement.classList.toggle('open')">
+            <input type="checkbox" onclick="event.stopPropagation()">
+            <span class="event-group-label">Vulnerability Events</span>
+            <span style="font-size:10px;color:var(--text-muted);">None selected</span>
+            <svg class="event-chevron" width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M12.78 6.22a.75.75 0 010 1.06l-4.25 4.25a.75.75 0 01-1.06 0L3.22 7.28a.75.75 0 011.06-1.06L8 9.94l3.72-3.72a.75.75 0 011.06 0z"/></svg>
+          </div>
+          <div class="event-group-items">
+            <div class="event-item"><input type="checkbox"><span class="hook-badge">HOOK</span><span class="event-item-label">New vulnerabilities (full scan)</span><select class="risk-select"><option>All severities</option><option>High + Critical</option><option>Critical only</option></select></div>
+            <div class="event-item"><input type="checkbox"><span class="hook-badge">HOOK</span><span class="event-item-label">Vulnerability patched</span></div>
+            <div class="event-item"><input type="checkbox"><span class="hook-badge">HOOK</span><span class="event-item-label">Vulnerability reopened</span></div>
+            <div class="event-item"><input type="checkbox"><span class="hook-badge">HOOK</span><span class="event-item-label">SCA new CVE</span><select class="risk-select"><option>All severities</option><option>High + Critical</option><option>Critical only</option></select></div>
+          </div>
+        </div>
+
+        <!-- Scan Events open -->
+        <div class="event-group open">
+          <div class="event-group-header" onclick="this.parentElement.classList.toggle('open')">
+            <input type="checkbox" checked onclick="event.stopPropagation()">
+            <span class="event-group-label">Scan Events</span>
+            <span class="event-count">2 of 5</span>
+            <svg class="event-chevron" width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M12.78 6.22a.75.75 0 010 1.06l-4.25 4.25a.75.75 0 01-1.06 0L3.22 7.28a.75.75 0 011.06-1.06L8 9.94l3.72-3.72a.75.75 0 011.06 0z"/></svg>
+          </div>
+          <div class="event-group-items">
+            <div class="event-item"><input type="checkbox"><span class="hook-badge">HOOK</span><span class="event-item-label">Scan started</span></div>
+            <div class="event-item"><input type="checkbox"><span class="hook-badge">HOOK</span><span class="event-item-label">Scan complete</span></div>
+            <div class="event-item"><input type="checkbox" checked><span class="hook-badge">HOOK</span><span class="event-item-label">Scan failed</span></div>
+            <div class="event-item"><input type="checkbox"><span class="hook-badge">HOOK</span><span class="event-item-label">Scan scheduled</span></div>
+            <div class="event-item"><input type="checkbox" checked><span class="hook-badge">HOOK</span><span class="event-item-label">Long running scan</span></div>
+          </div>
+        </div>
+
+        <!-- Other Events -->
+        <div class="event-group">
+          <div class="event-group-header" onclick="this.parentElement.classList.toggle('open')">
+            <input type="checkbox" onclick="event.stopPropagation()">
+            <span class="event-group-label">Other Events</span>
+            <span style="font-size:10px;color:var(--text-muted);">None selected</span>
+            <svg class="event-chevron" width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M12.78 6.22a.75.75 0 010 1.06l-4.25 4.25a.75.75 0 01-1.06 0L3.22 7.28a.75.75 0 011.06-1.06L8 9.94l3.72-3.72a.75.75 0 011.06 0z"/></svg>
+          </div>
+          <div class="event-group-items">
+            <div class="event-item"><input type="checkbox"><span class="hook-badge">HOOK</span><span class="event-item-label">Audit log event</span></div>
+            <div class="event-item"><input type="checkbox"><span class="hook-badge">HOOK</span><span class="event-item-label">Report complete</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Subscription Summary -->
+      <div style="margin-top: 14px;">
+        <div style="font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-muted); margin-bottom: 6px;">Currently subscribed to</div>
+        <div class="subs-summary">
+          <span class="sub-tag">Scan failed</span>
+          <span class="sub-tag">Long running scan</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 8px; padding-top: 20px; border-top: 1px solid var(--border-light);">
+    <button class="action-btn" style="padding: 9px 24px;">Cancel</button>
+    <button style="padding: 9px 24px; border: none; border-radius: 8px; background: var(--purple); color: #fff; font-size: 14px; font-weight: 600; cursor: pointer; font-family: var(--font);">Save Changes</button>
+  </div>
+
+</div>
+
+<script src="gate.js"></script>
+</body>
+</html>
