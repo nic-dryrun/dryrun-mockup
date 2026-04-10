@@ -453,90 +453,119 @@
   <!-- ══ STEP 4: BLOCKING ══ -->
   <div class="step-content" id="step-4">
     <div class="step-heading">Blocking</div>
-    <div class="step-subheading">Set the minimum severity that triggers a branch protection block on pull requests.</div>
+    <div class="step-subheading">Choose how DryRun blocks pull requests from merging when findings are detected.</div>
 
-    <div class="block-options">
-      <div class="block-opt" id="block-off" onclick="selectBlock('off')">
-        <div class="block-opt-label" style="color:var(--text-muted);">Off</div>
-        <div class="block-opt-desc">No merge blocking — findings are advisory only</div>
-      </div>
-      <div class="block-opt" id="block-critical" onclick="selectBlock('critical')">
-        <div class="block-opt-label" style="color:var(--red);">Critical only</div>
-        <div class="block-opt-desc">Block only when critical severity findings are present</div>
-      </div>
-      <div class="block-opt selected" id="block-high" onclick="selectBlock('high')">
-        <div class="block-opt-label" style="color:var(--orange);">High+</div>
-        <div class="block-opt-desc">Block on high or critical severity findings</div>
-      </div>
-      <div class="block-opt" id="block-any" onclick="selectBlock('any')">
-        <div class="block-opt-label" style="color:var(--purple);">Any finding</div>
-        <div class="block-opt-desc">Block whenever any severity finding is detected</div>
-      </div>
-    </div>
+    <!-- Mode selector -->
+    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px;">
 
-    <!-- Per-analyzer blocking -->
-    <div class="card">
-      <div class="card-header">
-        <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M4.47.22A.749.749 0 015 0h6c.199 0 .389.079.53.22l4.25 4.25c.141.14.22.331.22.53v6a.749.749 0 01-.22.53l-4.25 4.25A.749.749 0 0111 16H5a.749.749 0 01-.53-.22L.22 11.53A.749.749 0 010 11V5c0-.199.079-.389.22-.53L4.47.22z"/></svg>
-        Per-Analyzer Enforcement
-        <span style="font-size:11px;font-weight:400;color:var(--text-muted);text-transform:none;letter-spacing:0;">Override the global threshold for specific analyzers</span>
+      <!-- Option A: Global threshold -->
+      <div class="block-mode-opt" id="bmode-global" onclick="setBlockMode('global')" style="border:2px solid var(--purple);background:var(--purple-bg);border-radius:10px;padding:16px 18px;cursor:pointer;">
+        <div style="display:flex;align-items:flex-start;gap:12px;">
+          <div style="width:18px;height:18px;border-radius:50%;border:2px solid var(--purple);background:var(--purple);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">
+            <div style="width:7px;height:7px;border-radius:50%;background:#fff;"></div>
+          </div>
+          <div style="flex:1;">
+            <div style="font-size:13px;font-weight:700;margin-bottom:2px;">Block on any finding at or above a severity threshold</div>
+            <div style="font-size:12px;color:var(--text-sec);">One global rule applies to all analyzers — simplest to configure</div>
+            <!-- Severity picker (shown when selected) -->
+            <div id="global-sev-picker" style="margin-top:14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+              <span style="font-size:12px;font-weight:500;color:var(--text-sec);">Block when severity is at least:</span>
+              <div style="display:flex;gap:8px;">
+                <button class="sev-chip" id="sev-medium" onclick="event.stopPropagation();selectSev('medium')" style="font-size:12px;font-weight:600;padding:5px 14px;border-radius:20px;border:1.5px solid var(--border);background:var(--surface);color:var(--text-muted);cursor:pointer;">Medium+</button>
+                <button class="sev-chip selected" id="sev-high" onclick="event.stopPropagation();selectSev('high')" style="font-size:12px;font-weight:600;padding:5px 14px;border-radius:20px;border:1.5px solid var(--orange);background:var(--orange-bg);color:var(--orange);cursor:pointer;">High+</button>
+                <button class="sev-chip" id="sev-critical" onclick="event.stopPropagation();selectSev('critical')" style="font-size:12px;font-weight:600;padding:5px 14px;border-radius:20px;border:1.5px solid var(--border);background:var(--surface);color:var(--text-muted);cursor:pointer;">Critical only</button>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-      <table class="atbl">
-        <thead>
-          <tr>
-            <th>Analyzer / Policy</th>
-            <th>Blocking</th>
-            <th>Min Severity</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td class="atbl-name">Cross-Site Scripting Analyzer</td>
-            <td><button class="sm-tog sm-tog--off" onclick="toggleSmall(this)"></button></td>
-            <td><select class="sev-sel" disabled style="opacity:0.4;"><option>High+</option></select></td>
-          </tr>
-          <tr>
-            <td class="atbl-name">General Security Analyzer</td>
-            <td><button class="sm-tog sm-tog--off" onclick="toggleSmall(this)"></button></td>
-            <td><select class="sev-sel" disabled style="opacity:0.4;"><option>High+</option></select></td>
-          </tr>
-          <tr>
-            <td class="atbl-name">IDOR Analyzer</td>
-            <td><button class="sm-tog sm-tog--off" onclick="toggleSmall(this)"></button></td>
-            <td><select class="sev-sel" disabled style="opacity:0.4;"><option>High+</option></select></td>
-          </tr>
-          <tr>
-            <td class="atbl-name">Mass Assignment</td>
-            <td><button class="sm-tog sm-tog--off" onclick="toggleSmall(this)"></button></td>
-            <td><select class="sev-sel" disabled style="opacity:0.4;"><option>High+</option></select></td>
-          </tr>
-          <tr>
-            <td class="atbl-name">Secrets Analyzer</td>
-            <td><button class="sm-tog sm-tog--on" onclick="toggleSmall(this)"></button></td>
-            <td><select class="sev-sel"><option selected>Any</option><option>High+</option><option>Critical</option></select></td>
-          </tr>
-          <tr>
-            <td class="atbl-name">Server-Side Request Forgery Analyzer</td>
-            <td><button class="sm-tog sm-tog--off" onclick="toggleSmall(this)"></button></td>
-            <td><select class="sev-sel" disabled style="opacity:0.4;"><option>High+</option></select></td>
-          </tr>
-          <tr>
-            <td class="atbl-name">SQL Injection Analyzer</td>
-            <td><button class="sm-tog sm-tog--off" onclick="toggleSmall(this)"></button></td>
-            <td><select class="sev-sel" disabled style="opacity:0.4;"><option>High+</option></select></td>
-          </tr>
-          <tr>
-            <td class="atbl-name">Dependency License Check v1</td>
-            <td><button class="sm-tog sm-tog--on" onclick="toggleSmall(this)"></button></td>
-            <td><select class="sev-sel"><option selected>Any</option><option>High+</option><option>Critical</option></select></td>
-          </tr>
-          <tr>
-            <td class="atbl-name">No Default Env Var Values</td>
-            <td><button class="sm-tog sm-tog--off" onclick="toggleSmall(this)"></button></td>
-            <td><select class="sev-sel" disabled style="opacity:0.4;"><option>High+</option></select></td>
-          </tr>
-        </tbody>
-      </table>
+
+      <!-- Option B: Per-analyzer -->
+      <div class="block-mode-opt" id="bmode-per" onclick="setBlockMode('per')" style="border:2px solid var(--border);background:var(--surface);border-radius:10px;padding:16px 18px;cursor:pointer;">
+        <div style="display:flex;align-items:flex-start;gap:12px;">
+          <div id="bmode-per-radio" style="width:18px;height:18px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">
+            <div style="width:7px;height:7px;border-radius:50%;background:transparent;"></div>
+          </div>
+          <div style="flex:1;">
+            <div style="font-size:13px;font-weight:700;margin-bottom:2px;">Configure blocking per analyzer</div>
+            <div style="font-size:12px;color:var(--text-sec);">Set individual blocking rules and severity thresholds for each analyzer</div>
+          </div>
+        </div>
+
+        <!-- Per-analyzer table (shown when selected) -->
+        <div id="per-analyzer-table" style="display:none;margin-top:16px;border:1px solid var(--border);border-radius:8px;overflow:hidden;">
+          <table class="atbl" style="margin:0;">
+            <thead>
+              <tr>
+                <th style="background:var(--surface-alt);">Analyzer / Policy</th>
+                <th style="background:var(--surface-alt);width:80px;">Block</th>
+                <th style="background:var(--surface-alt);width:130px;">Min Severity</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><div class="atbl-name">Cross-Site Scripting Analyzer</div></td>
+                <td><button class="sm-tog sm-tog--off" onclick="event.stopPropagation();togglePerAnalyzer(this)"></button></td>
+                <td><select class="sev-sel" disabled style="opacity:0.4;" onclick="event.stopPropagation()"><option>Any</option><option selected>High+</option><option>Critical</option></select></td>
+              </tr>
+              <tr>
+                <td><div class="atbl-name">General Security Analyzer</div></td>
+                <td><button class="sm-tog sm-tog--off" onclick="event.stopPropagation();togglePerAnalyzer(this)"></button></td>
+                <td><select class="sev-sel" disabled style="opacity:0.4;" onclick="event.stopPropagation()"><option>Any</option><option selected>High+</option><option>Critical</option></select></td>
+              </tr>
+              <tr>
+                <td><div class="atbl-name">IDOR Analyzer</div></td>
+                <td><button class="sm-tog sm-tog--off" onclick="event.stopPropagation();togglePerAnalyzer(this)"></button></td>
+                <td><select class="sev-sel" disabled style="opacity:0.4;" onclick="event.stopPropagation()"><option>Any</option><option selected>High+</option><option>Critical</option></select></td>
+              </tr>
+              <tr>
+                <td><div class="atbl-name">Mass Assignment</div></td>
+                <td><button class="sm-tog sm-tog--off" onclick="event.stopPropagation();togglePerAnalyzer(this)"></button></td>
+                <td><select class="sev-sel" disabled style="opacity:0.4;" onclick="event.stopPropagation()"><option>Any</option><option selected>High+</option><option>Critical</option></select></td>
+              </tr>
+              <tr>
+                <td><div class="atbl-name">Secrets Analyzer</div></td>
+                <td><button class="sm-tog sm-tog--on" onclick="event.stopPropagation();togglePerAnalyzer(this)"></button></td>
+                <td><select class="sev-sel" onclick="event.stopPropagation()"><option selected>Any</option><option>High+</option><option>Critical</option></select></td>
+              </tr>
+              <tr>
+                <td><div class="atbl-name">Server-Side Request Forgery Analyzer</div></td>
+                <td><button class="sm-tog sm-tog--off" onclick="event.stopPropagation();togglePerAnalyzer(this)"></button></td>
+                <td><select class="sev-sel" disabled style="opacity:0.4;" onclick="event.stopPropagation()"><option>Any</option><option selected>High+</option><option>Critical</option></select></td>
+              </tr>
+              <tr>
+                <td><div class="atbl-name">SQL Injection Analyzer</div></td>
+                <td><button class="sm-tog sm-tog--off" onclick="event.stopPropagation();togglePerAnalyzer(this)"></button></td>
+                <td><select class="sev-sel" disabled style="opacity:0.4;" onclick="event.stopPropagation()"><option>Any</option><option selected>High+</option><option>Critical</option></select></td>
+              </tr>
+              <tr>
+                <td><div class="atbl-name">Dependency License Check v1</div></td>
+                <td><button class="sm-tog sm-tog--on" onclick="event.stopPropagation();togglePerAnalyzer(this)"></button></td>
+                <td><select class="sev-sel" onclick="event.stopPropagation()"><option selected>Any</option><option>High+</option><option>Critical</option></select></td>
+              </tr>
+              <tr>
+                <td><div class="atbl-name">No Default Env Var Values</div></td>
+                <td><button class="sm-tog sm-tog--off" onclick="event.stopPropagation();togglePerAnalyzer(this)"></button></td>
+                <td><select class="sev-sel" disabled style="opacity:0.4;" onclick="event.stopPropagation()"><option>Any</option><option selected>High+</option><option>Critical</option></select></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Option C: Off -->
+      <div class="block-mode-opt" id="bmode-off" onclick="setBlockMode('off')" style="border:2px solid var(--border);background:var(--surface);border-radius:10px;padding:16px 18px;cursor:pointer;">
+        <div style="display:flex;align-items:flex-start;gap:12px;">
+          <div id="bmode-off-radio" style="width:18px;height:18px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">
+            <div style="width:7px;height:7px;border-radius:50%;background:transparent;"></div>
+          </div>
+          <div>
+            <div style="font-size:13px;font-weight:700;margin-bottom:2px;color:var(--text-muted);">No blocking</div>
+            <div style="font-size:12px;color:var(--text-muted);">Findings are advisory only — PRs are never blocked from merging</div>
+          </div>
+        </div>
+      </div>
+
     </div>
 
     <div class="step-nav">
@@ -713,12 +742,76 @@ function toggleMaster(btn) {
   sub.style.pointerEvents = isNowOn ? '' : 'none';
 }
 
-// ── BLOCKING SELECTION ──
-function selectBlock(val) {
-  ['off','critical','high','any'].forEach(v => {
-    document.getElementById('block-' + v).classList.remove('selected');
+// ── BLOCKING MODE ──
+let blockMode = 'global';
+
+function setBlockMode(mode) {
+  blockMode = mode;
+  const modes = ['global', 'per', 'off'];
+  modes.forEach(m => {
+    const el = document.getElementById('bmode-' + m);
+    const radio = document.getElementById('bmode-' + m + '-radio');
+    if (m === mode) {
+      el.style.border = '2px solid var(--purple)';
+      el.style.background = 'var(--purple-bg)';
+      if (radio) {
+        radio.style.borderColor = 'var(--purple)';
+        radio.style.background = 'var(--purple)';
+        radio.querySelector('div').style.background = '#fff';
+      }
+    } else {
+      el.style.border = '2px solid var(--border)';
+      el.style.background = 'var(--surface)';
+      if (radio) {
+        radio.style.borderColor = 'var(--border)';
+        radio.style.background = 'transparent';
+        radio.querySelector('div').style.background = 'transparent';
+      }
+    }
   });
-  document.getElementById('block-' + val).classList.add('selected');
+
+  // Global mode radio indicator
+  const globalRadio = document.querySelector('#bmode-global > div > div:first-child');
+  if (globalRadio) {
+    if (mode === 'global') {
+      globalRadio.style.borderColor = 'var(--purple)';
+      globalRadio.style.background = 'var(--purple)';
+    } else {
+      globalRadio.style.borderColor = 'var(--border)';
+      globalRadio.style.background = 'transparent';
+    }
+  }
+
+  // Show/hide sev picker & per-analyzer table
+  document.getElementById('global-sev-picker').style.display = mode === 'global' ? 'flex' : 'none';
+  document.getElementById('per-analyzer-table').style.display = mode === 'per' ? 'block' : 'none';
+}
+
+function selectSev(val) {
+  ['medium','high','critical'].forEach(v => {
+    const chip = document.getElementById('sev-' + v);
+    chip.classList.remove('selected');
+    chip.style.borderColor = 'var(--border)';
+    chip.style.background = 'var(--surface)';
+    chip.style.color = 'var(--text-muted)';
+  });
+  const colors = { medium: ['var(--purple-border)','var(--purple-bg)','var(--purple)'], high: ['var(--orange-border)','var(--orange-bg)','var(--orange)'], critical: ['#ffcecb','var(--red-bg)','var(--red)'] };
+  const chip = document.getElementById('sev-' + val);
+  chip.classList.add('selected');
+  chip.style.borderColor = colors[val][0];
+  chip.style.background = colors[val][1];
+  chip.style.color = colors[val][2];
+}
+
+function togglePerAnalyzer(btn) {
+  const isOn = btn.classList.contains('sm-tog--on');
+  btn.classList.toggle('sm-tog--on', !isOn);
+  btn.classList.toggle('sm-tog--off', isOn);
+  const sel = btn.closest('tr').querySelector('.sev-sel');
+  if (sel) {
+    sel.disabled = isOn;
+    sel.style.opacity = isOn ? '0.4' : '1';
+  }
 }
 
 // ── SAVE ──
