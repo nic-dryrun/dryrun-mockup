@@ -857,7 +857,8 @@ function sumRow(on, label, detail) {
 function buildSummary() {
 
   // ── ANALYZERS (step 1 core) ──
-  const analyzerRows = document.querySelectorAll('#step-1 .card:first-of-type tbody tr');
+  const step1Cards = document.querySelectorAll('#step-1 .card');
+  const analyzerRows = step1Cards[0] ? step1Cards[0].querySelectorAll('tbody tr') : [];
   const allAnalyzers = [...analyzerRows].map(row => ({
     name: row.querySelector('.atbl-name').textContent.trim(),
     on: row.querySelector('.sm-tog').classList.contains('sm-tog--on')
@@ -878,7 +879,7 @@ function buildSummary() {
   document.getElementById('sum-analyzers').innerHTML = analyzerHtml;
 
   // ── POLICIES (step 1 custom) ──
-  const policyRows = document.querySelectorAll('#step-1 .card:last-of-type tbody tr');
+  const policyRows = step1Cards[1] ? step1Cards[1].querySelectorAll('tbody tr') : [];
   const allPolicies = [...policyRows].map(row => ({
     name: row.querySelector('.atbl-name').textContent.trim(),
     on: row.querySelector('.sm-tog').classList.contains('sm-tog--on')
