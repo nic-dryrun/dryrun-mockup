@@ -34,7 +34,7 @@
     .sidebar-logo { display: flex; align-items: center; gap: 8px; padding: 0 16px 14px; border-bottom: 1px solid var(--border-light); margin-bottom: 10px; font-weight: 700; font-size: 13px; }
     .sidebar-org { margin: 0 12px 12px; padding: 7px 10px; border: 1px solid var(--border); border-radius: 8px; display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; }
     .s-sec { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); padding: 10px 16px 4px; }
-    .s-link { display: flex; align-items: center; gap: 8px; padding: 7px 16px; font-size: 13px; font-weight: 500; color: var(--text-sec); cursor: pointer; }
+    .s-link { text-decoration: none !important; display: flex; align-items: center; gap: 8px; padding: 7px 16px; font-size: 13px; font-weight: 500; color: var(--text-sec); cursor: pointer; }
     .s-link:hover { color: var(--text); background: #f6f8fa; }
     .s-link--active { color: var(--purple); background: var(--purple-bg); font-weight: 600; }
     .s-link svg { width: 16px; height: 16px; flex-shrink: 0; }
@@ -135,15 +135,7 @@
     </button>
   </div>
 
-  <div class="anno">
-    <svg width="14" height="14" viewBox="0 0 16 16" fill="#7c6ef0"><path d="M8 0a8 8 0 100 16A8 8 0 008 0zm0 3a1 1 0 110 2 1 1 0 010-2zm2 9H6v-1h1V7H6V6h3v6h1v1z"/></svg>
-    <div><strong>Proposed redesign.</strong> The Default Configuration now shows the repos it actually applies to (all repos minus those explicitly assigned to custom configs). Each row surfaces key setting states at a glance. <span class="ci ci-new">New</span></div>
-  </div>
 
-  <div class="info-box">
-    <svg width="14" height="14" viewBox="0 0 16 16" fill="#0969da"><path d="M8 0a8 8 0 100 16A8 8 0 008 0zm0 3a1 1 0 110 2 1 1 0 010-2zm2 9H6v-1h1V7H6V6h3v6h1v1z"/></svg>
-    <div>The <strong>Default Configuration</strong> applies to all repositories not explicitly assigned to a custom configuration. When you assign repos to a new config, they are automatically removed from the default. <span class="ci ci-new">New</span></div>
-  </div>
 
   <table class="config-table" style="width:100%;">
     <thead>
@@ -272,6 +264,134 @@
     <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" style="vertical-align:-2px;margin-right:4px;"><path d="M7.75 2a.75.75 0 01.75.75V7h4.25a.75.75 0 010 1.5H8.5v4.25a.75.75 0 01-1.5 0V8.5H2.75a.75.75 0 010-1.5H7V2.75A.75.75 0 017.75 2z"/></svg>
     Add New Configuration
   </div>
+
+  <!-- ══════════════════════════════════════════ -->
+  <!--            REPOSITORY MANAGEMENT           -->
+  <!-- ══════════════════════════════════════════ -->
+  <div style="margin-top:40px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+      <div>
+        <div style="font-size:18px;font-weight:700;">Repositories</div>
+        <div style="font-size:13px;color:var(--text-muted);margin-top:2px;">Manage which repositories DryRun Security is installed on and scanning.</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <div style="font-size:12px;color:var(--text-muted);">Installation scope:</div>
+        <div style="display:flex;background:var(--surface-alt,#f6f8fa);border:1px solid var(--border);border-radius:8px;overflow:hidden;">
+          <button style="font-size:12px;font-weight:500;padding:6px 14px;border:none;background:var(--surface);color:var(--purple);font-family:var(--font);cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,0.08);">All repositories</button>
+          <button style="font-size:12px;font-weight:500;padding:6px 14px;border:none;background:transparent;color:var(--text-sec);font-family:var(--font);cursor:pointer;">Selected only</button>
+        </div>
+        <button style="display:flex;align-items:center;gap:5px;font-size:12px;font-weight:600;padding:7px 14px;border:1px solid var(--purple-border);background:var(--purple-bg);color:var(--purple);border-radius:8px;cursor:pointer;font-family:var(--font);">Add Repositories +</button>
+      </div>
+    </div>
+
+    <div class="info-box" style="margin-bottom:16px;">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="#0969da"><path d="M8 0a8 8 0 100 16A8 8 0 008 0zm0 3a1 1 0 110 2 1 1 0 010-2zm2 9H6v-1h1V7H6V6h3v6h1v1z"/></svg>
+      <div>DryRun is currently set to scan <strong>all repositories</strong> in the DryRunSec organization. Switch to <em>Selected only</em> to restrict scanning to specific repos.</div>
+    </div>
+
+    <!-- Repo table header -->
+    <div style="display:grid;grid-template-columns:1fr 130px 110px 110px 120px 90px 40px;gap:0;padding:8px 16px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.04em;color:var(--text-muted);border-bottom:1px solid var(--border);">
+      <div>Repository</div>
+      <div>Installed by</div>
+      <div>Installed</div>
+      <div>PRs scanned</div>
+      <div>Committers</div>
+      <div>Status</div>
+      <div></div>
+    </div>
+
+    <!-- Repo rows -->
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-top:8px;">
+
+      <div style="display:grid;grid-template-columns:1fr 130px 110px 110px 120px 90px 40px;align-items:center;padding:12px 16px;border-bottom:1px solid var(--border-light);">
+        <div>
+          <div style="font-size:13px;font-weight:500;">DryRunSec/dryrun-api</div>
+          <div style="font-size:11px;color:var(--text-muted);margin-top:1px;">Go &middot; Main branch</div>
+        </div>
+        <div style="font-size:12px;color:var(--text-sec);">cnichols-dry</div>
+        <div style="font-size:12px;color:var(--text-muted);">Jan 5, 2025</div>
+        <div style="font-size:13px;font-weight:600;">28,412</div>
+        <div style="font-size:13px;font-weight:600;">38</div>
+        <div><span style="font-size:11px;font-weight:600;padding:2px 8px;border-radius:10px;background:var(--green-bg);color:var(--green);border:1px solid var(--green-border);">Active</span></div>
+        <div style="text-align:right;"><button class="menu-btn"><svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 9a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm-5.5 0a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm11 0a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"/></svg></button></div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 130px 110px 110px 120px 90px 40px;align-items:center;padding:12px 16px;border-bottom:1px solid var(--border-light);">
+        <div>
+          <div style="font-size:13px;font-weight:500;">DryRunSec/reposture</div>
+          <div style="font-size:11px;color:var(--text-muted);margin-top:1px;">Ruby &middot; Main branch</div>
+        </div>
+        <div style="font-size:12px;color:var(--text-sec);">wickett</div>
+        <div style="font-size:12px;color:var(--text-muted);">Jan 5, 2025</div>
+        <div style="font-size:13px;font-weight:600;">14,201</div>
+        <div style="font-size:13px;font-weight:600;">22</div>
+        <div><span style="font-size:11px;font-weight:600;padding:2px 8px;border-radius:10px;background:var(--green-bg);color:var(--green);border:1px solid var(--green-border);">Active</span></div>
+        <div style="text-align:right;"><button class="menu-btn"><svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 9a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm-5.5 0a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm11 0a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"/></svg></button></div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 130px 110px 110px 120px 90px 40px;align-items:center;padding:12px 16px;border-bottom:1px solid var(--border-light);">
+        <div>
+          <div style="font-size:13px;font-weight:500;">DryRunSec/analyzers</div>
+          <div style="font-size:11px;color:var(--text-muted);margin-top:1px;">Go &middot; Main branch</div>
+        </div>
+        <div style="font-size:12px;color:var(--text-sec);">cnichols-dry</div>
+        <div style="font-size:12px;color:var(--text-muted);">Feb 3, 2025</div>
+        <div style="font-size:13px;font-weight:600;">6,847</div>
+        <div style="font-size:13px;font-weight:600;">12</div>
+        <div><span style="font-size:11px;font-weight:600;padding:2px 8px;border-radius:10px;background:var(--green-bg);color:var(--green);border:1px solid var(--green-border);">Active</span></div>
+        <div style="text-align:right;"><button class="menu-btn"><svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 9a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm-5.5 0a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm11 0a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"/></svg></button></div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 130px 110px 110px 120px 90px 40px;align-items:center;padding:12px 16px;border-bottom:1px solid var(--border-light);">
+        <div>
+          <div style="font-size:13px;font-weight:500;">DryRunSec/dd_vuln_repo</div>
+          <div style="font-size:11px;color:var(--text-muted);margin-top:1px;">Python &middot; Main branch</div>
+        </div>
+        <div style="font-size:12px;color:var(--text-sec);">wickett</div>
+        <div style="font-size:12px;color:var(--text-muted);">Mar 14, 2025</div>
+        <div style="font-size:13px;font-weight:600;">3,291</div>
+        <div style="font-size:13px;font-weight:600;">8</div>
+        <div><span style="font-size:11px;font-weight:600;padding:2px 8px;border-radius:10px;background:var(--green-bg);color:var(--green);border:1px solid var(--green-border);">Active</span></div>
+        <div style="text-align:right;"><button class="menu-btn"><svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 9a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm-5.5 0a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm11 0a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"/></svg></button></div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 130px 110px 110px 120px 90px 40px;align-items:center;padding:12px 16px;border-bottom:1px solid var(--border-light);opacity:0.55;">
+        <div>
+          <div style="font-size:13px;font-weight:500;">DryRunSec/dashboard-ui</div>
+          <div style="font-size:11px;color:var(--text-muted);margin-top:1px;">TypeScript &middot; Main branch</div>
+        </div>
+        <div style="font-size:12px;color:var(--text-sec);">peterkarman1</div>
+        <div style="font-size:12px;color:var(--text-muted);">Jun 2, 2025</div>
+        <div style="font-size:13px;font-weight:600;">812</div>
+        <div style="font-size:13px;font-weight:600;">5</div>
+        <div><span style="font-size:11px;font-weight:600;padding:2px 8px;border-radius:10px;background:var(--orange-bg);color:var(--orange);border:1px solid var(--orange-border);">Paused</span></div>
+        <div style="text-align:right;"><button class="menu-btn"><svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 9a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm-5.5 0a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm11 0a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"/></svg></button></div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 130px 110px 110px 120px 90px 40px;align-items:center;padding:12px 16px;">
+        <div>
+          <div style="font-size:13px;font-weight:500;">DryRunSec/scanner-agent</div>
+          <div style="font-size:11px;color:var(--text-muted);margin-top:1px;">Go &middot; Main branch</div>
+        </div>
+        <div style="font-size:12px;color:var(--text-sec);">cnichols-dry</div>
+        <div style="font-size:12px;color:var(--text-muted);">Sep 19, 2025</div>
+        <div style="font-size:13px;font-weight:600;">2,104</div>
+        <div style="font-size:13px;font-weight:600;">7</div>
+        <div><span style="font-size:11px;font-weight:600;padding:2px 8px;border-radius:10px;background:var(--green-bg);color:var(--green);border:1px solid var(--green-border);">Active</span></div>
+        <div style="text-align:right;"><button class="menu-btn"><svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 9a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm-5.5 0a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm11 0a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"/></svg></button></div>
+      </div>
+
+    </div>
+
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:12px;font-size:12px;color:var(--text-muted);">
+      <span>Showing 6 of 34 repositories</span>
+      <div style="display:flex;gap:6px;">
+        <button style="padding:5px 12px;border:1px solid var(--border);border-radius:6px;background:var(--surface);color:var(--text-sec);font-size:12px;cursor:pointer;font-family:var(--font);">← Previous</button>
+        <button style="padding:5px 12px;border:1px solid var(--purple-border);border-radius:6px;background:var(--purple-bg);color:var(--purple);font-size:12px;cursor:pointer;font-family:var(--font);">Next →</button>
+      </div>
+    </div>
+  </div>
+
 </div>
 </div>
 
