@@ -312,7 +312,7 @@
     .mockup-breadcrumb a:hover { text-decoration: underline; }
     .mockup-breadcrumb span { color: #5a5f6b; }
 
-    /* ── WIZARD STEP 2 COMPONENTS ── */
+    /* ── WIZARD COMPONENTS (injected from configuration-detail) ── */
     .tog { width: 42px; height: 24px; border-radius: 12px; position: relative; flex-shrink: 0; cursor: pointer; transition: background 0.2s; border: none; }
     .tog::after { content: ''; position: absolute; width: 18px; height: 18px; border-radius: 50%; background: #fff; top: 3px; box-shadow: 0 1px 3px rgba(0,0,0,0.2); transition: left 0.2s; }
     .tog--on { background: #7c6ef0; }
@@ -435,242 +435,930 @@
       <strong>Proposed layout below.</strong> Items marked <span class="change-indicator change-indicator--new" style="margin: 0 2px;">New</span> are additions. Items marked <span class="change-indicator change-indicator--updated" style="margin: 0 2px;">Renamed</span> replace an existing toggle. Everything else is unchanged from the current config.
     </div>
   </div>
+<style>
+/* ══ WIZARD CSS (from configuration-detail) ══ */
 
-  <!-- Breadcrumb -->
-  <div class="breadcrumb">
-    <a href="#">Settings</a> &gt; <a href="#">Configurations</a>
-  </div>
-  <h1>Default Configuration</h1>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --font: 'Inter', -apple-system, sans-serif;
+      --mono: 'JetBrains Mono', monospace;
+      --bg: #fafbfc; --surface: #fff; --surface-alt: #f6f8fa;
+      --text: #1a1d23; --text-sec: #5a5f6b; --text-muted: #8b919e;
+      --border: #e3e6eb; --border-light: #eef0f4;
+      --purple: #7c6ef0; --purple-bg: #f0eeff; --purple-border: #d8d3f7;
+      --green: #1a7f37; --green-bg: #dafbe1; --green-border: #aceebb;
+      --orange: #bf8700; --orange-bg: #fff8c5; --orange-border: #f5e0a0;
+      --red: #cf222e; --red-bg: #ffebe9;
+    }
+    body { font-family: var(--font); font-size: 14px; line-height: 1.5; color: var(--text); background: var(--bg); }
 
-  <!-- ── COMMENT BEHAVIOR (updated to match wizard step 2) ── -->
-  <div class="config-section">
-    <div class="config-section-header">
-      <svg width="14" height="14" viewBox="0 0 16 16" fill="#8b919e"><path d="M0 1.75C0 .784.784 0 1.75 0h12.5C15.216 0 16 .784 16 1.75v9.5A1.75 1.75 0 0114.25 13H8.06l-2.573 2.573A1.458 1.458 0 013 14.543V13H1.75A1.75 1.75 0 010 11.25v-9.5zM1.75 1.5a.25.25 0 00-.25.25v9.5c0 .138.112.25.25.25h2a.75.75 0 01.75.75v2.19l2.72-2.72a.749.749 0 01.53-.22h6.5a.25.25 0 00.25-.25v-9.5a.25.25 0 00-.25-.25H1.75z"/></svg>
-      Comment Visibility
+    /* TOP BARS */
+    .wip-bar { background:#b91c1c;color:#fff;padding:10px 24px;display:flex;align-items:center;gap:10px;font-size:13px;font-weight:700;letter-spacing:0.01em; }
+    .wip-bar svg { flex-shrink:0; }
+    .mockup-bar { background: linear-gradient(135deg, #1a1e3a, #2d3260); padding: 10px 24px; display: flex; align-items: center; gap: 12px; font-size: 12px; color: #fff; }
+    .mockup-badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(124,110,240,0.3); padding: 3px 10px; border-radius: 10px; font-size: 11px; font-weight: 600; }
+    .mockup-breadcrumb { padding: 8px 24px; font-size: 12px; color: #8b919e; background: #fff; border-bottom: 1px solid #e8ecf0; }
+    .mockup-breadcrumb a { color: var(--purple); text-decoration: none; }
+
+    /* APP SHELL */
+    .app { display: flex; min-height: calc(100vh - 110px); }
+    .sidebar { width: 200px; flex-shrink: 0; background: var(--surface); border-right: 1px solid var(--border); padding: 16px 0; display: flex; flex-direction: column; }
+    .sidebar-logo { display: flex; align-items: center; gap: 8px; padding: 0 16px 14px; border-bottom: 1px solid var(--border-light); margin-bottom: 10px; font-weight: 700; font-size: 13px; }
+    .sidebar-org { margin: 0 12px 12px; padding: 7px 10px; border: 1px solid var(--border); border-radius: 8px; display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; }
+    .s-sec { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); padding: 10px 16px 4px; }
+    .s-link { text-decoration: none !important; display: flex; align-items: center; gap: 8px; padding: 7px 16px; font-size: 13px; font-weight: 500; color: var(--text-sec); cursor: pointer; }
+    .s-link:hover { color: var(--text); background: #f6f8fa; }
+    .s-link--active { color: var(--purple); background: var(--purple-bg); font-weight: 600; }
+    .s-link svg { width: 16px; height: 16px; flex-shrink: 0; }
+    .sidebar-spacer { flex: 1; }
+    .sidebar-bottom { padding: 12px 16px; border-top: 1px solid var(--border-light); font-size: 12px; color: var(--text-muted); display: flex; align-items: center; justify-content: space-between; }
+    .dark-toggle { width: 32px; height: 18px; border-radius: 9px; background: var(--border); border: none; cursor: pointer; position: relative; }
+    .dark-toggle::after { content:''; position: absolute; width: 12px; height: 12px; border-radius: 50%; background: #fff; top: 3px; left: 3px; }
+
+    /* MAIN */
+    .main { flex: 1; overflow-y: auto; }
+
+    /* ── WIZARD HEADER ── */
+    .wizard-header { padding: 20px 36px 0; background: var(--surface); border-bottom: 1px solid var(--border); }
+    .wizard-title-row { display: flex; align-items: baseline; gap: 10px; margin-bottom: 16px; }
+    .wizard-title { font-size: 20px; font-weight: 700; }
+    .wizard-meta { font-size: 12px; color: var(--text-muted); }
+    .repo-pill { font-size: 11px; font-weight: 500; padding: 1px 8px; border-radius: 10px; background: var(--purple-bg); color: var(--purple); border: 1px solid var(--purple-border); }
+
+    /* STEP TRACK */
+    .step-track { display: flex; align-items: stretch; gap: 0; }
+    .step { display: flex; align-items: center; gap: 10px; padding: 12px 20px 12px 16px; cursor: pointer; border-bottom: 3px solid transparent; position: relative; transition: all 0.15s; flex: 1; }
+    .step:first-child { padding-left: 0; }
+    .step--active { border-bottom-color: var(--purple); }
+    .step--done { border-bottom-color: var(--green); }
+    .step-num { width: 22px; height: 22px; border-radius: 50%; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; background: var(--border); color: var(--text-muted); }
+    .step--active .step-num { background: var(--purple); color: #fff; }
+    .step--done .step-num { background: var(--green); color: #fff; }
+    .step-label { font-size: 12px; font-weight: 600; color: var(--text-muted); }
+    .step--active .step-label { color: var(--purple); }
+    .step--done .step-label { color: var(--green); }
+    .step-sublabel { font-size: 10.5px; color: var(--text-muted); margin-top: 1px; }
+    .step--active .step-sublabel { color: var(--text-sec); }
+    .step-connector { width: 1px; background: var(--border-light); align-self: stretch; margin: 8px 0; }
+
+    /* STEP CONTENT */
+    .step-content { padding: 28px 36px 40px; display: none; }
+    .step-content.active { display: block; }
+    .step-heading { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+    .step-subheading { font-size: 13px; color: var(--text-muted); margin-bottom: 20px; }
+
+    /* CARD */
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; margin-bottom: 14px; }
+    .card-header { padding: 9px 16px; background: var(--surface-alt); border-bottom: 1px solid var(--border-light); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); display: flex; align-items: center; gap: 8px; }
+    .card-header-actions { margin-left: auto; display: flex; gap: 6px; }
+    .card-btn { font-size: 11px; padding: 3px 10px; border-radius: 6px; border: 1px solid var(--border); background: var(--surface); color: var(--text-sec); cursor: pointer; font-family: var(--font); }
+    .card-btn:hover { background: var(--surface-alt); }
+
+    /* ANALYZER / POLICY TABLE */
+    .atbl { width: 100%; border-collapse: collapse; }
+    .atbl th { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); padding: 7px 16px; background: var(--surface-alt); border-bottom: 1px solid var(--border-light); text-align: left; }
+    .atbl th:not(:first-child) { text-align: center; width: 90px; }
+    .atbl td { padding: 9px 16px; border-bottom: 1px solid var(--border-light); font-size: 13px; vertical-align: middle; }
+    .atbl tr:last-child td { border-bottom: none; }
+    .atbl td:not(:first-child) { text-align: center; }
+    .atbl-name { font-weight: 500; }
+    .atbl-desc { font-size: 11px; color: var(--text-muted); margin-top: 1px; }
+
+    /* TOGGLES */
+    .tog { width: 36px; height: 20px; border-radius: 10px; border: none; cursor: pointer; position: relative; flex-shrink: 0; vertical-align: middle; }
+    .tog--on { background: var(--purple); }
+    .tog--off { background: var(--border); }
+    .tog::after { content:''; position: absolute; width: 14px; height: 14px; border-radius: 50%; background: #fff; top: 3px; box-shadow: 0 1px 2px rgba(0,0,0,0.15); transition: left 0.15s; }
+    .tog--on::after { left: 19px; }
+    .tog--off::after { left: 3px; }
+    .sm-tog { width: 30px; height: 17px; border-radius: 8.5px; border: none; cursor: pointer; position: relative; display: inline-block; vertical-align: middle; }
+    .sm-tog--on { background: var(--purple); }
+    .sm-tog--off { background: var(--border); }
+    .sm-tog::after { content:''; position: absolute; width: 11px; height: 11px; border-radius: 50%; background: #fff; top: 3px; box-shadow: 0 1px 2px rgba(0,0,0,0.15); transition: left 0.15s; }
+    .sm-tog--on::after { left: 16px; }
+    .sm-tog--off::after { left: 3px; }
+
+    /* SELECTS */
+    .sev-sel { font-size: 11px; padding: 3px 18px 3px 7px; border: 1px solid var(--border); border-radius: 5px; background: var(--surface); color: var(--text); font-family: var(--font); cursor: pointer; appearance: none; background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='%236b7084' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 5px center; }
+    .dropdown { font-size: 12px; padding: 6px 24px 6px 10px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); color: var(--text); font-family: var(--font); cursor: pointer; appearance: none; background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='%236b7084' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 8px center; }
+
+    /* REMOVE BTN */
+    .remove-btn { width: 20px; height: 20px; border-radius: 50%; border: 1.5px solid var(--red); background: none; color: var(--red); display: inline-flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; line-height: 1; vertical-align: middle; }
+
+    /* TOGGLE OPTION ROWS (comment step) */
+    .opt-row { display: flex; align-items: center; padding: 11px 16px; border-bottom: 1px solid var(--border-light); gap: 12px; }
+    .opt-row:last-child { border-bottom: none; }
+    .opt-label { flex: 1; }
+    .opt-name { font-size: 13px; font-weight: 500; }
+    .opt-hint { font-size: 11px; color: var(--text-muted); margin-top: 1px; }
+    .opt-sub { background: #fdfdfe; padding-left: 44px; }
+    .opt-sub .opt-name { font-size: 12.5px; color: var(--text-sec); }
+
+    /* WEBHOOK */
+    .wh-row { display: flex; align-items: center; gap: 10px; padding: 11px 16px; border-bottom: 1px solid var(--border-light); }
+    .wh-row:last-of-type { border-bottom: none; }
+    .wh-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+    .wh-dot--on { background: var(--green); }
+    .wh-dot--off { background: var(--text-muted); }
+    .wh-info { flex: 1; min-width: 0; }
+    .wh-name { font-size: 13px; font-weight: 600; }
+    .wh-url { font-size: 10.5px; font-family: var(--mono); color: var(--text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .wh-tags { display: flex; flex-wrap: wrap; gap: 3px; margin-top: 4px; }
+    .wh-tag { font-size: 10px; font-weight: 500; padding: 1px 6px; border-radius: 7px; background: var(--purple-bg); color: var(--purple); border: 1px solid var(--purple-border); }
+    .wh-btn { font-size: 11px; font-weight: 500; padding: 4px 10px; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); color: var(--text-sec); cursor: pointer; white-space: nowrap; font-family: var(--font); }
+    .add-row { display: flex; align-items: center; gap: 6px; padding: 10px 16px; font-size: 12px; font-weight: 500; color: var(--purple); cursor: pointer; border-top: 1px solid var(--border-light); }
+    .add-row:hover { background: var(--purple-bg); }
+
+    /* BLOCKING OPTION CARDS */
+    .block-options { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 18px; }
+    .block-opt { border: 2px solid var(--border); border-radius: 10px; padding: 14px 16px; cursor: pointer; transition: all 0.15s; background: var(--surface); }
+    .block-opt:hover { border-color: var(--purple-border); background: var(--purple-bg); }
+    .block-opt.selected { border-color: var(--purple); background: var(--purple-bg); }
+    .block-opt-label { font-size: 13px; font-weight: 700; margin-bottom: 2px; }
+    .block-opt-desc { font-size: 11px; color: var(--text-muted); line-height: 1.4; }
+    .block-opt.selected .block-opt-desc { color: var(--text-sec); }
+
+    /* STEP NAV */
+    .step-nav { display: flex; align-items: center; gap: 10px; padding-top: 20px; border-top: 1px solid var(--border-light); margin-top: 24px; }
+    .btn-primary { padding: 8px 22px; border: none; border-radius: 8px; background: var(--purple); color: #fff; font-size: 13px; font-weight: 600; cursor: pointer; font-family: var(--font); }
+    .btn-primary:hover { background: #6b5edf; }
+    .btn-secondary { padding: 8px 18px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); color: var(--text-sec); font-size: 13px; font-weight: 500; cursor: pointer; font-family: var(--font); }
+    .btn-secondary:hover { background: var(--surface-alt); }
+    .btn-ghost { padding: 8px 16px; border: none; border-radius: 8px; background: none; color: var(--text-muted); font-size: 13px; cursor: pointer; font-family: var(--font); margin-left: auto; }
+
+    /* SUMMARY (final step) */
+    .summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .summary-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; }
+    .summary-card-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+    .summary-item { font-size: 12.5px; display: flex; align-items: center; gap: 6px; padding: 3px 0; }
+    .summary-item svg { flex-shrink: 0; }
+    .dot-on { width: 7px; height: 7px; border-radius: 50%; background: var(--green); flex-shrink: 0; display: inline-block; }
+    .dot-off { width: 7px; height: 7px; border-radius: 50%; background: var(--border); flex-shrink: 0; display: inline-block; }
+
+
+    /* HELP TIP */
+    .help-tip { display: inline-flex; align-items: center; justify-content: center; width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid var(--border); font-size: 10px; font-weight: 600; color: var(--text-muted); cursor: help; flex-shrink: 0; position: relative; vertical-align: middle; margin-left: 2px; }
+    .help-tip:hover { border-color: var(--purple); color: var(--purple); }
+
+    /* BADGE */
+    .badge { display: inline-flex; align-items: center; font-size: 10px; font-weight: 600; padding: 1px 6px; border-radius: 8px; }
+    .badge-new { background: var(--purple-bg); color: var(--purple); border: 1px solid var(--purple-border); }
+    .badge-upd { background: #fef3c7; color: #92400e; border: 1px solid #fcd34d; }
+  
+/* Override .main for non-app-shell context */
+.main { flex: 1; overflow-y: visible; }
+.wizard-header { position: static; }
+</style>
+
+</div><!-- /page -->
+
+<!-- ══ WIZARD ══ -->
+<div style="display:flex;min-height:60vh;">
+<!-- No sidebar in admin-config context -->
+<div class="main">
+
+  <!-- WIZARD HEADER -->
+  <div class="wizard-header">
+    <div class="wizard-title-row">
+      <div class="wizard-title">Default Configuration</div>
+      <div class="wizard-meta">Applied to <span class="repo-pill">31 repos</span></div>
     </div>
 
-    <div style="border:1px solid var(--border);border-radius:10px;overflow:hidden;">
+    <!-- STEP TRACK -->
+    <div class="step-track">
+      <div class="step step--done" id="tab-1" onclick="goToStep(1)" class="step">
+        <div class="step-num" id="num-1"><svg width="11" height="11" viewBox="0 0 16 16" fill="currentColor"><path d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"/></svg></div>
+        <div>
+          <div class="step-label">Analyzers</div>
+          <div class="step-sublabel">Core &amp; custom policies</div>
+        </div>
+      </div>
+      <div class="step-connector"></div>
+      <div class="step step--active" id="tab-2" onclick="goToStep(2)">
+        <div class="step-num" id="num-2">2</div>
+        <div>
+          <div class="step-label">Comment Visibility</div>
+          <div class="step-sublabel">When &amp; what to post</div>
+        </div>
+      </div>
+      <div class="step-connector"></div>
+      <div class="step" id="tab-3" onclick="goToStep(3)">
+        <div class="step-num" id="num-3">3</div>
+        <div>
+          <div class="step-label">Integrations</div>
+          <div class="step-sublabel">Webhooks &amp; notifications</div>
+        </div>
+      </div>
+      <div class="step-connector"></div>
+      <div class="step" id="tab-4" onclick="goToStep(4)">
+        <div class="step-num" id="num-4">4</div>
+        <div>
+          <div class="step-label">Blocking</div>
+          <div class="step-sublabel">Merge enforcement</div>
+        </div>
+      </div>
+      <div class="step-connector"></div>
+      <div class="step" id="tab-5" onclick="goToStep(5)">
+        <div class="step-num" id="num-5">5</div>
+        <div>
+          <div class="step-label">Review &amp; Save</div>
+          <div class="step-sublabel">Confirm all settings</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ STEP 1: ANALYZERS ══ -->
+  <div class="step-content" id="step-1">
+    <div class="step-heading">Analyzers &amp; Code Policies</div>
+    <div class="step-subheading">Choose which analyzers and custom code policies run on pull requests in this configuration.</div>
+
+    <!-- Core Analyzers -->
+    <div class="card">
+      <div class="card-header">
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M7.467.133a1.75 1.75 0 011.066 0l5.25 1.68A1.75 1.75 0 0115 3.48V7c0 1.566-.32 3.182-1.303 4.682-.983 1.498-2.585 2.813-5.032 3.855a1.697 1.697 0 01-1.33 0c-2.447-1.042-4.049-2.357-5.032-3.855C1.32 10.182 1 8.566 1 7V3.48a1.75 1.75 0 011.217-1.667l5.25-1.68z"/></svg>
+        Core Analyzers
+      </div>
+      <table class="atbl">
+        <thead>
+          <tr>
+            <th>Analyzer</th>
+            <th>Enabled</th>
+            <th>Silent Mode</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><div class="atbl-name">Cross-Site Scripting Analyzer</div><div class="atbl-desc">Detects reflected and stored XSS patterns</div></td>
+            <td><button class="sm-tog sm-tog--on" onclick="toggleSmall(this)"></button></td>
+            <td><button class="sm-tog sm-tog--off" onclick="toggleSmall(this)"></button></td>
+          </tr>
+          <tr>
+            <td><div class="atbl-name">General Security Analyzer</div><div class="atbl-desc">Broad pattern detection across common vulnerability classes</div></td>
+            <td><button class="sm-tog sm-tog--on" onclick="toggleSmall(this)"></button></td>
+            <td><button class="sm-tog sm-tog--off" onclick="toggleSmall(this)"></button></td>
+          </tr>
+          <tr>
+            <td><div class="atbl-name">IDOR Analyzer</div><div class="atbl-desc">Insecure direct object reference patterns</div></td>
+            <td><button class="sm-tog sm-tog--on" onclick="toggleSmall(this)"></button></td>
+            <td><button class="sm-tog sm-tog--off" onclick="toggleSmall(this)"></button></td>
+          </tr>
+          <tr>
+            <td><div class="atbl-name">Mass Assignment</div><div class="atbl-desc">Unfiltered parameter binding vulnerabilities</div></td>
+            <td><button class="sm-tog sm-tog--on" onclick="toggleSmall(this)"></button></td>
+            <td><button class="sm-tog sm-tog--off" onclick="toggleSmall(this)"></button></td>
+          </tr>
+          <tr>
+            <td><div class="atbl-name">Secrets Analyzer</div><div class="atbl-desc">Hardcoded credentials, API keys, and tokens</div></td>
+            <td><button class="sm-tog sm-tog--on" onclick="toggleSmall(this)"></button></td>
+            <td><button class="sm-tog sm-tog--off" onclick="toggleSmall(this)"></button></td>
+          </tr>
+          <tr>
+            <td><div class="atbl-name">Server-Side Request Forgery Analyzer</div><div class="atbl-desc">SSRF patterns in HTTP client code</div></td>
+            <td><button class="sm-tog sm-tog--on" onclick="toggleSmall(this)"></button></td>
+            <td><button class="sm-tog sm-tog--off" onclick="toggleSmall(this)"></button></td>
+          </tr>
+          <tr>
+            <td><div class="atbl-name">SQL Injection Analyzer</div><div class="atbl-desc">Raw query construction with user input</div></td>
+            <td><button class="sm-tog sm-tog--on" onclick="toggleSmall(this)"></button></td>
+            <td><button class="sm-tog sm-tog--off" onclick="toggleSmall(this)"></button></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Custom Code Policies -->
+    <div class="card">
+      <div class="card-header">
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M8.878.392a1.75 1.75 0 00-1.756 0l-5.25 3.045A1.75 1.75 0 001 4.951v6.098c0 .624.332 1.2.872 1.514l5.25 3.045a1.75 1.75 0 001.756 0l5.25-3.045c.54-.313.872-.89.872-1.514V4.951c0-.624-.332-1.2-.872-1.514L8.878.392z"/></svg>
+        Custom Code Policies
+        <div class="card-header-actions">
+          <button class="card-btn">Add Policy +</button>
+          <button class="card-btn">Create Policy +</button>
+        </div>
+      </div>
+      <table class="atbl">
+        <thead>
+          <tr>
+            <th>Policy</th>
+            <th>Enabled</th>
+            <th>Silent Mode</th>
+            <th style="width:40px;"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><div class="atbl-name">Dependency License Check v1</div><div class="atbl-desc">Flags dependencies with restricted or unknown licenses</div></td>
+            <td><button class="sm-tog sm-tog--on" onclick="toggleSmall(this)"></button></td>
+            <td><button class="sm-tog sm-tog--off" onclick="toggleSmall(this)"></button></td>
+            <td><button class="remove-btn">&minus;</button></td>
+          </tr>
+          <tr>
+            <td><div class="atbl-name">No Default Env Var Values</div><div class="atbl-desc">Prevents hardcoded fallback values in env config</div></td>
+            <td><button class="sm-tog sm-tog--on" onclick="toggleSmall(this)"></button></td>
+            <td><button class="sm-tog sm-tog--off" onclick="toggleSmall(this)"></button></td>
+            <td><button class="remove-btn">&minus;</button></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="step-nav">
+      <button class="btn-primary" onclick="goToStep(2)">Next: Comment Visibility →</button>
+      <button class="btn-ghost" onclick="window.location='configurations.html'">Cancel</button>
+    </div>
+  </div>
+
+  <!-- ══ STEP 2: COMMENT VISIBILITY ══ -->
+  <div class="step-content active" id="step-2">
+    <div class="step-heading">Comment Visibility</div>
+    <div class="step-subheading">Control when and how DryRun posts comments to pull requests for repos in this configuration.</div>
+
+    <div class="card">
 
       <!-- Master toggle -->
-      <div class="opt-row" style="padding:12px 16px;">
+      <div class="opt-row">
         <div class="opt-label">
           <div class="opt-name" style="font-size:14px;font-weight:600;">
             Issue Comment Enabled
-            <span class="help-tip" title="Master control for all GitHub PR comments. When disabled, DryRun scans PRs but never posts any comment.">?</span>
+            <span class="help-tip" tabindex="0" title="Master control for all GitHub PR comments. When disabled, DryRun scans PRs but never posts any comment to GitHub.">?</span>
           </div>
           <div class="opt-hint">Master control — when off, DryRun scans PRs silently and never posts any GitHub comment</div>
         </div>
-        <button class="tog tog--on" id="ac-master" onclick="acToggleMaster(this)"></button>
+        <button class="tog tog--on" id="master-comment" onclick="toggleMaster(this)"></button>
       </div>
 
       <!-- Sub-settings -->
-      <div id="ac-sub">
+      <div id="comment-sub">
 
-        <div class="opt-row opt-sub" style="padding:10px 16px 10px 40px;">
+        <!-- Comment on Clean Scans -->
+        <div class="opt-row opt-sub">
           <div class="opt-label">
             <div class="opt-name">
               Comment on Clean Scans
               <span class="badge badge-upd">Renamed</span>
-              <span class="help-tip" title="Previously 'Show Comment for No Findings.' Controls whether DryRun posts a comment when a scan produces zero vulnerabilities.">?</span>
+              <span class="help-tip" tabindex="0" title="Previously 'Show Comment for No Findings.' Controls whether DryRun posts a comment when a scan produces zero vulnerabilities.">?</span>
             </div>
             <div class="opt-hint">Post a confirmation comment even when no vulnerabilities are detected, proving the PR was scanned</div>
           </div>
-          <button class="tog tog--on" onclick="acToggle(this)"></button>
+          <button class="tog tog--on" onclick="toggleTog(this)"></button>
         </div>
 
-        <div class="opt-row opt-sub" style="padding:10px 16px 10px 40px;">
+        <!-- Comment on Draft PRs -->
+        <div class="opt-row opt-sub">
           <div class="opt-label">
             <div class="opt-name">
               Comment on Draft PRs
               <span class="badge badge-new">New</span>
-              <span class="help-tip" title="When enabled, DryRun posts comments on draft PRs just like regular PRs. When disabled, scans still run but comments are held until the PR leaves draft status.">?</span>
+              <span class="help-tip" tabindex="0" title="When enabled, DryRun posts comments on draft PRs just like regular PRs. When disabled, scans still run but comments are held until the PR leaves draft status.">?</span>
             </div>
             <div class="opt-hint">Post findings on PRs while in draft mode — when off, scans run silently until the PR is marked ready</div>
           </div>
-          <button class="tog tog--on" onclick="acToggle(this)"></button>
+          <button class="tog tog--on" onclick="toggleTog(this)"></button>
         </div>
 
-        <div class="opt-row opt-sub" style="padding:10px 16px 10px 40px;">
+        <!-- Retain Comment When Resolved -->
+        <div class="opt-row opt-sub">
           <div class="opt-label">
             <div class="opt-name">
               Retain Comment When Resolved
               <span class="badge badge-new">New</span>
-              <span class="help-tip" title="When enabled, the comment updates to an 'All Clear' state showing what was found and how it was handled. When disabled, the comment is deleted once all findings are resolved or dismissed.">?</span>
+              <span class="help-tip" tabindex="0" title="When enabled, the comment updates to an 'All Clear' state showing what was found and how it was handled. When disabled, the comment is deleted once all findings are resolved or dismissed.">?</span>
             </div>
             <div class="opt-hint">Keep the comment with an "All Clear" resolved state instead of deleting it — preserves the audit trail</div>
           </div>
-          <button class="tog tog--on" onclick="acToggle(this)"></button>
+          <button class="tog tog--on" onclick="toggleTog(this)"></button>
         </div>
 
-      </div><!-- /ac-sub -->
+      </div><!-- /comment-sub -->
+    </div>
 
-      <!-- Comment state preview -->
-      <div style="background:var(--border-light);border-top:1px solid var(--border);">
-        <div style="padding:8px 16px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted);display:flex;align-items:center;gap:6px;">
-          <svg width="11" height="11" viewBox="0 0 16 16" fill="currentColor"><path d="M0 1.75C0 .784.784 0 1.75 0h12.5C15.216 0 16 .784 16 1.75v9.5A1.75 1.75 0 0114.25 13H8.06l-2.573 2.573A1.458 1.458 0 013 14.543V13H1.75A1.75 1.75 0 010 11.25v-9.5z"/></svg>
-          Comment State Preview
-          <span style="font-size:10px;font-weight:400;text-transform:none;letter-spacing:0;color:var(--text-muted);">Based on current settings</span>
-        </div>
-        <div class="preview-grid">
-          <div class="preview-box" style="border:1px solid #aceebb;background:#dafbe1;">
-            <div class="preview-box-title" style="color:#1a7f37;">✓ Will post comment when...</div>
-            <div class="preview-box-body" id="ac-prev-will" style="color:#1a7f37;">
-              Findings are detected<br>No findings (clean scan)<br>PR is in draft status
-            </div>
+    <!-- What the comment looks like -->
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;">
+      <div style="padding:10px 16px;background:var(--surface-alt);border-bottom:1px solid var(--border-light);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted);display:flex;align-items:center;gap:8px;">
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M0 1.75C0 .784.784 0 1.75 0h12.5C15.216 0 16 .784 16 1.75v9.5A1.75 1.75 0 0114.25 13H8.06l-2.573 2.573A1.458 1.458 0 013 14.543V13H1.75A1.75 1.75 0 010 11.25v-9.5z"/></svg>
+        Comment State Preview
+        <span style="font-size:10px;font-weight:500;color:var(--text-muted);text-transform:none;letter-spacing:0;margin-left:4px;">Based on your current settings</span>
+      </div>
+      <div style="padding:16px;display:grid;grid-template-columns:1fr 1fr;gap:10px;" id="comment-preview">
+        <div style="border:1px solid var(--green-border);border-radius:8px;padding:12px;background:var(--green-bg);">
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--green);margin-bottom:6px;">✓ Will post comment when...</div>
+          <div id="prev-will" style="font-size:12px;color:var(--green);line-height:1.8;">
+            Findings are detected<br>
+            No findings detected (clean scan)<br>
+            PR is in draft status
           </div>
-          <div class="preview-box" style="border:1px solid var(--border);background:#f6f8fa;">
-            <div class="preview-box-title" style="color:var(--text-muted);">When resolved...</div>
-            <div class="preview-box-body" id="ac-prev-resolve" style="color:var(--text-secondary);">
-              Comment updates to "All Clear" state<br>Finding history is retained
+        </div>
+        <div style="border:1px solid var(--border);border-radius:8px;padding:12px;background:var(--surface-alt);">
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-muted);margin-bottom:6px;">When resolved...</div>
+          <div id="prev-resolve" style="font-size:12px;color:var(--text-sec);line-height:1.8;">
+            Comment updates to "All Clear" state<br>
+            Finding history is retained
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="step-nav">
+      <button class="btn-secondary" onclick="goToStep(1)">← Back</button>
+      <button class="btn-primary" onclick="goToStep(3)">Next: Integrations →</button>
+      <button class="btn-ghost" onclick="window.location='configurations.html'">Cancel</button>
+    </div>
+  </div>
+
+  <!-- ══ STEP 3: INTEGRATIONS ══ -->
+  <div class="step-content" id="step-3">
+    <div class="step-heading">Integrations</div>
+    <div class="step-subheading">Assign webhooks to receive event notifications for repos in this configuration.</div>
+
+    <div class="card">
+      <div class="opt-row">
+        <div class="opt-label">
+          <div class="opt-name">Notifications Enabled</div>
+          <div class="opt-hint">Send webhook events for repos in this config</div>
+        </div>
+        <button class="tog tog--on" onclick="toggleTog(this)"></button>
+      </div>
+
+      <div class="wh-row">
+        <div class="wh-dot wh-dot--on"></div>
+        <div class="wh-info">
+          <div class="wh-name">Security Alerts — Tines</div>
+          <div class="wh-url">https://aged-snow-3554.tines.com/webhook/security</div>
+          <div class="wh-tags">
+            <span class="wh-tag">PR scan complete</span>
+            <span class="wh-tag">New vulns (PR) · High+</span>
+            <span class="wh-tag">PR blocked</span>
+            <span class="wh-tag">PR improved</span>
+            <span class="wh-tag">+2 more</span>
+          </div>
+        </div>
+        <button class="wh-btn">Configure</button>
+        <button class="wh-btn" style="color:var(--red);border-color:#ffcecb;">Remove</button>
+      </div>
+
+      <div class="add-row">
+        <svg width="11" height="11" viewBox="0 0 16 16" fill="currentColor"><path d="M7.75 2a.75.75 0 01.75.75V7h4.25a.75.75 0 010 1.5H8.5v4.25a.75.75 0 01-1.5 0V8.5H2.75a.75.75 0 010-1.5H7V2.75A.75.75 0 017.75 2z"/></svg>
+        Add webhook
+      </div>
+    </div>
+
+    <div class="step-nav">
+      <button class="btn-secondary" onclick="goToStep(2)">← Back</button>
+      <button class="btn-primary" onclick="goToStep(4)">Next: Blocking →</button>
+      <button class="btn-ghost" onclick="window.location='configurations.html'">Cancel</button>
+    </div>
+  </div>
+
+  <!-- ══ STEP 4: BLOCKING ══ -->
+  <div class="step-content" id="step-4">
+    <div class="step-heading">Blocking</div>
+    <div class="step-subheading">Choose how DryRun blocks pull requests from merging when findings are detected.</div>
+
+    <!-- Mode selector -->
+    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px;">
+
+      <!-- Option A: Global threshold -->
+      <div class="block-mode-opt" id="bmode-global" onclick="setBlockMode('global')" style="border:2px solid var(--purple);background:var(--purple-bg);border-radius:10px;padding:16px 18px;cursor:pointer;">
+        <div style="display:flex;align-items:flex-start;gap:12px;">
+          <div style="width:18px;height:18px;border-radius:50%;border:2px solid var(--purple);background:var(--purple);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">
+            <div style="width:7px;height:7px;border-radius:50%;background:#fff;"></div>
+          </div>
+          <div style="flex:1;">
+            <div style="font-size:13px;font-weight:700;margin-bottom:2px;">Block on any finding at or above a severity threshold</div>
+            <div style="font-size:12px;color:var(--text-sec);">One global rule applies to all analyzers — simplest to configure</div>
+            <!-- Severity picker (shown when selected) -->
+            <div id="global-sev-picker" style="margin-top:14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+              <span style="font-size:12px;font-weight:500;color:var(--text-sec);">Block when severity is at least:</span>
+              <div style="display:flex;gap:8px;">
+                <button class="sev-chip" id="sev-medium" onclick="event.stopPropagation();selectSev('medium')" style="font-size:12px;font-weight:600;padding:5px 14px;border-radius:20px;border:1.5px solid var(--border);background:var(--surface);color:var(--text-muted);cursor:pointer;">Medium+</button>
+                <button class="sev-chip selected" id="sev-high" onclick="event.stopPropagation();selectSev('high')" style="font-size:12px;font-weight:600;padding:5px 14px;border-radius:20px;border:1.5px solid var(--orange);background:var(--orange-bg);color:var(--orange);cursor:pointer;">High+</button>
+                <button class="sev-chip" id="sev-critical" onclick="event.stopPropagation();selectSev('critical')" style="font-size:12px;font-weight:600;padding:5px 14px;border-radius:20px;border:1.5px solid var(--border);background:var(--surface);color:var(--text-muted);cursor:pointer;">Critical only</button>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-    </div><!-- /card -->
+      <!-- Option B: Per-analyzer -->
+      <div class="block-mode-opt" id="bmode-per" onclick="setBlockMode('per')" style="border:2px solid var(--border);background:var(--surface);border-radius:10px;padding:16px 18px;cursor:pointer;">
+        <div style="display:flex;align-items:flex-start;gap:12px;">
+          <div id="bmode-per-radio" style="width:18px;height:18px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">
+            <div style="width:7px;height:7px;border-radius:50%;background:transparent;"></div>
+          </div>
+          <div style="flex:1;">
+            <div style="font-size:13px;font-weight:700;margin-bottom:2px;">Configure blocking per analyzer</div>
+            <div style="font-size:12px;color:var(--text-sec);">Set individual blocking rules and severity thresholds for each analyzer</div>
+          </div>
+        </div>
+
+        <!-- Per-analyzer table (shown when selected) -->
+        <div id="per-analyzer-table" style="display:none;margin-top:16px;border:1px solid var(--border);border-radius:8px;overflow:hidden;">
+          <table class="atbl" style="margin:0;">
+            <thead>
+              <tr>
+                <th style="background:var(--surface-alt);">Analyzer / Policy</th>
+                <th style="background:var(--surface-alt);width:80px;">Block</th>
+                <th style="background:var(--surface-alt);width:130px;">Min Severity</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><div class="atbl-name">Cross-Site Scripting Analyzer</div></td>
+                <td><button class="sm-tog sm-tog--off" onclick="event.stopPropagation();togglePerAnalyzer(this)"></button></td>
+                <td><select class="sev-sel" disabled style="opacity:0.4;" onclick="event.stopPropagation()"><option>Any</option><option selected>High+</option><option>Critical</option></select></td>
+              </tr>
+              <tr>
+                <td><div class="atbl-name">General Security Analyzer</div></td>
+                <td><button class="sm-tog sm-tog--off" onclick="event.stopPropagation();togglePerAnalyzer(this)"></button></td>
+                <td><select class="sev-sel" disabled style="opacity:0.4;" onclick="event.stopPropagation()"><option>Any</option><option selected>High+</option><option>Critical</option></select></td>
+              </tr>
+              <tr>
+                <td><div class="atbl-name">IDOR Analyzer</div></td>
+                <td><button class="sm-tog sm-tog--off" onclick="event.stopPropagation();togglePerAnalyzer(this)"></button></td>
+                <td><select class="sev-sel" disabled style="opacity:0.4;" onclick="event.stopPropagation()"><option>Any</option><option selected>High+</option><option>Critical</option></select></td>
+              </tr>
+              <tr>
+                <td><div class="atbl-name">Mass Assignment</div></td>
+                <td><button class="sm-tog sm-tog--off" onclick="event.stopPropagation();togglePerAnalyzer(this)"></button></td>
+                <td><select class="sev-sel" disabled style="opacity:0.4;" onclick="event.stopPropagation()"><option>Any</option><option selected>High+</option><option>Critical</option></select></td>
+              </tr>
+              <tr>
+                <td><div class="atbl-name">Secrets Analyzer</div></td>
+                <td><button class="sm-tog sm-tog--on" onclick="event.stopPropagation();togglePerAnalyzer(this)"></button></td>
+                <td><select class="sev-sel" onclick="event.stopPropagation()"><option selected>Any</option><option>High+</option><option>Critical</option></select></td>
+              </tr>
+              <tr>
+                <td><div class="atbl-name">Server-Side Request Forgery Analyzer</div></td>
+                <td><button class="sm-tog sm-tog--off" onclick="event.stopPropagation();togglePerAnalyzer(this)"></button></td>
+                <td><select class="sev-sel" disabled style="opacity:0.4;" onclick="event.stopPropagation()"><option>Any</option><option selected>High+</option><option>Critical</option></select></td>
+              </tr>
+              <tr>
+                <td><div class="atbl-name">SQL Injection Analyzer</div></td>
+                <td><button class="sm-tog sm-tog--off" onclick="event.stopPropagation();togglePerAnalyzer(this)"></button></td>
+                <td><select class="sev-sel" disabled style="opacity:0.4;" onclick="event.stopPropagation()"><option>Any</option><option selected>High+</option><option>Critical</option></select></td>
+              </tr>
+              <tr>
+                <td><div class="atbl-name">Dependency License Check v1</div></td>
+                <td><button class="sm-tog sm-tog--on" onclick="event.stopPropagation();togglePerAnalyzer(this)"></button></td>
+                <td><select class="sev-sel" onclick="event.stopPropagation()"><option selected>Any</option><option>High+</option><option>Critical</option></select></td>
+              </tr>
+              <tr>
+                <td><div class="atbl-name">No Default Env Var Values</div></td>
+                <td><button class="sm-tog sm-tog--off" onclick="event.stopPropagation();togglePerAnalyzer(this)"></button></td>
+                <td><select class="sev-sel" disabled style="opacity:0.4;" onclick="event.stopPropagation()"><option>Any</option><option selected>High+</option><option>Critical</option></select></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Option C: Off -->
+      <div class="block-mode-opt" id="bmode-off" onclick="setBlockMode('off')" style="border:2px solid var(--border);background:var(--surface);border-radius:10px;padding:16px 18px;cursor:pointer;">
+        <div style="display:flex;align-items:flex-start;gap:12px;">
+          <div id="bmode-off-radio" style="width:18px;height:18px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">
+            <div style="width:7px;height:7px;border-radius:50%;background:transparent;"></div>
+          </div>
+          <div>
+            <div style="font-size:13px;font-weight:700;margin-bottom:2px;color:var(--text-muted);">No blocking</div>
+            <div style="font-size:12px;color:var(--text-muted);">Findings are advisory only — PRs are never blocked from merging</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="step-nav">
+      <button class="btn-secondary" onclick="goToStep(3)">← Back</button>
+      <button class="btn-primary" onclick="goToStep(5)">Next: Review &amp; Save →</button>
+      <button class="btn-ghost" onclick="window.location='configurations.html'">Cancel</button>
+    </div>
   </div>
 
-  <script>
-  function acToggle(btn) {
-    const on = btn.classList.contains('tog--on');
-    btn.classList.toggle('tog--on', !on);
-    btn.classList.toggle('tog--off', on);
-    acUpdatePreview();
-  }
-  function acToggleMaster(btn) {
-    acToggle(btn);
-    const isOn = btn.classList.contains('tog--on');
-    const sub = document.getElementById('ac-sub');
-    sub.style.opacity = isOn ? '1' : '0.4';
-    sub.style.pointerEvents = isOn ? '' : 'none';
-    acUpdatePreview();
-  }
-  function acUpdatePreview() {
-    const masterOn = document.getElementById('ac-master').classList.contains('tog--on');
-    const subTogs = document.querySelectorAll('#ac-sub .tog');
-    const cleanOn = subTogs[0]?.classList.contains('tog--on');
-    const draftOn = subTogs[1]?.classList.contains('tog--on');
-    const retainOn = subTogs[2]?.classList.contains('tog--on');
+  <!-- ══ STEP 5: REVIEW & SAVE ══ -->
+  <div class="step-content" id="step-5">
+    <div class="step-heading">Review &amp; Save</div>
+    <div class="step-subheading">Confirm your configuration before saving. Click Edit on any section to go back and change it.</div>
 
-    const willEl = document.getElementById('ac-prev-will');
-    const resolveEl = document.getElementById('ac-prev-resolve');
+    <div class="summary-grid">
 
-    if (!masterOn) {
-      willEl.innerHTML = '<em style="color:#6b7280;">Comments are disabled — scans run silently</em>';
-      resolveEl.innerHTML = '<em style="color:#6b7280;">N/A</em>';
-      return;
+      <!-- Analyzers summary -->
+      <div class="summary-card">
+        <div class="summary-card-title">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M7.467.133a1.75 1.75 0 011.066 0l5.25 1.68A1.75 1.75 0 0115 3.48V7c0 1.566-.32 3.182-1.303 4.682-.983 1.498-2.585 2.813-5.032 3.855a1.697 1.697 0 01-1.33 0c-2.447-1.042-4.049-2.357-5.032-3.855C1.32 10.182 1 8.566 1 7V3.48a1.75 1.75 0 011.217-1.667l5.25-1.68z"/></svg>
+          Core Analyzers
+          <button class="card-btn" onclick="goToStep(1)" style="margin-left:auto;font-size:10px;padding:2px 8px;">Edit</button>
+        </div>
+        <div id="sum-analyzers"><!-- populated by buildSummary() --></div>
+      </div>
+
+      <!-- Custom policies summary -->
+      <div class="summary-card">
+        <div class="summary-card-title">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M8.878.392a1.75 1.75 0 00-1.756 0l-5.25 3.045A1.75 1.75 0 001 4.951v6.098c0 .624.332 1.2.872 1.514l5.25 3.045a1.75 1.75 0 001.756 0l5.25-3.045c.54-.313.872-.89.872-1.514V4.951c0-.624-.332-1.2-.872-1.514L8.878.392z"/></svg>
+          Custom Code Policies
+          <button class="card-btn" onclick="goToStep(1)" style="margin-left:auto;font-size:10px;padding:2px 8px;">Edit</button>
+        </div>
+        <div id="sum-policies"><!-- populated by buildSummary() --></div>
+      </div>
+
+      <!-- Comment visibility summary -->
+      <div class="summary-card">
+        <div class="summary-card-title">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M0 1.75C0 .784.784 0 1.75 0h12.5C15.216 0 16 .784 16 1.75v9.5A1.75 1.75 0 0114.25 13H8.06l-2.573 2.573A1.458 1.458 0 013 14.543V13H1.75A1.75 1.75 0 010 11.25v-9.5z"/></svg>
+          Comment Visibility
+          <button class="card-btn" onclick="goToStep(2)" style="margin-left:auto;font-size:10px;padding:2px 8px;">Edit</button>
+        </div>
+        <div id="sum-comments"><!-- populated by buildSummary() --></div>
+      </div>
+
+      <!-- Integrations summary -->
+      <div class="summary-card">
+        <div class="summary-card-title">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M8 16a2 2 0 001.985-1.75c.017-.137-.097-.25-.235-.25h-3.5c-.138 0-.252.113-.235.25A2 2 0 008 16zm.25-14.75v-.5a.75.75 0 00-1.5 0v.5A4.56 4.56 0 003.5 7.35c0 1.129-.133 2.099-.348 2.895A2.088 2.088 0 001 12.5c0 .828.48 1.5 1.085 1.5h11.83C14.52 14 15 13.328 15 12.5a2.088 2.088 0 00-2.152-2.255c-.215-.796-.348-1.766-.348-2.895A4.56 4.56 0 008.25 2.25z"/></svg>
+          Integrations
+          <button class="card-btn" onclick="goToStep(3)" style="margin-left:auto;font-size:10px;padding:2px 8px;">Edit</button>
+        </div>
+        <div class="summary-item"><span class="dot-on"></span> Notifications enabled</div>
+        <div class="summary-item" style="flex-direction:column;align-items:flex-start;gap:2px;">
+          <div style="display:flex;align-items:center;gap:6px;"><span class="dot-on"></span> Security Alerts — Tines</div>
+          <div style="font-size:11px;color:var(--text-muted);padding-left:13px;">5 events · PR scan, new vulns, blocked…</div>
+        </div>
+      </div>
+
+      <!-- Blocking summary — dynamic width -->
+      <div class="summary-card" id="sum-blocking-card" style="grid-column:1/-1;">
+        <div class="summary-card-title">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M4.47.22A.749.749 0 015 0h6c.199 0 .389.079.53.22l4.25 4.25c.141.14.22.331.22.53v6a.749.749 0 01-.22.53l-4.25 4.25A.749.749 0 0111 16H5a.749.749 0 01-.53-.22L.22 11.53A.749.749 0 010 11V5c0-.199.079-.389.22-.53L4.47.22z"/></svg>
+          Blocking
+          <button class="card-btn" onclick="goToStep(4)" style="margin-left:auto;font-size:10px;padding:2px 8px;">Edit</button>
+        </div>
+        <div id="sum-blocking"><!-- populated by buildSummary() --></div>
+      </div>
+
+    </div><!-- /summary-grid -->
+
+    <div class="step-nav">
+      <button class="btn-secondary" onclick="goToStep(4)">← Back</button>
+      <button class="btn-primary" onclick="saveConfig()" style="background:var(--green);padding:9px 28px;font-size:14px;">
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor" style="vertical-align:-2px;margin-right:5px;"><path d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"/></svg>
+        Save Configuration
+      </button>
+      <button class="btn-ghost" onclick="window.location='configurations.html'">Cancel</button>
+    </div>
+  </div>
+
+
+</div><!-- /wizard -->
+
+<script>
+// ── STEP NAVIGATION ──
+const totalSteps = 5;
+let currentStep = 2;
+const completedSteps = new Set([1]);
+
+function goToStep(n) {
+  // Mark previous as done
+  if (n > currentStep) completedSteps.add(currentStep);
+
+  // Hide all content
+  document.querySelectorAll('.step-content').forEach(el => el.classList.remove('active'));
+  document.getElementById('step-' + n).classList.add('active');
+
+  // Update tabs
+  for (let i = 1; i <= totalSteps; i++) {
+    const tab = document.getElementById('tab-' + i);
+    const num = document.getElementById('num-' + i);
+    tab.classList.remove('step--active', 'step--done');
+    if (i === n) {
+      tab.classList.add('step--active');
+    } else if (completedSteps.has(i)) {
+      tab.classList.add('step--done');
+      num.innerHTML = '<svg width="11" height="11" viewBox="0 0 16 16" fill="currentColor"><path d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"/></svg>';
+    } else {
+      num.textContent = i;
     }
-    let willLines = ['Findings are detected'];
-    if (cleanOn) willLines.push('No findings (clean scan)');
-    if (draftOn) willLines.push('PR is in draft status');
-    willEl.innerHTML = willLines.join('<br>');
-
-    resolveEl.innerHTML = retainOn
-      ? 'Comment updates to "All Clear" state<br>Finding history is retained'
-      : 'Comment is deleted when all findings resolve';
   }
-  </script>
+  currentStep = n;
 
-  <hr class="config-divider">
+  // Build summary when entering step 5
+  if (n === 5) buildSummary();
 
-  <!-- ── PR BLOCKING ── -->
-  <div class="config-section">
-    <div class="config-section-header">
-      <svg width="14" height="14" viewBox="0 0 16 16" fill="#8b919e"><path d="M4.25 7.25a.75.75 0 000 1.5h7.5a.75.75 0 000-1.5h-7.5z"/><path d="M8 0a8 8 0 100 16A8 8 0 008 0zM1.5 8a6.5 6.5 0 1113 0 6.5 6.5 0 01-13 0z"/></svg>
-      PR Blocking &amp; Notifications
-    </div>
+  // Scroll to top of main
+  document.querySelector('.main').scrollTo({ top: 0, behavior: 'smooth' });
+}
 
-    <div class="toggle-row">
-      <div class="toggle-left">
-        <div class="toggle-label">PR Blocking Enabled</div>
-        <div class="toggle-desc">Block PRs from merging when critical vulnerabilities are detected.</div>
-      </div>
-      <div class="toggle toggle--off"></div>
-    </div>
+// ── TOGGLE HELPERS ──
+function toggleTog(btn) {
+  const isOn = btn.classList.contains('tog--on');
+  btn.classList.toggle('tog--on', !isOn);
+  btn.classList.toggle('tog--off', isOn);
+}
 
-    <div class="toggle-row">
-      <div class="toggle-left">
-        <div class="toggle-label">Notifications Enabled</div>
-        <div class="toggle-desc">Send notifications when new findings are detected.</div>
-      </div>
-      <div class="toggle toggle--off"></div>
-    </div>
-  </div>
+function toggleSmall(btn) {
+  const isOn = btn.classList.contains('sm-tog--on');
+  btn.classList.toggle('sm-tog--on', !isOn);
+  btn.classList.toggle('sm-tog--off', isOn);
 
-  <hr class="config-divider">
+  // If this is a blocking toggle in the per-analyzer table, enable/disable severity dropdown
+  const row = btn.closest('tr');
+  if (row) {
+    const sel = row.querySelector('.sev-sel');
+    if (sel) {
+      sel.disabled = isOn; // was on, now turning off
+      sel.style.opacity = isOn ? '0.4' : '1';
+    }
+  }
+}
 
-  <!-- ── POLICY ENFORCEMENT AGENT ── -->
-  <div class="config-section">
-    <div class="policy-header">
-      <h3>Policy Enforcement Agent</h3>
-      <button class="policy-btn">Add Policy +</button>
-      <button class="policy-btn">Create Policy +</button>
-      <span class="tooltip-trigger help-icon">?
-        <span class="tooltip-content">Policy agents enforce custom rules on PRs. Blocking policies prevent merge. Silent mode suppresses the finding from the comment.</span>
-      </span>
-    </div>
+function toggleMaster(btn) {
+  toggleTog(btn);
+  const isNowOn = btn.classList.contains('tog--on');
+  const sub = document.getElementById('comment-sub');
+  sub.style.opacity = isNowOn ? '1' : '0.4';
+  sub.style.pointerEvents = isNowOn ? '' : 'none';
+}
 
-    <div class="agent-card">
-      <div class="agent-card-name">Dependency License Check v1</div>
-      <div class="agent-card-controls">
-        <div class="agent-control">Blocking <div class="agent-toggle agent-toggle--on"></div></div>
-        <div class="agent-control">Silent Mode <div class="agent-toggle agent-toggle--off"></div></div>
-        <button class="remove-btn">&minus;</button>
-      </div>
-    </div>
+// ── BLOCKING MODE ──
+let blockMode = 'global';
 
-    <div class="agent-card">
-      <div class="agent-card-name">No Default Env Var Values</div>
-      <div class="agent-card-controls">
-        <div class="agent-control">Blocking <div class="agent-toggle agent-toggle--on"></div></div>
-        <div class="agent-control">Silent Mode <div class="agent-toggle agent-toggle--off"></div></div>
-        <button class="remove-btn">&minus;</button>
-      </div>
-    </div>
-  </div>
+function setBlockMode(mode) {
+  blockMode = mode;
+  const modes = ['global', 'per', 'off'];
+  modes.forEach(m => {
+    const el = document.getElementById('bmode-' + m);
+    const radio = document.getElementById('bmode-' + m + '-radio');
+    if (m === mode) {
+      el.style.border = '2px solid var(--purple)';
+      el.style.background = 'var(--purple-bg)';
+      if (radio) {
+        radio.style.borderColor = 'var(--purple)';
+        radio.style.background = 'var(--purple)';
+        radio.querySelector('div').style.background = '#fff';
+      }
+    } else {
+      el.style.border = '2px solid var(--border)';
+      el.style.background = 'var(--surface)';
+      if (radio) {
+        radio.style.borderColor = 'var(--border)';
+        radio.style.background = 'transparent';
+        radio.querySelector('div').style.background = 'transparent';
+      }
+    }
+  });
 
-  <!-- ── CODE SECURITY AGENTS ── -->
-  <div class="config-section">
-    <div class="agents-section-label">Code Security Agents</div>
+  // Global mode radio indicator
+  const globalRadio = document.querySelector('#bmode-global > div > div:first-child');
+  if (globalRadio) {
+    if (mode === 'global') {
+      globalRadio.style.borderColor = 'var(--purple)';
+      globalRadio.style.background = 'var(--purple)';
+    } else {
+      globalRadio.style.borderColor = 'var(--border)';
+      globalRadio.style.background = 'transparent';
+    }
+  }
 
-    <div class="agent-card">
-      <div class="agent-card-name">Cross-Site Scripting Analyzer</div>
-      <div class="agent-card-controls">
-        <div class="agent-control">Blocking <div class="agent-toggle agent-toggle--off"></div></div>
-        <div class="agent-control">Silent Mode <div class="agent-toggle agent-toggle--off"></div></div>
-        <div class="risk-level">Risk Level: <span>Risky</span> ▾</div>
-      </div>
-    </div>
+  // Show/hide sev picker & per-analyzer table
+  document.getElementById('global-sev-picker').style.display = mode === 'global' ? 'flex' : 'none';
+  document.getElementById('per-analyzer-table').style.display = mode === 'per' ? 'block' : 'none';
+}
 
-    <div class="agent-card">
-      <div class="agent-card-name">General Security Analyzer</div>
-      <div class="agent-card-controls">
-        <div class="agent-control">Blocking <div class="agent-toggle agent-toggle--off"></div></div>
-        <div class="agent-control">Silent Mode <div class="agent-toggle agent-toggle--off"></div></div>
-        <div class="risk-level">Risk Level: <span class="info">Info</span> ▾</div>
-      </div>
-    </div>
+function selectSev(val) {
+  ['medium','high','critical'].forEach(v => {
+    const chip = document.getElementById('sev-' + v);
+    chip.classList.remove('selected');
+    chip.style.borderColor = 'var(--border)';
+    chip.style.background = 'var(--surface)';
+    chip.style.color = 'var(--text-muted)';
+  });
+  const colors = { medium: ['var(--purple-border)','var(--purple-bg)','var(--purple)'], high: ['var(--orange-border)','var(--orange-bg)','var(--orange)'], critical: ['#ffcecb','var(--red-bg)','var(--red)'] };
+  const chip = document.getElementById('sev-' + val);
+  chip.classList.add('selected');
+  chip.style.borderColor = colors[val][0];
+  chip.style.background = colors[val][1];
+  chip.style.color = colors[val][2];
+}
 
-    <div class="agent-card">
-      <div class="agent-card-name">IDOR Analyzer</div>
-      <div class="agent-card-controls">
-        <div class="agent-control">Blocking <div class="agent-toggle agent-toggle--off"></div></div>
-        <div class="agent-control">Silent Mode <div class="agent-toggle agent-toggle--off"></div></div>
-        <div class="risk-level">Risk Level: <span>Risky</span> ▾</div>
-      </div>
-    </div>
+function togglePerAnalyzer(btn) {
+  const isOn = btn.classList.contains('sm-tog--on');
+  btn.classList.toggle('sm-tog--on', !isOn);
+  btn.classList.toggle('sm-tog--off', isOn);
+  const sel = btn.closest('tr').querySelector('.sev-sel');
+  if (sel) {
+    sel.disabled = isOn;
+    sel.style.opacity = isOn ? '0.4' : '1';
+  }
+}
 
-    <div class="agent-card">
-      <div class="agent-card-name">Mass Assignment</div>
-      <div class="agent-card-controls">
-        <div class="agent-control">Blocking <div class="agent-toggle agent-toggle--off"></div></div>
-        <div class="agent-control">Silent Mode <div class="agent-toggle agent-toggle--off"></div></div>
-        <div class="risk-level">Risk Level: <span>Risky</span> ▾</div>
-      </div>
-    </div>
-  </div>
+// ── SUMMARY BUILDER ──
+function dot(on) {
+  return on
+    ? '<span class="dot-on"></span>'
+    : '<span class="dot-off"></span>';
+}
+function sumRow(on, label, detail) {
+  const color = on ? '' : 'color:var(--text-muted);';
+  return `<div class="summary-item" style="${color}">${dot(on)} ${label}${detail ? `<span style="font-size:11px;color:var(--text-muted);margin-left:6px;">${detail}</span>` : ''}</div>`;
+}
 
-</div>
+function buildSummary() {
+
+  // ── ANALYZERS (step 1 core) ──
+  const analyzerRows = document.querySelectorAll('#step-1 .card:first-of-type tbody tr');
+  let analyzerHtml = '';
+  analyzerRows.forEach(row => {
+    const name = row.querySelector('.atbl-name').textContent;
+    const on = row.querySelector('.sm-tog').classList.contains('sm-tog--on');
+    analyzerHtml += sumRow(on, name);
+  });
+  document.getElementById('sum-analyzers').innerHTML = analyzerHtml;
+
+  // ── POLICIES (step 1 custom) ──
+  const policyRows = document.querySelectorAll('#step-1 .card:last-of-type tbody tr');
+  let policyHtml = '';
+  policyRows.forEach(row => {
+    const name = row.querySelector('.atbl-name').textContent;
+    const on = row.querySelector('.sm-tog').classList.contains('sm-tog--on');
+    policyHtml += sumRow(on, name);
+  });
+  if (!policyHtml) policyHtml = '<div class="summary-item" style="color:var(--text-muted);">No custom policies added</div>';
+  document.getElementById('sum-policies').innerHTML = policyHtml;
+
+  // ── COMMENT VISIBILITY (step 2) ──
+  const masterOn = document.getElementById('master-comment').classList.contains('tog--on');
+  const subToggles = document.querySelectorAll('#comment-sub .tog');
+  const subNames = ['Comment on Clean Scans', 'Comment on Draft PRs', 'Retain Comment When Resolved'];
+  let commentHtml = sumRow(masterOn, 'Issue comments ' + (masterOn ? 'enabled' : 'disabled'));
+  if (masterOn) {
+    subToggles.forEach((tog, i) => {
+      const on = tog.classList.contains('tog--on');
+      commentHtml += sumRow(on, subNames[i]);
+    });
+  } else {
+    commentHtml += '<div class="summary-item" style="color:var(--text-muted);font-size:12px;padding-left:13px;">All sub-settings inactive — comments are off</div>';
+  }
+  document.getElementById('sum-comments').innerHTML = commentHtml;
+
+  // ── BLOCKING (step 4) ──
+  let blockHtml = '';
+
+  if (blockMode === 'off') {
+    blockHtml = `<div style="display:flex;align-items:center;gap:8px;padding:6px 0 10px;">
+      <span style="font-size:13px;font-weight:600;color:var(--text-muted);">No blocking</span>
+      <span style="font-size:12px;color:var(--text-muted);">PRs are never blocked from merging — findings are advisory only</span>
+    </div>`;
+
+  } else if (blockMode === 'global') {
+    const selectedChip = document.querySelector('.sev-chip.selected');
+    const sevLabel = selectedChip ? selectedChip.textContent.trim() : 'High+';
+    const sevColors = { 'Medium+': 'var(--purple)', 'High+': 'var(--orange)', 'Critical only': 'var(--red)' };
+    const color = sevColors[sevLabel] || 'var(--orange)';
+    blockHtml = `<div style="display:flex;align-items:center;gap:10px;padding:6px 0 10px;">
+      <span style="font-size:13px;font-weight:700;color:${color};">Global threshold: ${sevLabel}</span>
+      <span style="font-size:12px;color:var(--text-muted);">All analyzers block on ${sevLabel} findings or above</span>
+    </div>`;
+
+  } else if (blockMode === 'per') {
+    blockHtml = `<div style="padding:4px 0 10px;font-size:12px;color:var(--text-sec);">Per-analyzer blocking rules:</div>`;
+    const perRows = document.querySelectorAll('#per-analyzer-table tbody tr');
+    blockHtml += '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;">';
+    perRows.forEach(row => {
+      const name = row.querySelector('.atbl-name').textContent;
+      const blocking = row.querySelector('.sm-tog').classList.contains('sm-tog--on');
+      const sel = row.querySelector('.sev-sel');
+      const sev = (blocking && sel) ? sel.value || sel.options[sel.selectedIndex]?.text : null;
+      const detail = blocking && sev ? `(${sev})` : null;
+      blockHtml += sumRow(blocking, name, detail);
+    });
+    blockHtml += '</div>';
+  }
+
+  document.getElementById('sum-blocking').innerHTML = blockHtml;
+
+  // Only span full width when per-analyzer mode (needs the grid)
+  document.getElementById('sum-blocking-card').style.gridColumn = (blockMode === 'per') ? '1/-1' : 'auto';
+}
+
+// ── SAVE ──
+function saveConfig() {
+  // Flash all steps done, then navigate
+  for (let i = 1; i <= totalSteps; i++) {
+    completedSteps.add(i);
+    const tab = document.getElementById('tab-' + i);
+    const num = document.getElementById('num-' + i);
+    tab.classList.remove('step--active', 'step--done');
+    tab.classList.add('step--done');
+    num.innerHTML = '<svg width="11" height="11" viewBox="0 0 16 16" fill="currentColor"><path d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"/></svg>';
+  }
+  // Show brief saved toast
+  const toast = document.createElement('div');
+  toast.textContent = 'Configuration saved';
+  toast.style.cssText = 'position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:#1a7f37;color:#fff;padding:10px 24px;border-radius:8px;font-size:13px;font-weight:600;box-shadow:0 4px 16px rgba(0,0,0,0.18);z-index:9999;';
+  document.body.appendChild(toast);
+  setTimeout(() => window.location = 'configurations.html', 1200);
+}
+</script>
 
 <script src="gate.js"></script>
 </body>
