@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DryRun — Default Configuration Mockup</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --font: 'Inter', -apple-system, sans-serif;
+      --mono: 'JetBrains Mono', monospace;
+      --bg: #fafbfc; --surface: #fff; --surface-alt: #f6f8fa;
+      --text: #1a1d23; --text-sec: #5a5f6b; --text-muted: #8b919e;
+      --border: #e3e6eb; --border-light: #eef0f4;
+      --purple: #7c6ef0; --purple-bg: #f0eeff; --purple-border: #d8d3f7;
+      --green: #1a7f37; --green-bg: #dafbe1; --green-border: #aceebb;
+      --orange: #bf8700; --orange-bg: #fff8c5; --orange-border: #f5e0a0;
+      --red: #cf222e; --red-bg: #ffebe9;
+      --blue: #0969da; --blue-bg: #ddf4ff; --blue-border: #b6d8ff;
+    }
+    body { font-family: var(--font); font-size: 14px; line-height: 1.5; color: var(--text); background: var(--bg); }
+    .mockup-bar { background: linear-gradient(135deg, #1a1e3a, #2d3260); padding: 10px 24px; display: flex; align-items: center; gap: 12px; font-size: 12px; color: #fff; }
+    .mockup-badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(124,110,240,0.3); padding: 3px 10px; border-radius: 10px; font-size: 11px; font-weight: 600; }
+    .mockup-breadcrumb { padding: 8px 24px; font-size: 12px; color: #8b919e; background: #fff; border-bottom: 1px solid #e8ecf0; }
+    .mockup-breadcrumb a { color: var(--purple); text-decoration: none; }
+    .ci { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 10px; }
+    .ci-new { background: var(--purple-bg); color: var(--purple); border: 1px solid var(--purple-border); }
+    .ci-rm { background: var(--red-bg); color: var(--red); border: 1px solid #ffcecb; }
+    .ci-upd { background: #fef3c7; color: #92400e; border: 1px solid #fcd34d; }
+
+    /* APP SHELL */
+    .app { display: flex; min-height: calc(100vh - 64px); }
+    .sidebar { width: 200px; flex-shrink: 0; background: var(--surface); border-right: 1px solid var(--border); padding: 16px 0; display: flex; flex-direction: column; }
+    .sidebar-logo { display: flex; align-items: center; gap: 8px; padding: 0 16px 14px; border-bottom: 1px solid var(--border-light); margin-bottom: 10px; font-weight: 700; font-size: 13px; }
+    .sidebar-org { margin: 0 12px 12px; padding: 7px 10px; border: 1px solid var(--border); border-radius: 8px; display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; }
+    .s-sec { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); padding: 10px 16px 4px; }
+    .s-link { display: flex; align-items: center; gap: 8px; padding: 7px 16px; font-size: 13px; font-weight: 500; color: var(--text-sec); cursor: pointer; }
+    .s-link:hover { color: var(--text); background: #f6f8fa; }
+    .s-link--active { color: var(--purple); background: var(--purple-bg); font-weight: 600; }
+    .s-link svg { width: 16px; height: 16px; flex-shrink: 0; }
+    .sidebar-spacer { flex: 1; }
+    .sidebar-bottom { padding: 12px 16px; border-top: 1px solid var(--border-light); font-size: 12px; color: var(--text-muted); display: flex; align-items: center; justify-content: space-between; }
+    .dark-toggle { width: 32px; height: 18px; border-radius: 9px; background: var(--border); border: none; cursor: pointer; position: relative; }
+    .dark-toggle::after { content:''; position: absolute; width: 12px; height: 12px; border-radius: 50%; background: #fff; top: 3px; left: 3px; }
+
+    /* MAIN */
+    .main { flex: 1; padding: 28px 40px 80px; max-width: 760px; }
+    .breadcrumb-inner { font-size: 13px; color: var(--text-muted); margin-bottom: 6px; }
+    .page-title { font-size: 22px; font-weight: 700; margin-bottom: 6px; }
+    .page-subtitle { font-size: 13px; color: var(--text-muted); margin-bottom: 28px; display: flex; align-items: center; gap: 8px; }
+    .page-subtitle .repo-pill { font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: 10px; background: var(--purple-bg); color: var(--purple); border: 1px solid var(--purple-border); }
+
+    /* SECTION */
+    .section { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 0; margin-bottom: 16px; overflow: hidden; }
+    .section-header { padding: 12px 20px; background: var(--surface-alt); border-bottom: 1px solid var(--border-light); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); display: flex; align-items: center; gap: 8px; }
+    .section-body { padding: 18px 20px; }
+
+    /* TOGGLE ROW */
+    .toggle-row { display: flex; align-items: center; gap: 12px; padding: 10px 0; }
+    .toggle-row + .toggle-row { border-top: 1px solid var(--border-light); }
+    .toggle-label { font-size: 14px; font-weight: 500; flex: 1; display: flex; align-items: center; gap: 6px; }
+    .toggle-desc { font-size: 12px; color: var(--text-muted); margin-top: 2px; max-width: 460px; line-height: 1.45; }
+    .toggle-left { flex: 1; }
+    .help-icon { width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 10px; color: var(--text-muted); cursor: help; flex-shrink: 0; }
+    .toggle { width: 40px; height: 22px; border-radius: 11px; border: none; cursor: pointer; position: relative; flex-shrink: 0; }
+    .toggle--on { background: var(--purple); }
+    .toggle--off { background: var(--border); }
+    .toggle::after { content:''; position: absolute; width: 16px; height: 16px; border-radius: 50%; background: #fff; top: 3px; box-shadow: 0 1px 2px rgba(0,0,0,0.15); }
+    .toggle--on::after { left: 21px; }
+    .toggle--off::after { left: 3px; }
+
+    /* SUB-SETTINGS */
+    .sub-settings { margin-left: 20px; padding-left: 20px; border-left: 2px solid var(--border-light); margin-top: 4px; }
+    .sub-settings .toggle-row { padding: 8px 0; }
+    .sub-settings .toggle-label { font-size: 13px; font-weight: 500; }
+
+    /* DROPDOWN */
+    .field-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-muted); margin-bottom: 5px; }
+    .dropdown { font-size: 13px; padding: 8px 28px 8px 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); color: var(--text); font-family: var(--font); cursor: pointer; appearance: none; background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='%236b7084' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; }
+
+    /* WEBHOOK SUMMARY */
+    .webhook-row { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 12px 16px; display: flex; align-items: center; gap: 12px; margin-top: 10px; }
+    .webhook-info { flex: 1; min-width: 0; }
+    .webhook-name { font-size: 13px; font-weight: 600; }
+    .webhook-url { font-size: 11px; font-family: var(--mono); color: var(--text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .webhook-events { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 5px; }
+    .wh-tag { font-size: 10px; font-weight: 500; padding: 1px 7px; border-radius: 8px; background: var(--purple-bg); color: var(--purple); border: 1px solid var(--purple-border); }
+    .wh-btn { font-size: 11px; font-weight: 500; padding: 5px 10px; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); color: var(--text-sec); cursor: pointer; white-space: nowrap; font-family: var(--font); }
+    .add-webhook-btn { display: flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 500; padding: 7px 14px; border: 1px dashed var(--purple-border); border-radius: 8px; background: var(--purple-bg); color: var(--purple); cursor: pointer; margin-top: 10px; width: fit-content; }
+
+    /* AGENT ROWS */
+    .agents-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); padding: 12px 20px 8px; border-top: 1px solid var(--border-light); margin-top: 4px; display: flex; align-items: center; gap: 8px; }
+    .agent-row { display: flex; align-items: center; gap: 12px; padding: 12px 20px; border-top: 1px solid var(--border-light); }
+    .agent-name { flex: 1; font-size: 13.5px; font-weight: 500; }
+    .agent-controls { display: flex; align-items: center; gap: 16px; }
+    .agent-control { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-sec); }
+    .agent-toggle { width: 34px; height: 19px; border-radius: 9.5px; border: none; cursor: pointer; position: relative; }
+    .agent-toggle--on { background: var(--purple); }
+    .agent-toggle--off { background: var(--border); }
+    .agent-toggle::after { content:''; position: absolute; width: 13px; height: 13px; border-radius: 50%; background: #fff; top: 3px; box-shadow: 0 1px 2px rgba(0,0,0,0.15); }
+    .agent-toggle--on::after { left: 18px; }
+    .agent-toggle--off::after { left: 3px; }
+    .sev-select { font-size: 11px; padding: 3px 20px 3px 8px; border: 1px solid var(--border); border-radius: 5px; background: var(--surface); color: var(--text); font-family: var(--font); cursor: pointer; appearance: none; background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='%236b7084' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 6px center; }
+    .remove-btn { width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid var(--red); background: none; color: var(--red); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; flex-shrink: 0; }
+
+    /* FOOTER */
+    .form-footer { display: flex; gap: 10px; padding-top: 20px; border-top: 1px solid var(--border-light); position: sticky; bottom: 0; background: var(--bg); padding-bottom: 20px; }
+    .btn-save { padding: 9px 24px; border: none; border-radius: 8px; background: var(--purple); color: #fff; font-size: 14px; font-weight: 600; cursor: pointer; font-family: var(--font); }
+    .btn-reset { padding: 9px 20px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); color: var(--text-sec); font-size: 14px; font-weight: 500; cursor: pointer; font-family: var(--font); }
+    .btn-cancel { padding: 9px 20px; border: none; border-radius: 8px; background: none; color: var(--text-muted); font-size: 14px; cursor: pointer; font-family: var(--font); }
+  </style>
+</head>
+<body>
+
+<div class="mockup-bar">
+  <span class="mockup-badge"><svg width="10" height="10" viewBox="0 0 16 16" fill="#c4b5fd"><circle cx="8" cy="8" r="8"/></svg> PROPOSED MOCKUP</span>
+  <span style="opacity:0.6;">Configurations — Default Configuration Detail</span>
+</div>
+<div class="mockup-breadcrumb"><a href="index.html">Mockups</a> / <a href="configurations.html">PR Scanner Config</a> / <span>Default Configuration</span></div>
+
+<div class="app">
+<!-- SIDEBAR (condensed) -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <svg width="22" height="22" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="13" stroke="var(--text)" stroke-width="1.5" fill="none"/><path d="M16 7L9 11v10l7 4 7-4V11l-7-4z" stroke="var(--text)" stroke-width="1" fill="none"/><path d="M13 16l2 2 4-4" stroke="#1a7f37" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    DRYRUN SECURITY
+  </div>
+  <div class="sidebar-org"><svg width="16" height="16" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="13" stroke="var(--text-muted)" stroke-width="1" fill="none"/></svg><span>DryRunSec</span><svg width="12" height="12" viewBox="0 0 16 16" fill="var(--text-muted)" style="margin-left:auto;"><path d="M4.427 7.427l3.396 3.396a.25.25 0 00.354 0l3.396-3.396A.25.25 0 0011.396 7H4.604a.25.25 0 00-.177.427z"/></svg></div>
+  <div class="s-sec">Main</div>
+  <a class="s-link" href="#"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M1.75 1h12.5c.966 0 1.75.784 1.75 1.75v10.5A1.75 1.75 0 0114.25 15H1.75A1.75 1.75 0 010 13.25V2.75C0 1.784.784 1 1.75 1z"/></svg>Risk Register</a>
+  <a class="s-link" href="#"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M2 2.5A2.5 2.5 0 014.5 0h8.75a.75.75 0 01.75.75v12.5a.75.75 0 01-.75.75h-2.5a.75.75 0 010-1.5h1.75v-2h-8a1 1 0 00-.714 1.7.75.75 0 01-1.072 1.05A2.495 2.495 0 012 11.5v-9z"/></svg>Repositories</a>
+  <a class="s-link" href="#"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M1.5 3.25a2.25 2.25 0 113 2.122v5.256a2.251 2.251 0 11-1.5 0V5.372A2.25 2.25 0 011.5 3.25z"/></svg>Pull Requests</a>
+  <a class="s-link" href="#">DeepScan</a>
+  <a class="s-link" href="#">Code Policies</a>
+  <a class="s-link" href="#">Code Security Intelligence</a>
+  <div class="s-sec">Settings</div>
+  <a class="s-link s-link--active" href="configurations.html"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 0a8.2 8.2 0 00-2.3.3c-.3.1-.5.4-.5.7v1.4a1 1 0 01-.6.9l-.5.3a1 1 0 01-1.1-.1L1.9 2.4c-.2-.2-.6-.2-.8 0A8 8 0 00.3 5.7c0 .3.2.6.5.7L2.2 7a1 1 0 01.5 1v.5a1 1 0 01-.5.9l-1.4.8c-.3.1-.5.4-.5.7a8 8 0 00.8 3.3c.2.3.5.3.8.1l1.1-1.1a1 1 0 011.1-.1l.5.3a1 1 0 01.6.9v1.4c0 .3.2.6.5.7a8.2 8.2 0 004.6 0c.3-.1.5-.4.5-.7v-1.4a1 1 0 01.6-.9l.5-.3a1 1 0 011.1.1l1.1 1.1c.2.2.6.2.8 0a8 8 0 00.8-3.3c0-.3-.2-.6-.5-.7L13.8 9a1 1 0 01-.5-1V7.5a1 1 0 01.5-.9l1.4-.8c.3-.1.5-.4.5-.7a8 8 0 00-.8-3.3c-.2-.3-.5-.3-.8-.1l-1.1 1.1a1 1 0 01-1.1.1l-.5-.3a1 1 0 01-.6-.9V.8c0-.3-.2-.6-.5-.7A8.2 8.2 0 008 0zM8 11a3 3 0 110-6 3 3 0 010 6z"/></svg>Configurations</a>
+  <a class="s-link" href="#">Integrations</a>
+  <a class="s-link" href="#">Access Keys</a>
+  <div class="sidebar-spacer"></div>
+  <div class="sidebar-bottom">Dark Mode <button class="dark-toggle"></button></div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="breadcrumb-inner">Settings &rsaquo; Configurations</div>
+  <div class="page-title">Default Configuration</div>
+  <div class="page-subtitle">
+    <span>Applied to:</span>
+    <span class="repo-pill">31 repos (all except explicitly configured)</span>
+    <span class="ci ci-new">Updated</span>
+  </div>
+
+  <!-- ══ GITHUB COMMENT BEHAVIOR ══ -->
+  <div class="section">
+    <div class="section-header">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M0 1.75C0 .784.784 0 1.75 0h12.5C15.216 0 16 .784 16 1.75v9.5A1.75 1.75 0 0114.25 13H8.06l-2.573 2.573A1.458 1.458 0 013 14.543V13H1.75A1.75 1.75 0 010 11.25v-9.5z"/></svg>
+      GitHub Comment Behavior
+    </div>
+    <div class="section-body">
+      <!-- Issue Comment Enabled -->
+      <div class="toggle-row">
+        <div class="toggle-left">
+          <div class="toggle-label">Issue Comment Enabled</div>
+          <div class="toggle-desc">Master control. When off, DryRun never posts any comment to GitHub/GitLab for repos in this config.</div>
+        </div>
+        <button class="toggle toggle--on"></button>
+      </div>
+      <!-- Sub-settings -->
+      <div class="sub-settings">
+        <div class="toggle-row">
+          <div class="toggle-left">
+            <div class="toggle-label">Comment on Clean Scans <span class="ci ci-upd">Renamed</span><span class="help-icon">?</span></div>
+            <div class="toggle-desc">Post a confirmation comment even when no vulnerabilities are found. Previously "Show Comment for No Findings."</div>
+          </div>
+          <button class="toggle toggle--on"></button>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-left">
+            <div class="toggle-label">Comment on Draft PRs <span class="ci ci-new">New</span></div>
+            <div class="toggle-desc">Post comments on PRs while in draft status. When off, scans still run silently.</div>
+          </div>
+          <button class="toggle toggle--on"></button>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-left">
+            <div class="toggle-label">Retain Comment When Resolved <span class="ci ci-new">New</span></div>
+            <div class="toggle-desc">Keep the comment with an "All Clear" status instead of deleting it when all findings are resolved or dismissed.</div>
+          </div>
+          <button class="toggle toggle--on"></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ PR BLOCKING ══ -->
+  <div class="section">
+    <div class="section-header">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M4.47.22A.749.749 0 015 0h6c.199 0 .389.079.53.22l4.25 4.25c.141.14.22.331.22.53v6a.749.749 0 01-.22.53l-4.25 4.25A.749.749 0 0111 16H5a.749.749 0 01-.53-.22L.22 11.53A.749.749 0 010 11V5c0-.199.079-.389.22-.53L4.47.22z"/></svg>
+      PR Blocking
+    </div>
+    <div class="section-body">
+      <div class="toggle-row">
+        <div class="toggle-left">
+          <div class="toggle-label">PR Blocking Enabled</div>
+          <div class="toggle-desc">Block PRs from merging when findings meet or exceed the minimum risk threshold below.</div>
+        </div>
+        <button class="toggle toggle--on"></button>
+      </div>
+      <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+        <div class="field-label">Minimum Risk Threshold</div>
+        <select class="dropdown">
+          <option>Critical</option>
+          <option selected>High</option>
+          <option>Medium</option>
+          <option>Any</option>
+        </select>
+        <div style="font-size: 12px; color: var(--text-muted); margin-top: 6px;">Findings at this severity or above will trigger a branch protection block on the SCM.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ NOTIFICATIONS ══ -->
+  <div class="section">
+    <div class="section-header">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 16a2 2 0 001.985-1.75c.017-.137-.097-.25-.235-.25h-3.5c-.138 0-.252.113-.235.25A2 2 0 008 16zm.25-14.75v-.5a.75.75 0 00-1.5 0v.5A4.56 4.56 0 003.5 7.35c0 1.129-.133 2.099-.348 2.895A2.088 2.088 0 001 12.5c0 .828.48 1.5 1.085 1.5h11.83C14.52 14 15 13.328 15 12.5a2.088 2.088 0 00-2.152-2.255c-.215-.796-.348-1.766-.348-2.895A4.56 4.56 0 008.25 2.25z"/></svg>
+      Notifications
+    </div>
+    <div class="section-body">
+      <div class="toggle-row">
+        <div class="toggle-left">
+          <div class="toggle-label">Notifications Enabled</div>
+          <div class="toggle-desc">Send webhook notifications for events triggered by repos in this configuration.</div>
+        </div>
+        <button class="toggle toggle--on"></button>
+      </div>
+
+      <div style="margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border-light);">
+        <div class="field-label" style="margin-bottom: 10px;">Assigned Webhooks</div>
+
+        <!-- Webhook card inline -->
+        <div class="webhook-row">
+          <div style="width: 8px; height: 8px; border-radius: 50%; background: var(--green); flex-shrink: 0;"></div>
+          <div class="webhook-info">
+            <div class="webhook-name">Security Alerts — Tines</div>
+            <div class="webhook-url">https://aged-snow-3554.tines.com/webhook/security</div>
+            <div class="webhook-events">
+              <span class="wh-tag">PR scan complete</span>
+              <span class="wh-tag">New vulnerabilities (PR) · High+</span>
+              <span class="wh-tag">PR blocked</span>
+              <span class="wh-tag">PR improved</span>
+              <span class="wh-tag">+2 more</span>
+            </div>
+          </div>
+          <button class="wh-btn">Configure</button>
+          <button class="wh-btn" style="color:var(--red);border-color:#ffcecb;">Remove</button>
+        </div>
+
+        <div class="add-webhook-btn">
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M7.75 2a.75.75 0 01.75.75V7h4.25a.75.75 0 010 1.5H8.5v4.25a.75.75 0 01-1.5 0V8.5H2.75a.75.75 0 010-1.5H7V2.75A.75.75 0 017.75 2z"/></svg>
+          Add webhook
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ CODE POLICY AGENTS ══ -->
+  <div class="section">
+    <div class="section-header">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8.878.392a1.75 1.75 0 00-1.756 0l-5.25 3.045A1.75 1.75 0 001 4.951v6.098c0 .624.332 1.2.872 1.514l5.25 3.045a1.75 1.75 0 001.756 0l5.25-3.045c.54-.313.872-.89.872-1.514V4.951c0-.624-.332-1.2-.872-1.514L8.878.392z"/></svg>
+      Code Policy Agents
+      <span class="ci ci-upd">Renamed</span>
+      <div style="margin-left:auto;display:flex;gap:6px;">
+        <button style="font-size:11px;padding:4px 10px;border-radius:6px;border:1px solid var(--border);background:var(--surface);color:var(--text-sec);cursor:pointer;">Add Policy +</button>
+        <button style="font-size:11px;padding:4px 10px;border-radius:6px;border:1px solid var(--border);background:var(--surface);color:var(--text-sec);cursor:pointer;">Create Policy +</button>
+        <div style="width:16px;height:16px;border-radius:50%;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--text-muted);cursor:help;">?</div>
+      </div>
+    </div>
+    <div>
+      <div class="agent-row">
+        <div class="agent-name">Dependency License Check v1</div>
+        <div class="agent-controls">
+          <div class="agent-control">
+            Blocking
+            <button class="agent-toggle agent-toggle--on"></button>
+          </div>
+          <div class="agent-control">
+            Min severity
+            <select class="sev-select"><option selected>Any</option><option>High+</option><option>Critical</option></select>
+          </div>
+          <div class="agent-control">
+            Silent Mode
+            <button class="agent-toggle agent-toggle--off"></button>
+          </div>
+          <button class="remove-btn">&minus;</button>
+        </div>
+      </div>
+      <div class="agent-row">
+        <div class="agent-name">No Default Env Var Values</div>
+        <div class="agent-controls">
+          <div class="agent-control">
+            Blocking
+            <button class="agent-toggle agent-toggle--on"></button>
+          </div>
+          <div class="agent-control">
+            Min severity
+            <select class="sev-select"><option selected>Any</option><option>High+</option><option>Critical</option></select>
+          </div>
+          <div class="agent-control">
+            Silent Mode
+            <button class="agent-toggle agent-toggle--off"></button>
+          </div>
+          <button class="remove-btn">&minus;</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SECURITY ANALYZERS ══ -->
+  <div class="section">
+    <div class="section-header">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M7.467.133a1.75 1.75 0 011.066 0l5.25 1.68A1.75 1.75 0 0115 3.48V7c0 1.566-.32 3.182-1.303 4.682-.983 1.498-2.585 2.813-5.032 3.855a1.697 1.697 0 01-1.33 0c-2.447-1.042-4.049-2.357-5.032-3.855C1.32 10.182 1 8.566 1 7V3.48a1.75 1.75 0 011.217-1.667l5.25-1.68z"/></svg>
+      Security Analyzers
+      <span class="ci ci-upd">Renamed</span>
+    </div>
+    <div>
+
+      <!-- Analyzer row with controls incl. new severity selector on blocking -->
+      <div class="agent-row">
+        <div class="agent-name">Cross-Site Scripting Analyzer</div>
+        <div class="agent-controls">
+          <div class="agent-control">Blocking <button class="agent-toggle agent-toggle--off"></button></div>
+          <div class="agent-control">Min severity <select class="sev-select" disabled style="opacity:0.4;"><option>High+</option></select></div>
+          <div class="agent-control">Silent Mode <button class="agent-toggle agent-toggle--off"></button></div>
+        </div>
+      </div>
+
+      <div class="agent-row">
+        <div class="agent-name">General Security Analyzer</div>
+        <div class="agent-controls">
+          <div class="agent-control">Blocking <button class="agent-toggle agent-toggle--off"></button></div>
+          <div class="agent-control">Min severity <select class="sev-select" disabled style="opacity:0.4;"><option>High+</option></select></div>
+          <div class="agent-control">Silent Mode <button class="agent-toggle agent-toggle--off"></button></div>
+        </div>
+      </div>
+
+      <div class="agent-row">
+        <div class="agent-name">IDOR Analyzer</div>
+        <div class="agent-controls">
+          <div class="agent-control">Blocking <button class="agent-toggle agent-toggle--off"></button></div>
+          <div class="agent-control">Min severity <select class="sev-select" disabled style="opacity:0.4;"><option>High+</option></select></div>
+          <div class="agent-control">Silent Mode <button class="agent-toggle agent-toggle--off"></button></div>
+        </div>
+      </div>
+
+      <div class="agent-row">
+        <div class="agent-name">Mass Assignment</div>
+        <div class="agent-controls">
+          <div class="agent-control">Blocking <button class="agent-toggle agent-toggle--off"></button></div>
+          <div class="agent-control">Min severity <select class="sev-select" disabled style="opacity:0.4;"><option>High+</option></select></div>
+          <div class="agent-control">Silent Mode <button class="agent-toggle agent-toggle--off"></button></div>
+        </div>
+      </div>
+
+      <div class="agent-row">
+        <div class="agent-name">Secrets Analyzer</div>
+        <div class="agent-controls">
+          <div class="agent-control">Blocking <button class="agent-toggle agent-toggle--on"></button></div>
+          <div class="agent-control">Min severity <select class="sev-select"><option selected>Any</option><option>High+</option><option>Critical</option></select></div>
+          <div class="agent-control">Silent Mode <button class="agent-toggle agent-toggle--off"></button></div>
+        </div>
+      </div>
+
+      <div class="agent-row">
+        <div class="agent-name">Server-Side Request Forgery Analyzer</div>
+        <div class="agent-controls">
+          <div class="agent-control">Blocking <button class="agent-toggle agent-toggle--off"></button></div>
+          <div class="agent-control">Min severity <select class="sev-select" disabled style="opacity:0.4;"><option>High+</option></select></div>
+          <div class="agent-control">Silent Mode <button class="agent-toggle agent-toggle--off"></button></div>
+        </div>
+      </div>
+
+      <div class="agent-row">
+        <div class="agent-name">SQL Injection Analyzer</div>
+        <div class="agent-controls">
+          <div class="agent-control">Blocking <button class="agent-toggle agent-toggle--off"></button></div>
+          <div class="agent-control">Min severity <select class="sev-select" disabled style="opacity:0.4;"><option>High+</option></select></div>
+          <div class="agent-control">Silent Mode <button class="agent-toggle agent-toggle--off"></button></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="form-footer">
+    <button class="btn-save">Save</button>
+    <button class="btn-reset">Reset Defaults</button>
+    <button class="btn-cancel">Cancel</button>
+  </div>
+</div>
+</div>
+
+<script src="gate.js"></script>
+</body>
+</html>

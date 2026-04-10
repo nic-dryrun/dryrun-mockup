@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DryRun — PR Scanner Configurations Mockup</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --font: 'Inter', -apple-system, sans-serif;
+      --bg: #fafbfc; --surface: #fff;
+      --text: #1a1d23; --text-sec: #5a5f6b; --text-muted: #8b919e;
+      --border: #e3e6eb; --border-light: #eef0f4;
+      --purple: #7c6ef0; --purple-bg: #f0eeff; --purple-border: #d8d3f7;
+      --green: #1a7f37; --green-bg: #dafbe1; --green-border: #aceebb;
+      --orange: #bf8700; --orange-bg: #fff8c5;
+      --red: #cf222e; --red-bg: #ffebe9;
+      --blue: #0969da; --blue-bg: #ddf4ff;
+    }
+    body { font-family: var(--font); font-size: 14px; line-height: 1.5; color: var(--text); background: var(--bg); }
+    .mockup-bar { background: linear-gradient(135deg, #1a1e3a, #2d3260); padding: 10px 24px; display: flex; align-items: center; gap: 12px; font-size: 12px; color: #fff; }
+    .mockup-badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(124,110,240,0.3); padding: 3px 10px; border-radius: 10px; font-size: 11px; font-weight: 600; }
+    .mockup-breadcrumb { padding: 8px 24px; font-size: 12px; color: #8b919e; background: #fff; border-bottom: 1px solid #e8ecf0; }
+    .mockup-breadcrumb a { color: var(--purple); text-decoration: none; }
+    .ci { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 10px; }
+    .ci-new { background: var(--purple-bg); color: var(--purple); border: 1px solid var(--purple-border); }
+    .ci-updated { background: #fef3c7; color: #92400e; border: 1px solid #fcd34d; }
+
+    /* APP SHELL */
+    .app { display: flex; min-height: calc(100vh - 64px); }
+    .sidebar { width: 200px; flex-shrink: 0; background: var(--surface); border-right: 1px solid var(--border); padding: 16px 0; display: flex; flex-direction: column; }
+    .sidebar-logo { display: flex; align-items: center; gap: 8px; padding: 0 16px 14px; border-bottom: 1px solid var(--border-light); margin-bottom: 10px; font-weight: 700; font-size: 13px; }
+    .sidebar-org { margin: 0 12px 12px; padding: 7px 10px; border: 1px solid var(--border); border-radius: 8px; display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; }
+    .s-sec { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); padding: 10px 16px 4px; }
+    .s-link { display: flex; align-items: center; gap: 8px; padding: 7px 16px; font-size: 13px; font-weight: 500; color: var(--text-sec); cursor: pointer; }
+    .s-link:hover { color: var(--text); background: #f6f8fa; }
+    .s-link--active { color: var(--purple); background: var(--purple-bg); font-weight: 600; }
+    .s-link svg { width: 16px; height: 16px; flex-shrink: 0; }
+    .sidebar-spacer { flex: 1; }
+    .sidebar-bottom { padding: 12px 16px; border-top: 1px solid var(--border-light); font-size: 12px; color: var(--text-muted); display: flex; align-items: center; justify-content: space-between; }
+    .dark-toggle { width: 32px; height: 18px; border-radius: 9px; background: var(--border); border: none; cursor: pointer; position: relative; }
+    .dark-toggle::after { content:''; position: absolute; width: 12px; height: 12px; border-radius: 50%; background: #fff; top: 3px; left: 3px; }
+
+    /* MAIN */
+    .main { flex: 1; padding: 28px 36px; }
+    .breadcrumb-inner { font-size: 13px; color: var(--text-muted); margin-bottom: 6px; }
+    .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+    .page-title { font-size: 22px; font-weight: 700; }
+    .add-btn { display: flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); font-size: 13px; font-weight: 500; color: var(--text-sec); cursor: pointer; }
+
+    /* ANNOTATION */
+    .anno { background: var(--purple-bg); border: 1px solid var(--purple-border); border-radius: 8px; padding: 10px 14px; margin-bottom: 20px; font-size: 12.5px; color: #4338ca; display: flex; gap: 8px; align-items: flex-start; }
+    .anno svg { flex-shrink: 0; margin-top: 1px; }
+
+    /* CONFIG TABLE */
+    .config-table { width: 100%; border-collapse: separate; border-spacing: 0; }
+    .config-table th { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-muted); padding: 8px 16px; text-align: left; border-bottom: 1px solid var(--border); }
+    .config-row { background: var(--surface); border-radius: 10px; margin-bottom: 10px; border: 1px solid var(--border); transition: border-color 0.15s; cursor: pointer; }
+    .config-row:hover { border-color: var(--purple); }
+    .config-row td { padding: 14px 16px; vertical-align: middle; }
+    .config-row td:first-child { border-radius: 10px 0 0 10px; }
+    .config-row td:last-child { border-radius: 0 10px 10px 0; }
+
+    .config-name { font-weight: 600; font-size: 14px; display: flex; align-items: center; gap: 8px; }
+    .default-badge { font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 4px; background: #f0eeff; color: var(--purple); border: 1px solid var(--purple-border); }
+    .config-desc { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+
+    .repo-cell { min-width: 120px; }
+    .repo-count { font-size: 13px; font-weight: 500; }
+    .repo-note { font-size: 11px; color: var(--text-muted); margin-top: 1px; }
+
+    .status-pills { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+    .pill { font-size: 10.5px; font-weight: 500; padding: 3px 8px; border-radius: 12px; white-space: nowrap; display: flex; align-items: center; gap: 3px; }
+    .pill-on { background: var(--green-bg); color: var(--green); border: 1px solid var(--green-border); }
+    .pill-off { background: #f3f4f6; color: var(--text-muted); border: 1px solid var(--border); }
+    .pill-warn { background: var(--orange-bg); color: var(--orange); border: 1px solid #f5e0a0; }
+
+    .menu-btn { width: 28px; height: 28px; border-radius: 6px; border: 1px solid transparent; background: none; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text-muted); }
+    .menu-btn:hover { background: #f0f0f0; border-color: var(--border); }
+
+    /* ADD NEW */
+    .add-new-row { border: 2px dashed var(--border); border-radius: 10px; padding: 16px; text-align: center; color: var(--text-muted); font-size: 13px; font-weight: 500; cursor: pointer; margin-top: 8px; transition: all 0.15s; }
+    .add-new-row:hover { border-color: var(--purple); color: var(--purple); background: var(--purple-bg); }
+
+    /* INFO CALLOUT */
+    .info-box { background: var(--blue-bg); border: 1px solid #b6d8ff; border-radius: 8px; padding: 10px 14px; font-size: 12px; color: #0550ae; margin-bottom: 16px; display: flex; gap: 8px; align-items: flex-start; }
+    .info-box svg { flex-shrink: 0; margin-top: 1px; }
+  </style>
+</head>
+<body>
+
+<div class="mockup-bar">
+  <span class="mockup-badge"><svg width="10" height="10" viewBox="0 0 16 16" fill="#c4b5fd"><circle cx="8" cy="8" r="8"/></svg> PROPOSED MOCKUP</span>
+  <span style="opacity:0.6;">Configurations — Landing Page</span>
+</div>
+<div class="mockup-breadcrumb"><a href="index.html">Mockups</a> / <span>PR Scanner Configuration / Configurations List</span></div>
+
+<div class="app">
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <svg width="22" height="22" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="13" stroke="var(--text)" stroke-width="1.5" fill="none"/><path d="M16 7L9 11v10l7 4 7-4V11l-7-4z" stroke="var(--text)" stroke-width="1" fill="none"/><path d="M13 16l2 2 4-4" stroke="#1a7f37" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    DRYRUN SECURITY
+  </div>
+  <div class="sidebar-org">
+    <svg width="16" height="16" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="13" stroke="var(--text-muted)" stroke-width="1" fill="none"/></svg>
+    <span>DryRunSec</span>
+    <svg width="12" height="12" viewBox="0 0 16 16" fill="var(--text-muted)" style="margin-left:auto;"><path d="M4.427 7.427l3.396 3.396a.25.25 0 00.354 0l3.396-3.396A.25.25 0 0011.396 7H4.604a.25.25 0 00-.177.427z"/></svg>
+  </div>
+  <div class="s-sec">Main</div>
+  <a class="s-link" href="#"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M1.75 1h12.5c.966 0 1.75.784 1.75 1.75v10.5A1.75 1.75 0 0114.25 15H1.75A1.75 1.75 0 010 13.25V2.75C0 1.784.784 1 1.75 1z"/></svg>Risk Register</a>
+  <a class="s-link" href="#"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M2 2.5A2.5 2.5 0 014.5 0h8.75a.75.75 0 01.75.75v12.5a.75.75 0 01-.75.75h-2.5a.75.75 0 010-1.5h1.75v-2h-8a1 1 0 00-.714 1.7.75.75 0 01-1.072 1.05A2.495 2.495 0 012 11.5v-9z"/></svg>Repositories</a>
+  <a class="s-link" href="#"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M1.5 3.25a2.25 2.25 0 113 2.122v5.256a2.251 2.251 0 11-1.5 0V5.372A2.25 2.25 0 011.5 3.25z"/></svg>Pull Requests</a>
+  <a class="s-link" href="#"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M5.45 5.154A4.25 4.25 0 009.25 7.5z"/></svg>DeepScan</a>
+  <a class="s-link" href="#"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M8.878.392a1.75 1.75 0 00-1.756 0l-5.25 3.045z"/></svg>Code Policies</a>
+  <a class="s-link" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg>Code Security Intelligence</a>
+  <div class="s-sec">Settings</div>
+  <a class="s-link s-link--active" href="#"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 0a8.2 8.2 0 00-2.3.3c-.3.1-.5.4-.5.7v1.4a1 1 0 01-.6.9l-.5.3a1 1 0 01-1.1-.1L1.9 2.4c-.2-.2-.6-.2-.8 0A8 8 0 00.3 5.7c0 .3.2.6.5.7L2.2 7a1 1 0 01.5 1v.5a1 1 0 01-.5.9l-1.4.8c-.3.1-.5.4-.5.7a8 8 0 00.8 3.3c.2.3.5.3.8.1l1.1-1.1a1 1 0 011.1-.1l.5.3a1 1 0 01.6.9v1.4c0 .3.2.6.5.7a8.2 8.2 0 004.6 0c.3-.1.5-.4.5-.7v-1.4a1 1 0 01.6-.9l.5-.3a1 1 0 011.1.1l1.1 1.1c.2.2.6.2.8 0a8 8 0 00.8-3.3c0-.3-.2-.6-.5-.7L13.8 9a1 1 0 01-.5-1V7.5a1 1 0 01.5-.9l1.4-.8c.3-.1.5-.4.5-.7a8 8 0 00-.8-3.3c-.2-.3-.5-.3-.8-.1l-1.1 1.1a1 1 0 01-1.1.1l-.5-.3a1 1 0 01-.6-.9V.8c0-.3-.2-.6-.5-.7A8.2 8.2 0 008 0zM8 11a3 3 0 110-6 3 3 0 010 6z"/></svg>Configurations</a>
+  <a class="s-link" href="#"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M2 1.75C2 .784 2.784 0 3.75 0h8.5C13.216 0 14 .784 14 1.75v12.5A1.75 1.75 0 0112.25 16h-8.5A1.75 1.75 0 012 14.25V1.75z"/></svg>Integrations</a>
+  <a class="s-link" href="#"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1a3.5 3.5 0 00-3.5 3.5V7H3.75A1.75 1.75 0 002 8.75v5.5c0 .966.784 1.75 1.75 1.75h8.5z"/></svg>Access Keys</a>
+  <div class="sidebar-spacer"></div>
+  <div class="sidebar-bottom">Dark Mode <button class="dark-toggle"></button></div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="breadcrumb-inner">Settings</div>
+  <div class="page-header">
+    <div class="page-title">Configurations</div>
+    <button class="add-btn">
+      <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M7.75 2a.75.75 0 01.75.75V7h4.25a.75.75 0 010 1.5H8.5v4.25a.75.75 0 01-1.5 0V8.5H2.75a.75.75 0 010-1.5H7V2.75A.75.75 0 017.75 2z"/></svg>
+      Add
+    </button>
+  </div>
+
+  <div class="anno">
+    <svg width="14" height="14" viewBox="0 0 16 16" fill="#7c6ef0"><path d="M8 0a8 8 0 100 16A8 8 0 008 0zm0 3a1 1 0 110 2 1 1 0 010-2zm2 9H6v-1h1V7H6V6h3v6h1v1z"/></svg>
+    <div><strong>Proposed redesign.</strong> The Default Configuration now shows the repos it actually applies to (all repos minus those explicitly assigned to custom configs). Each row surfaces key setting states at a glance. <span class="ci ci-new">New</span></div>
+  </div>
+
+  <div class="info-box">
+    <svg width="14" height="14" viewBox="0 0 16 16" fill="#0969da"><path d="M8 0a8 8 0 100 16A8 8 0 008 0zm0 3a1 1 0 110 2 1 1 0 010-2zm2 9H6v-1h1V7H6V6h3v6h1v1z"/></svg>
+    <div>The <strong>Default Configuration</strong> applies to all repositories not explicitly assigned to a custom configuration. When you assign repos to a new config, they are automatically removed from the default. <span class="ci ci-new">New</span></div>
+  </div>
+
+  <table class="config-table" style="width:100%;">
+    <thead>
+      <tr>
+        <th style="width:30%;">Name</th>
+        <th style="width:18%;">Repositories</th>
+        <th>Active Settings</th>
+        <th style="width:40px;"></th>
+      </tr>
+    </thead>
+  </table>
+
+  <!-- DEFAULT CONFIG ROW -->
+  <a href="configuration-detail.html" style="text-decoration:none;display:block;">
+  <div class="config-row" style="margin-top:8px;">
+    <table style="width:100%;border-collapse:collapse;">
+      <tr>
+        <td style="padding:14px 16px;width:30%;">
+          <div class="config-name">Default Configuration <span class="default-badge">Default</span>
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="var(--text-muted)" style="cursor:help;" title="Applies to all repos not assigned to another config."><path d="M8 0a8 8 0 100 16A8 8 0 008 0zm0 3a1 1 0 110 2 1 1 0 010-2zm2 9H6v-1h1V7H6V6h3v6h1v1z"/></svg>
+          </div>
+          <div class="config-desc">Applied to all repos not in another config</div>
+        </td>
+        <td style="padding:14px 16px;width:18%;">
+          <div class="repo-count">31 repos</div>
+          <div class="repo-note">All except 3 assigned</div>
+        </td>
+        <td style="padding:14px 16px;">
+          <div class="status-pills">
+            <span class="pill pill-on"><svg width="9" height="9" viewBox="0 0 16 16" fill="currentColor"><path d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"/></svg> Comments on</span>
+            <span class="pill pill-on"><svg width="9" height="9" viewBox="0 0 16 16" fill="currentColor"><path d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"/></svg> Comment on clean scans</span>
+            <span class="pill pill-warn">Blocking: Critical</span>
+            <span class="pill pill-on"><svg width="9" height="9" viewBox="0 0 16 16" fill="currentColor"><path d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"/></svg> Notifications: 1 webhook</span>
+            <span class="pill pill-off">Blocking: 2 agents</span>
+          </div>
+        </td>
+        <td style="padding:14px 16px;text-align:right;">
+          <button class="menu-btn" onclick="event.preventDefault();event.stopPropagation();">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 9a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm-5.5 0a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm11 0a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"/></svg>
+          </button>
+        </td>
+      </tr>
+    </table>
+  </div>
+  </a>
+
+  <!-- dd_vuln_repo -->
+  <div class="config-row">
+    <table style="width:100%;border-collapse:collapse;">
+      <tr>
+        <td style="padding:14px 16px;width:30%;">
+          <div class="config-name">dd_vuln_repo</div>
+          <div class="config-desc">DryRunSec/dd_vuln_repo</div>
+        </td>
+        <td style="padding:14px 16px;width:18%;">
+          <div class="repo-count">1 repo</div>
+          <div class="repo-note">dd_vuln_repo</div>
+        </td>
+        <td style="padding:14px 16px;">
+          <div class="status-pills">
+            <span class="pill pill-on"><svg width="9" height="9" viewBox="0 0 16 16" fill="currentColor"><path d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"/></svg> Comments on</span>
+            <span class="pill pill-off">No clean scan comment</span>
+            <span class="pill pill-warn">Blocking: High</span>
+            <span class="pill pill-off">No notifications</span>
+          </div>
+        </td>
+        <td style="padding:14px 16px;text-align:right;">
+          <button class="menu-btn"><svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 9a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm-5.5 0a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm11 0a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"/></svg></button>
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- django-config -->
+  <div class="config-row">
+    <table style="width:100%;border-collapse:collapse;">
+      <tr>
+        <td style="padding:14px 16px;width:30%;">
+          <div class="config-name">django-config</div>
+          <div class="config-desc">DryRunSec/django-api</div>
+        </td>
+        <td style="padding:14px 16px;width:18%;">
+          <div class="repo-count">1 repo</div>
+        </td>
+        <td style="padding:14px 16px;">
+          <div class="status-pills">
+            <span class="pill pill-on"><svg width="9" height="9" viewBox="0 0 16 16" fill="currentColor"><path d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"/></svg> Comments on</span>
+            <span class="pill pill-off">Blocking off</span>
+            <span class="pill pill-off">No notifications</span>
+          </div>
+        </td>
+        <td style="padding:14px 16px;text-align:right;">
+          <button class="menu-btn"><svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 9a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm-5.5 0a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm11 0a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"/></svg></button>
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- g1 -->
+  <div class="config-row">
+    <table style="width:100%;border-collapse:collapse;">
+      <tr>
+        <td style="padding:14px 16px;width:30%;">
+          <div class="config-name">g1</div>
+          <div class="config-desc">DryRunSec/g1-service</div>
+        </td>
+        <td style="padding:14px 16px;width:18%;">
+          <div class="repo-count">1 repo</div>
+        </td>
+        <td style="padding:14px 16px;">
+          <div class="status-pills">
+            <span class="pill pill-on"><svg width="9" height="9" viewBox="0 0 16 16" fill="currentColor"><path d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"/></svg> Comments on</span>
+            <span class="pill pill-warn">Blocking: Critical</span>
+            <span class="pill pill-on"><svg width="9" height="9" viewBox="0 0 16 16" fill="currentColor"><path d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"/></svg> Notifications: 1 webhook</span>
+          </div>
+        </td>
+        <td style="padding:14px 16px;text-align:right;">
+          <button class="menu-btn"><svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 9a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm-5.5 0a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm11 0a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"/></svg></button>
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- ADD NEW -->
+  <div class="add-new-row" style="margin-top:12px;">
+    <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" style="vertical-align:-2px;margin-right:4px;"><path d="M7.75 2a.75.75 0 01.75.75V7h4.25a.75.75 0 010 1.5H8.5v4.25a.75.75 0 01-1.5 0V8.5H2.75a.75.75 0 010-1.5H7V2.75A.75.75 0 017.75 2z"/></svg>
+    Add New Configuration
+  </div>
+</div>
+</div>
+
+<script src="gate.js"></script>
+</body>
+</html>
