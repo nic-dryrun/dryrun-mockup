@@ -311,6 +311,30 @@
     .mockup-breadcrumb a { color: #7c6ef0; text-decoration: none; }
     .mockup-breadcrumb a:hover { text-decoration: underline; }
     .mockup-breadcrumb span { color: #5a5f6b; }
+
+    /* ── WIZARD STEP 2 COMPONENTS ── */
+    .tog { width: 42px; height: 24px; border-radius: 12px; position: relative; flex-shrink: 0; cursor: pointer; transition: background 0.2s; border: none; }
+    .tog::after { content: ''; position: absolute; width: 18px; height: 18px; border-radius: 50%; background: #fff; top: 3px; box-shadow: 0 1px 3px rgba(0,0,0,0.2); transition: left 0.2s; }
+    .tog--on { background: #7c6ef0; }
+    .tog--on::after { left: 21px; }
+    .tog--off { background: #c9cdd4; }
+    .tog--off::after { left: 3px; }
+    .opt-row { display: flex; align-items: center; padding: 12px 0; gap: 14px; border-bottom: 1px solid var(--border-light); }
+    .opt-row:last-child { border-bottom: none; }
+    .opt-label { flex: 1; }
+    .opt-name { font-size: 14px; font-weight: 500; color: var(--text); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .opt-hint { font-size: 12px; color: var(--text-muted); margin-top: 3px; max-width: 520px; line-height: 1.45; }
+    .opt-sub { padding-left: 24px; border-left: 2px solid var(--border-light); margin-left: 0; }
+    .opt-sub .opt-name { font-size: 13.5px; }
+    .help-tip { display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; border-radius: 50%; border: 1.5px solid var(--purple); color: var(--purple); font-size: 11px; font-weight: 600; cursor: help; flex-shrink: 0; position: relative; }
+    .help-tip[title]:hover::after { content: attr(title); position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%); background: #1a1d23; color: #fff; font-size: 12px; font-weight: 400; padding: 8px 12px; border-radius: 6px; width: 280px; line-height: 1.45; z-index: 10; box-shadow: 0 4px 12px rgba(0,0,0,0.15); white-space: normal; }
+    .badge { display: inline-flex; align-items: center; font-size: 10px; font-weight: 600; padding: 1px 6px; border-radius: 8px; }
+    .badge-new { background: #f0eeff; color: #7c6ef0; border: 1px solid #d8d3f7; }
+    .badge-upd { background: #fef3c7; color: #92400e; border: 1px solid #fcd34d; }
+    .preview-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 16px; }
+    .preview-box { border-radius: 8px; padding: 12px; }
+    .preview-box-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
+    .preview-box-body { font-size: 12px; line-height: 1.8; }
 </style>
 </head>
 <body>
@@ -418,82 +442,134 @@
   </div>
   <h1>Default Configuration</h1>
 
-  <!-- ── COMMENT BEHAVIOR ── -->
+  <!-- ── COMMENT BEHAVIOR (updated to match wizard step 2) ── -->
   <div class="config-section">
     <div class="config-section-header">
       <svg width="14" height="14" viewBox="0 0 16 16" fill="#8b919e"><path d="M0 1.75C0 .784.784 0 1.75 0h12.5C15.216 0 16 .784 16 1.75v9.5A1.75 1.75 0 0114.25 13H8.06l-2.573 2.573A1.458 1.458 0 013 14.543V13H1.75A1.75 1.75 0 010 11.25v-9.5zM1.75 1.5a.25.25 0 00-.25.25v9.5c0 .138.112.25.25.25h2a.75.75 0 01.75.75v2.19l2.72-2.72a.749.749 0 01.53-.22h6.5a.25.25 0 00.25-.25v-9.5a.25.25 0 00-.25-.25H1.75z"/></svg>
-      GitHub Comment Behavior
+      Comment Visibility
     </div>
 
-    <!-- Master toggle -->
-    <div class="toggle-row">
-      <div class="toggle-left">
-        <div class="toggle-label">
-          Issue Comment Enabled
-        </div>
-        <div class="toggle-desc">
-          Master control for all GitHub PR comments. When disabled, DryRun scans PRs but never posts any comment.
-        </div>
-      </div>
-      <div class="toggle toggle--on"></div>
-    </div>
+    <div style="border:1px solid var(--border);border-radius:10px;overflow:hidden;">
 
-    <!-- Sub-settings (shown when Issue Comment is ON) -->
-    <div class="sub-settings">
-
-      <!-- Comment on Clean Scans (renamed from "Show Comment for No Findings") -->
-      <div class="toggle-row">
-        <div class="toggle-left">
-          <div class="toggle-label">
-            Comment on Clean Scans
-            <span class="change-indicator change-indicator--updated">Renamed</span>
-            <span class="tooltip-trigger help-icon">?
-              <span class="tooltip-content">Previously "Show Comment for No Findings." Controls whether DryRun posts a comment when a scan produces zero vulnerabilities.</span>
-            </span>
+      <!-- Master toggle -->
+      <div class="opt-row" style="padding:12px 16px;">
+        <div class="opt-label">
+          <div class="opt-name" style="font-size:14px;font-weight:600;">
+            Issue Comment Enabled
+            <span class="help-tip" title="Master control for all GitHub PR comments. When disabled, DryRun scans PRs but never posts any comment.">?</span>
           </div>
-          <div class="toggle-desc">
-            Post a confirmation comment even when no security vulnerabilities are detected, proving the PR was scanned.
-          </div>
+          <div class="opt-hint">Master control — when off, DryRun scans PRs silently and never posts any GitHub comment</div>
         </div>
-        <div class="toggle toggle--on"></div>
+        <button class="tog tog--on" id="ac-master" onclick="acToggleMaster(this)"></button>
       </div>
 
-      <!-- Comment on Draft PRs (NEW) -->
-      <div class="toggle-row">
-        <div class="toggle-left">
-          <div class="toggle-label">
-            Comment on Draft PRs
-            <span class="change-indicator change-indicator--new">New</span>
-            <span class="tooltip-trigger help-icon">?
-              <span class="tooltip-content">When enabled, DryRun posts comments on draft PRs just like regular PRs. When disabled, scans still run but comments are held until the PR leaves draft status.</span>
-            </span>
+      <!-- Sub-settings -->
+      <div id="ac-sub">
+
+        <div class="opt-row opt-sub" style="padding:10px 16px 10px 40px;">
+          <div class="opt-label">
+            <div class="opt-name">
+              Comment on Clean Scans
+              <span class="badge badge-upd">Renamed</span>
+              <span class="help-tip" title="Previously 'Show Comment for No Findings.' Controls whether DryRun posts a comment when a scan produces zero vulnerabilities.">?</span>
+            </div>
+            <div class="opt-hint">Post a confirmation comment even when no vulnerabilities are detected, proving the PR was scanned</div>
           </div>
-          <div class="toggle-desc">
-            Post findings and scan results on pull requests while they are in draft mode. When disabled, scans run silently and findings appear on the next scan after the PR is marked ready.
+          <button class="tog tog--on" onclick="acToggle(this)"></button>
+        </div>
+
+        <div class="opt-row opt-sub" style="padding:10px 16px 10px 40px;">
+          <div class="opt-label">
+            <div class="opt-name">
+              Comment on Draft PRs
+              <span class="badge badge-new">New</span>
+              <span class="help-tip" title="When enabled, DryRun posts comments on draft PRs just like regular PRs. When disabled, scans still run but comments are held until the PR leaves draft status.">?</span>
+            </div>
+            <div class="opt-hint">Post findings on PRs while in draft mode — when off, scans run silently until the PR is marked ready</div>
+          </div>
+          <button class="tog tog--on" onclick="acToggle(this)"></button>
+        </div>
+
+        <div class="opt-row opt-sub" style="padding:10px 16px 10px 40px;">
+          <div class="opt-label">
+            <div class="opt-name">
+              Retain Comment When Resolved
+              <span class="badge badge-new">New</span>
+              <span class="help-tip" title="When enabled, the comment updates to an 'All Clear' state showing what was found and how it was handled. When disabled, the comment is deleted once all findings are resolved or dismissed.">?</span>
+            </div>
+            <div class="opt-hint">Keep the comment with an "All Clear" resolved state instead of deleting it — preserves the audit trail</div>
+          </div>
+          <button class="tog tog--on" onclick="acToggle(this)"></button>
+        </div>
+
+      </div><!-- /ac-sub -->
+
+      <!-- Comment state preview -->
+      <div style="background:var(--border-light);border-top:1px solid var(--border);">
+        <div style="padding:8px 16px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted);display:flex;align-items:center;gap:6px;">
+          <svg width="11" height="11" viewBox="0 0 16 16" fill="currentColor"><path d="M0 1.75C0 .784.784 0 1.75 0h12.5C15.216 0 16 .784 16 1.75v9.5A1.75 1.75 0 0114.25 13H8.06l-2.573 2.573A1.458 1.458 0 013 14.543V13H1.75A1.75 1.75 0 010 11.25v-9.5z"/></svg>
+          Comment State Preview
+          <span style="font-size:10px;font-weight:400;text-transform:none;letter-spacing:0;color:var(--text-muted);">Based on current settings</span>
+        </div>
+        <div class="preview-grid">
+          <div class="preview-box" style="border:1px solid #aceebb;background:#dafbe1;">
+            <div class="preview-box-title" style="color:#1a7f37;">✓ Will post comment when...</div>
+            <div class="preview-box-body" id="ac-prev-will" style="color:#1a7f37;">
+              Findings are detected<br>No findings (clean scan)<br>PR is in draft status
+            </div>
+          </div>
+          <div class="preview-box" style="border:1px solid var(--border);background:#f6f8fa;">
+            <div class="preview-box-title" style="color:var(--text-muted);">When resolved...</div>
+            <div class="preview-box-body" id="ac-prev-resolve" style="color:var(--text-secondary);">
+              Comment updates to "All Clear" state<br>Finding history is retained
+            </div>
           </div>
         </div>
-        <div class="toggle toggle--on"></div>
       </div>
 
-      <!-- Retain Comment When Resolved (NEW) -->
-      <div class="toggle-row">
-        <div class="toggle-left">
-          <div class="toggle-label">
-            Retain Comment When Resolved
-            <span class="change-indicator change-indicator--new">New</span>
-            <span class="tooltip-trigger help-icon">?
-              <span class="tooltip-content">When enabled, the comment updates to an "All Clear" state showing what was found and how it was handled. When disabled, the comment is deleted once all findings are resolved or dismissed.</span>
-            </span>
-          </div>
-          <div class="toggle-desc">
-            Keep the comment with a resolved status and collapsed finding history instead of deleting it when all findings are addressed. Preserves the audit trail.
-          </div>
-        </div>
-        <div class="toggle toggle--on"></div>
-      </div>
-
-    </div>
+    </div><!-- /card -->
   </div>
+
+  <script>
+  function acToggle(btn) {
+    const on = btn.classList.contains('tog--on');
+    btn.classList.toggle('tog--on', !on);
+    btn.classList.toggle('tog--off', on);
+    acUpdatePreview();
+  }
+  function acToggleMaster(btn) {
+    acToggle(btn);
+    const isOn = btn.classList.contains('tog--on');
+    const sub = document.getElementById('ac-sub');
+    sub.style.opacity = isOn ? '1' : '0.4';
+    sub.style.pointerEvents = isOn ? '' : 'none';
+    acUpdatePreview();
+  }
+  function acUpdatePreview() {
+    const masterOn = document.getElementById('ac-master').classList.contains('tog--on');
+    const subTogs = document.querySelectorAll('#ac-sub .tog');
+    const cleanOn = subTogs[0]?.classList.contains('tog--on');
+    const draftOn = subTogs[1]?.classList.contains('tog--on');
+    const retainOn = subTogs[2]?.classList.contains('tog--on');
+
+    const willEl = document.getElementById('ac-prev-will');
+    const resolveEl = document.getElementById('ac-prev-resolve');
+
+    if (!masterOn) {
+      willEl.innerHTML = '<em style="color:#6b7280;">Comments are disabled — scans run silently</em>';
+      resolveEl.innerHTML = '<em style="color:#6b7280;">N/A</em>';
+      return;
+    }
+    let willLines = ['Findings are detected'];
+    if (cleanOn) willLines.push('No findings (clean scan)');
+    if (draftOn) willLines.push('PR is in draft status');
+    willEl.innerHTML = willLines.join('<br>');
+
+    resolveEl.innerHTML = retainOn
+      ? 'Comment updates to "All Clear" state<br>Finding history is retained'
+      : 'Comment is deleted when all findings resolve';
+  }
+  </script>
 
   <hr class="config-divider">
 
